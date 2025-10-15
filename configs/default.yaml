@@ -1,0 +1,53 @@
+# Paths
+paths:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  indexes_dir: data/indexes
+  bm25_index_path: data/indexes/bm25.pkl
+  jsonl_glob: data/processed/*.jsonl
+
+# Document defaults
+doc_defaults:
+  title: "Quy chế học vụ"
+  version: "2023.09"
+  effective_date: "2023-09-01"
+  faculty: "All"
+  language: "vi"
+
+# Chunking
+chunking:
+  target_tokens: 220       # 150–300 tokens
+  overlap_ratio: 0.25      # 20–30%
+
+# Embeddings
+embedding:
+  model_name: "intfloat/multilingual-e5-base"
+  normalize: true
+  batch_size: 64
+
+# Reranker
+reranker:
+  model_name: "BAAI/bge-reranker-v2-m3"
+  batch_size: 32
+
+# Qdrant
+qdrant:
+  url: "http://localhost:6333"
+  api_key: ""
+  collection: "reg_chunks"
+  vector_size: 768
+  distance: "Cosine"
+  hnsw:
+    m: 16
+    ef_construct: 128
+    ef: 128
+
+# BM25
+bm25:
+  tokenizer: "vi_basic"
+
+# Search
+search:
+  top_k: 10
+  rrf_k: 60
+  hybrid_dense_weight: 0.5

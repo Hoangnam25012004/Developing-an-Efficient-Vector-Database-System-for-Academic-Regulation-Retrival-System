@@ -1,0 +1,48 @@
+# Core
+PyYAML>=6.0.1
+regex>=2024.5.15
+unidecode>=1.3.8
+rapidfuzz>=3.9.6
+ujson>=5.9.0
+
+
+# Parsing
+pdfminer.six>=20221105
+python-docx>=1.1.2
+pdfplumber>=0.11.4
+pypdf>=5.0.0
+
+
+# (Optional) OCR — only if you need it for scanned PDFs
+pytesseract>=0.3.13
+Pillow>=10.4.0
+pdf2image>=1.17.0
+
+
+# Chunking / tokenization
+tiktoken>=0.7.0
+
+
+# Embeddings & Reranking
+sentence-transformers>=3.0.1
+transformers>=4.43.3
+torch>=2.3.0
+
+
+# Vector DB
+qdrant-client>=1.9.1
+
+
+# Sparse retrieval
+rank-bm25>=0.2.2
+
+
+# API & UI
+fastapi>=0.111.0
+uvicorn>=0.30.0
+pydantic>=2.8.2
+streamlit>=1.38.0
+
+
+# Eval
+scikit-learn>=1.5.1
