@@ -1125,12 +1125,26 @@ def text_from_docx(path: str) -> str:
 
 
 def list_files_recursively(in_paths: List[str]) -> List[Path]:
+    """Recursively collect PDF/DOCX files, deduplicating by resolved path.
+
+    Windows has a case-insensitive filesystem, so rglob("*.pdf") and
+    rglob("*.PDF") return the same files.  We resolve() each path and use
+    a seen-set to avoid processing any file twice.
+    """
     out: List[Path] = []
+    seen: set = set()
     for p in in_paths:
         pth = Path(p)
         if pth.is_dir():
-            for ext in ("*.pdf", "*.docx", "*.DOCX", "*.PDF"):
-                out.extend(sorted(pth.rglob(ext)))
+            for ext in ("*.pdf", "*.docx"):   # lowercase only; Windows matching is case-insensitive
+                for f in sorted(pth.rglob(ext)):
+                    key = f.resolve()
+                    if key not in seen:
+                        seen.add(key)
+                        out.append(f)
         elif pth.exists():
-            out.append(pth)
+            key = pth.resolve()
+            if key not in seen:
+                seen.add(key)
+                out.append(pth)
     return out

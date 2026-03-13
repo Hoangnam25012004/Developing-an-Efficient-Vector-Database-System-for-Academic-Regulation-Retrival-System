@@ -384,7 +384,7 @@ def process_file(path: Path, cfg: dict, meta_overrides: dict) -> List[Dict[str, 
             chunk_idx += 1
 
     print(
-        f"  → {len(out_rows)} chunks  |  table_mode={table_mode}"
+        f"  -> {len(out_rows)} chunks  |  table_mode={table_mode}"
         f"  |  doc_type={defaults.get('doc_type')}  |  group={defaults.get('group')}"
     )
     return out_rows
