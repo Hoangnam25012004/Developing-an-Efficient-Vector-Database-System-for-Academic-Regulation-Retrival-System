@@ -1,3 +1,14 @@
+# Chunking
+chunking:
+  target_tokens: 320       # 150–300 tokens
+  overlap_ratio: 0.08      # 8%
+
+# Embeddings
+embedding:
+  model_name: "intfloat/multilingual-e5-base"
+  normalize: true
+  batch_size: 64
+
 # Paths
 paths:
   raw_dir: data/raw
@@ -14,21 +25,19 @@ doc_defaults:
   faculty: "All"
   language: "vi"
 
-# Chunking
-chunking:
-  target_tokens: 220       # 150–300 tokens
-  overlap_ratio: 0.25      # 20–30%
-
-# Embeddings
-embedding:
-  model_name: "intfloat/multilingual-e5-base"
-  normalize: true
-  batch_size: 64
-
 # Reranker
+# Swap model_name to benchmark each candidate; run 06_rerank.py then 07_eval_metrics.py.
+# Candidates:
+#   BAAI/bge-reranker-v2-m3                  (CrossEncoder, sentence-transformers)
+#   BAAI/bge-reranker-v2-gemma               (FlagLLMReranker, needs FlagEmbedding) chay ko noi
+#   BAAI/bge-reranker-v2-minicpm-layerwise   (LayerWiseFlagLLMReranker, needs FlagEmbedding)
+#   jinaai/jina-reranker-v2-base-multilingual (CrossEncoder + trust_remote_code)
+#   itdainb/PhoRanker                        (CrossEncoder, sentence-transformers)
 reranker:
   model_name: "BAAI/bge-reranker-v2-m3"
   batch_size: 32
+  use_fp16: false        # set true for LLM-based rerankers on GPU
+  cutoff_layers: [28]    # only used by bge-reranker-v2-minicpm-layerwise
 
 # Qdrant
 qdrant:

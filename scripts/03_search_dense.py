@@ -4,7 +4,8 @@ import argparse
 from qdrant_client import QdrantClient
 from qdrant_client.http import models as qmodels
 from sentence_transformers import SentenceTransformer
-from utils import load_config
+from scripts.utils import load_config
+
 
 
 def main():
@@ -17,13 +18,9 @@ def main():
     cfg = load_config(args.config)
 
     model = SentenceTransformer(cfg["embedding"]["model_name"])
-    qclient = QdrantClient(
-        url=cfg["qdrant"]["url"], api_key=cfg["qdrant"].get("api_key") or None
-    )
+    qclient = QdrantClient(url=cfg["qdrant"]["url"], api_key=cfg["qdrant"].get("api_key") or None)
 
-    qvec = model.encode(
-        [args.query], normalize_embeddings=cfg["embedding"].get("normalize", True)
-    )[0]
+    qvec = model.encode([args.query], normalize_embeddings=cfg["embedding"].get("normalize", True))[0]
 
     hits = qclient.search(
         collection_name=cfg["qdrant"]["collection"],

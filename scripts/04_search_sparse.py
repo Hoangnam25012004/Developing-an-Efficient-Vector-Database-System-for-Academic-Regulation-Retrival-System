@@ -6,7 +6,7 @@ from typing import Dict, List
 
 import regex as re
 from rank_bm25 import BM25Okapi
-from utils import load_config, read_jsonl, vnfold
+from scripts.utils import load_config, read_jsonl, vnfold
 
 
 def tokenize_vi_basic(text: str) -> List[str]:

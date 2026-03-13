@@ -1,2 +1,350 @@
-{"query_id":"Q1","query":"miễn học phần GDQP"}
-{"query_id":"Q2","query":"điểm rèn luyện ảnh hưởng xét học bổng?"}
+{"query_id": "Q1", "query": "Quy định MGHP áp dụng cho đối tượng sinh viên nào?"}
+{"query_id": "Q2", "query": "Mục đích của quy định MGHP là gì?"}
+{"query_id": "Q3", "query": "Hồ sơ miễn, giảm học phí gồm những thành phần nào?"}
+{"query_id": "Q4", "query": "Đơn đề nghị miễn/giảm học phí dùng mẫu nào?"}
+{"query_id": "Q5", "query": "Đơn đề nghị hỗ trợ học phí dùng mẫu nào?"}
+{"query_id": "Q6", "query": "Đơn đề nghị hỗ trợ chi phí học tập dùng mẫu nào?"}
+{"query_id": "Q7", "query": "Đơn đề nghị hỗ trợ học tập (dân tộc thiểu số rất ít người) dùng mẫu nào?"}
+{"query_id": "Q8", "query": "Bước đầu tiên trong quy trình thực hiện MGHP là gì?"}
+{"query_id": "Q9", "query": "Sinh viên phải làm gì sau khi có thông báo MGHP?"}
+{"query_id": "Q10", "query": "Nếu hồ sơ chưa đúng quy định thì xử lý thế nào?"}
+{"query_id": "Q11", "query": "Thời hạn giải quyết xét và chi trả MGHP là bao lâu?"}
+{"query_id": "Q12", "query": "MGHP được xét cho những học kỳ nào?"}
+{"query_id": "Q13", "query": "Đối tượng nào được hỗ trợ chi phí học tập?"}
+{"query_id": "Q14", "query": "Mức hỗ trợ chi phí học tập được tính như thế nào?"}
+{"query_id": "Q15", "query": "Sinh viên bỏ học hoặc buộc thôi học có được hưởng hỗ trợ chi phí học tập không?"}
+{"query_id": "Q16", "query": "Sinh viên bị đình chỉ học tập có thời hạn có được nhận hỗ trợ chi phí học tập không?"}
+{"query_id": "Q17", "query": "Nếu sinh viên đã nhận hỗ trợ chi phí học tập rồi mới bị đình chỉ thì xử lý ra sao?"}
+{"query_id": "Q18", "query": "Công thức tính hỗ trợ học phí theo quy định nội bộ (nếu có) là gì?"}
+{"query_id": "Q19", "query": "Nhà nước cấp bù học phí được thực hiện theo cơ chế nào?"}
+{"query_id": "Q20", "query": "Thời lượng Nhà nước cấp bù học phí tối đa trong năm học là bao lâu?"}
+{"query_id": "Q21", "query": "Hồ sơ minh chứng đối tượng người có công (NCC) thường gồm gì?"}
+{"query_id": "Q22", "query": "Hồ sơ hộ nghèo/cận nghèo có thể yêu cầu giấy tờ nào?"}
+{"query_id": "Q23", "query": "Trường hợp nào không áp dụng miễn/giảm học phí?"}
+{"query_id": "Q24", "query": "Thông báo MGHP năm 2014 áp dụng từ thời điểm nào?"}
+{"query_id": "Q25", "query": "Trong thông báo MGHP 2014, nhóm đối tượng 01 là gì?"}
+{"query_id": "Q26", "query": "Đến muộn giờ học/giờ thực tập; nghỉ học không phép hoặc quá phép bị khiển trách từ lần nào?"}
+{"query_id": "Q27", "query": "Đến muộn/ nghỉ học không phép bị cảnh cáo từ lần nào?"}
+{"query_id": "Q28", "query": "Sau khi bị cảnh cáo vì đến muộn/nghỉ không phép mà tiếp tục vi phạm thì xử lý thế nào?"}
+{"query_id": "Q29", "query": "Nghỉ học không có lý do trong 01 học kỳ bị xử lý thế nào?"}
+{"query_id": "Q30", "query": "Số lần cảnh báo học tập vượt quá 02 lần liên tiếp hoặc quá 03 lần không liên tiếp bị xử lý thế nào?"}
+{"query_id": "Q31", "query": "Thời gian học tập vượt quá 02 lần thời gian theo chương trình đào tạo bị xử lý thế nào?"}
+{"query_id": "Q32", "query": "Mất trật tự, làm việc riêng trong giờ học/giờ thực tập/tự học bị khiển trách từ lần nào?"}
+{"query_id": "Q33", "query": "Mất trật tự, làm việc riêng trong giờ học bị cảnh cáo từ lần nào?"}
+{"query_id": "Q34", "query": "Sau khi bị cảnh cáo vì mất trật tự mà tiếp tục vi phạm thì sao?"}
+{"query_id": "Q35", "query": "Vô lễ/gây gổ/chống đối/đe doạ/lăng mạ giảng viên; xúc phạm danh dự nhân phẩm người khác bị xử lý thế nào?"}
+{"query_id": "Q36", "query": "Đi học thay/nhờ người khác đi học thay; thi/kiểm tra thay bị xử lý thế nào?"}
+{"query_id": "Q37", "query": "Tổ chức học/thi/kiểm tra thay; tổ chức làm thay tiểu luận/đồ án/khóa luận bị xử lý thế nào?"}
+{"query_id": "Q38", "query": "Trong trường hợp tổ chức thi hộ/học hộ nghiêm trọng, nhà trường có thể làm gì thêm?"}
+{"query_id": "Q39", "query": "Mua bán/gian lận trong đăng ký môn học; cố tình đăng nhập tài khoản người học khác bị xử lý thế nào?"}
+{"query_id": "Q40", "query": "Sử dụng hồ sơ/văn bằng/chứng chỉ giả để trúng tuyển hoặc làm điều kiện trúng tuyển bị xử lý thế nào?"}
+{"query_id": "Q41", "query": "Cố tình chậm hoặc không đóng học phí bị xử lý thế nào?"}
+{"query_id": "Q42", "query": "Không tham gia bảo hiểm y tế theo quy định (không lý do chính đáng) bị khiển trách từ lần nào?"}
+{"query_id": "Q43", "query": "Không tham gia bảo hiểm y tế bị cảnh cáo từ lần nào?"}
+{"query_id": "Q44", "query": "Đưa người lạ vào trường/thư viện/phòng lab/lớp học không xin phép bị xử lý thế nào?"}
+{"query_id": "Q45", "query": "Không đeo thẻ sinh viên trong khuôn viên trường thuộc nhóm vi phạm nào?"}
+{"query_id": "Q46", "query": "Giả mạo các loại thẻ (thẻ SV, thư viện, căn tin...) của người khác có ghi chú gì?"}
+{"query_id": "Q47", "query": "Nhặt được của rơi không trả lại hoặc đòi tiền chuộc bị xử lý thế nào?"}
+{"query_id": "Q48", "query": "Mặc trang phục hở hang, lộ liễu… lần 1 xử lý thế nào?"}
+{"query_id": "Q49", "query": "Mặc trang phục hở hang… bị xử lý kỷ luật tăng dần từ lần nào?"}
+{"query_id": "Q50", "query": "Có cử chỉ/hành động tình cảm vượt quá giới hạn trong khuôn viên trường lần 1 xử lý thế nào?"}
+{"query_id": "Q51", "query": "Tiêu chí 1 trong điểm rèn luyện đánh giá gì và tối đa bao nhiêu điểm?"}
+{"query_id": "Q52", "query": "GPA trong khoảng 90–100 được cộng bao nhiêu điểm (mục 1.1.1)?"}
+{"query_id": "Q53", "query": "GPA trong khoảng 80 đến dưới 90 được cộng bao nhiêu điểm?"}
+{"query_id": "Q54", "query": "GPA trong khoảng 70 đến dưới 80 được cộng bao nhiêu điểm?"}
+{"query_id": "Q55", "query": "GPA trong khoảng 60 đến dưới 70 được cộng bao nhiêu điểm?"}
+{"query_id": "Q56", "query": "GPA trong khoảng 50 đến dưới 60 được cộng bao nhiêu điểm?"}
+{"query_id": "Q57", "query": "GPA dưới 50 được cộng bao nhiêu điểm?"}
+{"query_id": "Q58", "query": "Môn không tính GPA (chương trình tiếng Anh tăng cường) được cộng bao nhiêu điểm?"}
+{"query_id": "Q59", "query": "Nếu GPA tăng so với học kỳ trước thì được cộng thêm bao nhiêu điểm?"}
+{"query_id": "Q60", "query": "Tham gia 01 hoạt động nghiên cứu khoa học từ cấp Khoa/BM/Phòng/Trung tâm trở lên được cộng bao nhiêu điểm?"}
+{"query_id": "Q61", "query": "Đăng ký đề tài NCKH nhưng không thực hiện/không hoàn thành (không lý do chính đáng) bị trừ bao nhiêu điểm?"}
+{"query_id": "Q62", "query": "Là thành viên tích cực của 01 phòng thí nghiệm được cộng bao nhiêu điểm?"}
+{"query_id": "Q63", "query": "Tham gia 01 khóa kỹ năng mềm/kỹ năng nghề nghiệp (có minh chứng) được cộng bao nhiêu điểm?"}
+{"query_id": "Q64", "query": "Tiêu chí 2 trong điểm rèn luyện đánh giá gì và tối đa bao nhiêu điểm?"}
+{"query_id": "Q65", "query": "Tuân thủ quy định và tích cực tham gia hoạt động do Trường/Khoa/BM/Lớp tổ chức được cộng tối đa bao nhiêu điểm?"}
+{"query_id": "Q66", "query": "Nếu bị kỷ luật mức cảnh cáo trở lên thì bị trừ bao nhiêu điểm rèn luyện?"}
+{"query_id": "Q67", "query": "Nếu bị kỷ luật mức khiển trách thì bị trừ bao nhiêu điểm rèn luyện?"}
+{"query_id": "Q68", "query": "Nếu bị lập biên bản thì bị trừ bao nhiêu điểm rèn luyện?"}
+{"query_id": "Q69", "query": "Vắng sinh hoạt bắt buộc của lớp/khoa/bộ môn/phòng (không xin phép trước, không lý do chính đáng) bị trừ bao nhiêu điểm?"}
+{"query_id": "Q70", "query": "Đăng ký sinh hoạt công dân nhưng vắng mặt không lý do chính đáng bị trừ bao nhiêu điểm?"}
+{"query_id": "Q71", "query": "Đăng ký tham gia hoạt động phong trào nhưng vắng mặt không báo trước BTC bị trừ bao nhiêu điểm?"}
+{"query_id": "Q72", "query": "Tiêu chí 4 trong điểm rèn luyện đánh giá gì và tối đa bao nhiêu điểm?"}
+{"query_id": "Q73", "query": "Tham gia tình nguyện 1 buổi (dưới 1 ngày) được cộng bao nhiêu điểm?"}
+{"query_id": "Q74", "query": "Tình nguyện từ 1 đến dưới 3 ngày (ngắn hạn) được cộng bao nhiêu điểm?"}
+{"query_id": "Q75", "query": "Hiến máu tình nguyện (có giấy chứng nhận) được cộng bao nhiêu điểm?"}
+{"query_id": "Q76", "query": "Danh hiệu khen thưởng cá nhân theo thành tích học tập và rèn luyện gồm những gì?"}
+{"query_id": "Q77", "query": "Điều kiện số tín chỉ tích lũy mỗi học kỳ chính để xét danh hiệu cá nhân là bao nhiêu?"}
+{"query_id": "Q78", "query": "Điều kiện điểm tổng kết từng môn học để xét danh hiệu cá nhân là gì?"}
+{"query_id": "Q79", "query": "Tiêu chuẩn danh hiệu Sinh viên Xuất sắc là gì?"}
+{"query_id": "Q80", "query": "Tiêu chuẩn danh hiệu Sinh viên Giỏi là gì?"}
+{"query_id": "Q81", "query": "Sinh viên trong danh sách chờ xét tốt nghiệp được khen thưởng theo cơ chế nào?"}
+{"query_id": "Q82", "query": "Một nguyên tắc của công tác khen thưởng là gì?"}
+{"query_id": "Q83", "query": "Trường hợp nào không xét khen thưởng do kỷ luật?"}
+{"query_id": "Q84", "query": "Trường hợp nào không xét khen thưởng do kết quả học phần?"}
+{"query_id": "Q85", "query": "Trường hợp nào không xét khen thưởng do bảo lưu/thôi học?"}
+{"query_id": "Q86", "query": "Có xét khen thưởng thành tích đạt sau khi đã có quyết định công nhận tốt nghiệp không?"}
+{"query_id": "Q87", "query": "Tiêu chuẩn khen thưởng NCKH với bài báo quốc tế thường nhắc đến các cơ sở dữ liệu nào?"}
+{"query_id": "Q88", "query": "Hội đồng khen thưởng cấp Trường họp định kỳ thời điểm nào?"}
+{"query_id": "Q89", "query": "Hội đồng làm việc khi có tối thiểu bao nhiêu thành viên có mặt?"}
+{"query_id": "Q90", "query": "Kết luận của Hội đồng được thông qua khi đạt tỷ lệ đồng ý như thế nào?"}
+{"query_id": "Q91", "query": "Những ai có thể được mời tham dự góp ý nhưng không biểu quyết?"}
+{"query_id": "Q92", "query": "Đầu tháng 11, Phòng ĐTĐH cung cấp dữ liệu gì phục vụ xét khen thưởng học tập & rèn luyện?"}
+{"query_id": "Q93", "query": "Phòng CTSV cung cấp dữ liệu gì phục vụ xét khen thưởng?"}
+{"query_id": "Q94", "query": "Đơn vị nào tổng hợp và đề xuất danh sách sinh viên đạt tiêu chuẩn khen thưởng?"}
+{"query_id": "Q95", "query": "Sau khi nhận danh sách đề xuất, Hội đồng khen thưởng cấp Trường làm gì?"}
+{"query_id": "Q96", "query": "Đầu tháng 09 hằng năm, ai thông báo cho lớp/khoa về đăng ký khen thưởng NCKH/cuộc thi học thuật?"}
+{"query_id": "Q97", "query": "Khoa/Bộ môn gửi danh sách đề cử khen thưởng lên cấp Trường vào thời điểm nào?"}
+{"query_id": "Q98", "query": "Hồ sơ đề nghị khen thưởng NCKH/cuộc thi học thuật thường gồm gì?"}
+{"query_id": "Q99", "query": "Nếu thấy việc khen thưởng không thỏa đáng, sinh viên có thể làm gì?"}
+{"query_id": "Q100", "query": "Nguồn kinh phí thực hiện công tác khen thưởng lấy từ đâu?"}
+{"query_id": "Q101", "query": "Quy chế tổ chức và hoạt động của Phòng Công tác Sinh viên (P.CTSV) quy định những nội dung chính nào?"}
+{"query_id": "Q102", "query": "Đối tượng áp dụng của quy chế tổ chức và hoạt động P.CTSV là những ai?"}
+{"query_id": "Q103", "query": "Theo quy chế, Phòng Công tác Sinh viên làm việc dưới sự quản lý/điều hành trực tiếp của ai?"}
+{"query_id": "Q104", "query": "Mọi hoạt động của P.CTSV phải tuân thủ những nguyên tắc/định hướng nào?"}
+{"query_id": "Q105", "query": "Trưởng Phòng Công tác Sinh viên chịu trách nhiệm trước ai về việc thực hiện chức trách, nhiệm vụ được giao?"}
+{"query_id": "Q106", "query": "Theo quy chế, P.CTSV được định hướng như một đơn vị vận hành dịch vụ phục vụ những nhóm đối tượng nào?"}
+{"query_id": "Q107", "query": "Việc đề xuất tuyển dụng nhân sự cho P.CTSV dựa trên cơ sở nào?"}
+{"query_id": "Q108", "query": "Việc bố trí công việc cho nhân sự P.CTSV dựa trên những tiêu chí nào?"}
+{"query_id": "Q109", "query": "Ai có thẩm quyền điều chỉnh, tái bố trí nhiệm vụ công tác của nhân sự thuộc P.CTSV?"}
+{"query_id": "Q110", "query": "Trưởng/Phó Trưởng P.CTSV được hưởng những chế độ nào theo quy chế?"}
+{"query_id": "Q111", "query": "Viên chức/người lao động P.CTSV được tạo điều kiện hỗ trợ gì để hoàn thành nhiệm vụ?"}
+{"query_id": "Q112", "query": "Theo quy chế, P.CTSV chịu sự chỉ đạo trực tiếp của ai?"}
+{"query_id": "Q113", "query": "Mục đích của quy định về chính sách hỗ trợ người học khuyết tật là gì?"}
+{"query_id": "Q114", "query": "Nguyên tắc 'công bằng và không phân biệt đối xử' được nêu như thế nào?"}
+{"query_id": "Q115", "query": "Nguyên tắc bảo mật thông tin trong quy định hỗ trợ người học khuyết tật là gì?"}
+{"query_id": "Q116", "query": "Nguyên tắc tôn trọng và tạo điều kiện hòa nhập được thể hiện ra sao?"}
+{"query_id": "Q117", "query": "Theo quy định, 'người khuyết tật' được định nghĩa như thế nào?"}
+{"query_id": "Q118", "query": "Các nhóm chính sách hỗ trợ người học khuyết tật tại trường bao gồm những nhóm nào?"}
+{"query_id": "Q119", "query": "Người khuyết tật đặc biệt nặng có giấy xác nhận có thể được xét tuyển như thế nào?"}
+{"query_id": "Q120", "query": "Người khuyết tật nặng khi đăng ký xét tuyển vào trường đại học được hưởng chính sách gì?"}
+{"query_id": "Q121", "query": "Nếu người khuyết tật không có khả năng đáp ứng yêu cầu chương trình giáo dục chung, Hiệu trưởng có thể quyết định gì?"}
+{"query_id": "Q122", "query": "Việc miễn/tạm hoãn môn Giáo dục Quốc phòng và an ninh cho người học khuyết tật thực hiện theo căn cứ nào?"}
+{"query_id": "Q123", "query": "Đối với môn giáo dục thể chất, người học khuyết tật được ưu tiên lựa chọn phương án nào?"}
+{"query_id": "Q124", "query": "Người học khuyết tật có thể đề nghị hỗ trợ gì liên quan đến thời khóa biểu và địa điểm học?"}
+{"query_id": "Q125", "query": "Quy định nêu những hình thức hỗ trợ thi cử nào cho người học khuyết tật? (nêu ít nhất 4 hình thức)"}
+{"query_id": "Q126", "query": "Hình thức hỗ trợ kiểm tra/thi cụ thể cho sinh viên khuyết tật sẽ do ai quyết định và căn cứ vào đâu?"}
+{"query_id": "Q127", "query": "Nhà trường hỗ trợ tài liệu học tập cho người học khuyết tật theo quy định như thế nào?"}
+{"query_id": "Q128", "query": "Nguyên tắc đánh giá kết quả giáo dục của người khuyết tật được nêu ra sao?"}
+{"query_id": "Q129", "query": "Nhà trường cam kết hỗ trợ cơ sở vật chất (lối tiếp cận) cho người học khuyết tật gồm những hạng mục nào?"}
+{"query_id": "Q130", "query": "Chính sách về hỗ trợ tham gia hoạt động và chăm sóc sức khỏe tinh thần cho người học khuyết tật gồm nội dung gì?"}
+{"query_id": "Q131", "query": "Khi người học khuyết tật tham gia CLB/đội nhóm hoặc chương trình kỹ năng mềm, việc đánh giá điểm rèn luyện có ưu tiên gì?"}
+{"query_id": "Q132", "query": "Việc xét lên lớp và cấp bằng tốt nghiệp cho người khuyết tật căn cứ trên điều gì?"}
+{"query_id": "Q133", "query": "Quy định đối với Ban cán sự lớp áp dụng cho những đối tượng nào?"}
+{"query_id": "Q134", "query": "Với sinh viên học nhiều hơn một ngành tại Trường, quy định Ban cán sự lớp áp dụng cho ngành nào?"}
+{"query_id": "Q135", "query": "Mục đích của quy định về Ban cán sự lớp là gì?"}
+{"query_id": "Q136", "query": "Ban cán sự lớp gồm những chức danh nào theo quy định?"}
+{"query_id": "Q137", "query": "Nếu sĩ số lớp dưới 30 sinh viên, lớp có tối đa bao nhiêu lớp phó?"}
+{"query_id": "Q138", "query": "Nếu sĩ số lớp từ 30 sinh viên trở lên, lớp có tối đa bao nhiêu lớp phó?"}
+{"query_id": "Q139", "query": "Nhiệm kỳ Ban cán sự lớp được tính theo gì và kéo dài trong bao lâu?"}
+{"query_id": "Q140", "query": "Một tiêu chuẩn về phẩm chất đạo đức đối với Ban cán sự lớp là gì?"}
+{"query_id": "Q141", "query": "Tiêu chuẩn về kỷ luật/gương mẫu của Ban cán sự lớp được nêu như thế nào?"}
+{"query_id": "Q142", "query": "Tiêu chuẩn về tinh thần trách nhiệm và đoàn kết tập thể của Ban cán sự lớp là gì?"}
+{"query_id": "Q143", "query": "Với sinh viên từ năm thứ 2 trở đi, tiêu chuẩn học tập và rèn luyện tối thiểu là gì?"}
+{"query_id": "Q144", "query": "Với sinh viên năm nhất, việc lựa chọn Ban cán sự lớp có thể căn cứ theo những yếu tố nào?"}
+{"query_id": "Q145", "query": "Nếu một thành viên Ban cán sự lớp muốn thôi nhiệm vụ hoặc vi phạm quy định, quy trình xử lý thế nào?"}
+{"query_id": "Q146", "query": "Trong tuần đầu của mỗi năm học, Khoa/Bộ môn có trách nhiệm gì để tổ chức bầu Ban cán sự lớp?"}
+{"query_id": "Q147", "query": "Danh sách Ban cán sự lớp sau khi bầu được Khoa/Bộ môn gửi đến đơn vị nào?"}
+{"query_id": "Q148", "query": "Khoa/Bộ môn phối hợp với P.CTSV để thực hiện nội dung nào liên quan Ban cán sự lớp?"}
+{"query_id": "Q149", "query": "Theo quy chế học vụ, học phần đã đăng ký có thể bị hủy trong trường hợp nào?"}
+{"query_id": "Q150", "query": "Sinh viên được điều chỉnh đăng ký học tập trong thời gian nào của học kỳ chính?"}
+{"query_id": "Q151", "query": "Học kỳ hè có áp dụng tuần điều chỉnh đăng ký học tập không?"}
+{"query_id": "Q152", "query": "Sau tuần đầu của học kỳ chính, việc đăng ký bổ sung/điều chỉnh/hủy đăng ký được xử lý và tính học phí ra sao?"}
+{"query_id": "Q153", "query": "Kết quả đăng ký học tập của sinh viên được quản lý lưu trữ ở đâu theo quy chế?"}
+{"query_id": "Q154", "query": "Vắng mặt quá 20% số giờ trên lớp của học phần lý thuyết dẫn tới hậu quả gì?"}
+{"query_id": "Q155", "query": "Với học phần thực hành, nếu vắng mặt quá 20% giờ thực hành và 50% số kỳ kiểm tra trong học kỳ thì bị xử lý gì?"}
+{"query_id": "Q156", "query": "Khi vắng giờ thí nghiệm/thực tập/kiểm tra trong lớp, sinh viên phải nộp đơn kèm chứng lý trong thời hạn bao lâu?"}
+{"query_id": "Q157", "query": "Nếu sinh viên không trình bày hoặc lý do vắng mặt không được công nhận (đối với buổi học/thực hành), kết quả bị tính thế nào?"}
+{"query_id": "Q158", "query": "Khi vắng thi cuối kỳ tập trung, sinh viên phải nộp đơn trong thời hạn bao lâu và nộp cho ai?"}
+{"query_id": "Q159", "query": "Nếu không trình bày hoặc lý do vắng thi cuối kỳ không được công nhận thì sinh viên bị xử lý ra sao?"}
+{"query_id": "Q160", "query": "Sinh viên đề nghị chấm phúc tra điểm thi cuối kỳ trong vòng bao lâu kể từ ngày công bố kết quả và kết quả phúc tra được công bố khi nào?"}
+{"query_id": "Q161", "query": "Theo Phụ lục I về vi phạm và khung xử lý kỷ luật, hành vi thi hộ/nhờ thi hộ lần đầu và lần thứ hai bị xử lý thế nào?"}
+{"query_id": "Q162", "query": "Theo Phụ lục I, hành vi cố tình đăng nhập tài khoản của người học khác hoặc sử dụng tài khoản nhà trường cho mục đích vi phạm pháp luật có thể bị xử lý ở mức nào?"}
+{"query_id": "Q163", "query": "Theo Phụ lục I, việc đăng tải/bình luận/chia sẻ nội dung dung tục, bạo lực, đồi trụy; hoặc xuyên tạc, vu khống, xúc phạm uy tín tổ chức/cá nhân trên mạng internet có thể bị xử lý thế nào?"}
+{"query_id": "Q164", "query": "Theo Phụ lục I, hành vi cố tình quay phim/ghi âm khi không có sự đồng thuận của người khác có thể bị xử lý ra sao?"}
+{"query_id": "Q165", "query": "Theo khung tiêu chí và khung điểm rèn luyện, sinh viên bị kỷ luật từ mức cảnh cáo trở lên sẽ bị trừ bao nhiêu điểm ở mục chấp hành nội quy?"}
+{"query_id": "Q166", "query": "Theo khung tiêu chí và khung điểm rèn luyện, sinh viên bị kỷ luật mức khiển trách sẽ bị trừ bao nhiêu điểm ở mục chấp hành nội quy?"}
+{"query_id": "Q167", "query": "Quy định xét cấp học bổng khuyến khích học tập áp dụng cho những đối tượng sinh viên nào?"}
+{"query_id": "Q168", "query": "Sinh viên thuộc diện hưởng học bổng chính sách hoặc trợ cấp xã hội nếu đủ điều kiện có được xét học bổng khuyến khích học tập không?"}
+{"query_id": "Q169", "query": "Quỹ học bổng khuyến khích học tập của nhà trường được bố trí tối thiểu bằng bao nhiêu phần trăm nguồn thu học phí hệ chính quy?"}
+{"query_id": "Q170", "query": "Trong quy trình xét học bổng, P.ĐTĐH tham mưu xác định số suất học bổng theo cơ sở nào?"}
+{"query_id": "Q171", "query": "Khoa/Bộ môn và giảng viên phải hoàn tất chấm điểm, phúc tra, điều chỉnh điểm và cập nhật điểm tối đa trong bao lâu sau khi kết thúc học kỳ (phục vụ xét học bổng)?"}
+{"query_id": "Q172", "query": "P.CTSV phải gửi kết quả xếp loại điểm rèn luyện cho P.ĐTĐH tối đa trong bao lâu sau khi kết thúc học kỳ I và học kỳ II?"}
+{"query_id": "Q173", "query": "Khi xét học bổng học tập (HBHT), P.ĐTĐH lập danh sách sinh viên đủ tiêu chuẩn theo thứ tự nào?"}
+{"query_id": "Q174", "query": "Danh sách sinh viên dự kiến đạt học bổng được công bố ở đâu và thời hạn tiếp nhận/giải quyết thắc mắc là bao lâu?"}
+{"query_id": "Q175", "query": "Trong danh mục từ viết tắt của quy định học bổng, 'ĐRL' nghĩa là gì?"}
+{"query_id": "Q176", "query": "Trong danh mục từ viết tắt của quy định học bổng, 'TC' nghĩa là gì?"}
+{"query_id": "Q177", "query": "Phạm vi điều chỉnh của quy định học bổng khuyến khích học tập là gì?"}
+{"query_id": "Q178", "query": "Trong quy trình xét học bổng, P.ĐTĐH nhận thêm những thông tin nào từ P.CTSV ngoài kết quả điểm rèn luyện?"}
+{"query_id": "Q179", "query": "Nếu phát hiện đề thi có sai sót trong giờ thi, cán bộ coi thi (CBCT) phải báo cáo và có những phương án xử lý nào?"}
+{"query_id": "Q180", "query": "Đề thi gốc phải được bảo quản theo chế độ nào và có hạn chế gì?"}
+{"query_id": "Q181", "query": "Sau mỗi kỳ thi, các đề thi đã sử dụng hoặc chưa sử dụng phải được xử lý thế nào?"}
+{"query_id": "Q182", "query": "Một trong các nghĩa vụ để sinh viên được dự thi học kỳ là gì (liên quan học phí)?"}
+{"query_id": "Q183", "query": "Sinh viên đến sau khi đã bốc đề thi quá bao lâu sẽ không được dự thi?"}
+{"query_id": "Q184", "query": "Theo nguyên tắc sắp lịch thi, mỗi buổi thi bố trí tối đa bao nhiêu ca thi và thời gian chuyển tiếp tối thiểu giữa 2 ca là bao lâu?"}
+{"query_id": "Q185", "query": "Lịch thi tối thiểu phải được thông báo trước bao lâu đối với kiểm tra giữa kỳ và thi cuối kỳ?"}
+{"query_id": "Q186", "query": "Nếu thay đổi hình thức thi đã công bố, phải được phê duyệt và thông báo đến sinh viên trước ít nhất bao lâu?"}
+{"query_id": "Q187", "query": "Quy chế liệt kê một số hình thức thi nào?"}
+{"query_id": "Q188", "query": "Khi vào phòng thi, sinh viên phải xuất trình giấy tờ gì để xác định nhân thân?"}
+{"query_id": "Q189", "query": "Sinh viên chỉ được mang vào phòng thi loại tài liệu nào?"}
+{"query_id": "Q190", "query": "Những vật dụng nào bị cấm mang vào khu vực phòng thi theo quy chế?"}
+{"query_id": "Q191", "query": "Trong phòng thi, sinh viên bị cấm làm gì liên quan hút thuốc và chất kích thích?"}
+{"query_id": "Q192", "query": "Quy chế quy định bài làm không được có dấu hiệu/đánh dấu gì? (nêu ví dụ)"}
+{"query_id": "Q193", "query": "Hình thức xử lý 'khiển trách' áp dụng cho lỗi nào và bị trừ bao nhiêu phần trăm điểm thi?"}
+{"query_id": "Q194", "query": "Hình thức xử lý 'cảnh cáo' áp dụng cho những lỗi nào và bị trừ bao nhiêu phần trăm điểm thi?"}
+{"query_id": "Q195", "query": "Cố vấn học tập (CVHT) tham gia Hội đồng khen thưởng/kỷ luật sinh viên với quyền hạn gì?"}
+{"query_id": "Q196", "query": "CVHT được cấp quyền truy cập hệ thống nào để theo dõi học tập, duyệt đăng ký môn học và xem điểm rèn luyện?"}
+{"query_id": "Q197", "query": "CVHT có vai trò gì liên quan đến quyền khiếu nại của sinh viên về kết quả khen thưởng/kỷ luật?"}
+{"query_id": "Q198", "query": "CVHT có trách nhiệm gì khi theo dõi sinh viên có hoàn cảnh khó khăn/khuyết tật hoặc nguy cơ bị xử lý theo quy chế học vụ?"}
+{"query_id": "Q199", "query": "Mức hỗ trợ chi phí học tập cho sinh viên dân tộc thiểu số thuộc hộ nghèo hoặc hộ cận nghèo là bao nhiêu và hưởng tối đa bao nhiêu tháng/năm học?"}
+{"query_id": "Q200", "query": "Nếu sinh viên bỏ học hoặc bị kỷ luật buộc thôi học thì chính sách hỗ trợ chi phí học tập được áp dụng như thế nào?"}
+{"query_id": "Q201", "query": "Quy chế này quy định những nội dung chính nào về đánh giá kết quả rèn luyện sinh viên?"}
+{"query_id": "Q202", "query": "Quy chế đánh giá kết quả rèn luyện áp dụng cho đối tượng sinh viên nào trong hệ thống ĐHQG-HCM?"}
+{"query_id": "Q203", "query": "Quy chế này dùng để đánh giá kết quả rèn luyện của sinh viên tại đơn vị nào?"}
+{"query_id": "Q204", "query": "Quyết định ban hành Quy chế được ký ngày tháng năm nào?"}
+{"query_id": "Q205", "query": "Điều 2 của Quyết định ban hành Quy chế nói gì về hiệu lực?"}
+{"query_id": "Q206", "query": "Những đơn vị/chức danh nào chịu trách nhiệm thi hành Quyết định ban hành Quy chế?"}
+{"query_id": "Q207", "query": "Trong Quy chế, cơ sở đào tạo được hiểu là gì (theo cách gọi chung trong văn bản)?"}
+{"query_id": "Q208", "query": "Điều 1 của Quy chế nói về phạm vi điều chỉnh và đối tượng áp dụng ở mấy khoản?"}
+{"query_id": "Q209", "query": "Mục đích của công tác đánh giá kết quả rèn luyện sinh viên được nêu như thế nào?"}
+{"query_id": "Q210", "query": "Quy chế yêu cầu việc đánh giá phải đảm bảo những yếu tố nào về tính khách quan và công khai?"}
+{"query_id": "Q211", "query": "Nguyên tắc đánh giá có nhắc đến yếu tố 'bình đẳng, dân chủ' không? Nếu có thì nói gì?"}
+{"query_id": "Q212", "query": "Nguyên tắc đánh giá yêu cầu tạo điều kiện gì cho sinh viên trong quá trình rèn luyện?"}
+{"query_id": "Q213", "query": "Nguyên tắc đánh giá yêu cầu thể hiện tính hệ thống và liên thông như thế nào trong toàn ĐHQG-HCM?"}
+{"query_id": "Q214", "query": "Nguyên tắc đánh giá có yêu cầu ứng dụng công nghệ thông tin không? Nêu nội dung."}
+{"query_id": "Q215", "query": "Nguyên tắc đánh giá yêu cầu sự phối hợp giữa các bộ phận/đơn vị như thế nào?"}
+{"query_id": "Q216", "query": "Trong mục đích, đánh giá rèn luyện gắn với việc đáp ứng yêu cầu gì của đất nước?"}
+{"query_id": "Q217", "query": "Trong nguyên tắc, việc đánh giá phải đảm bảo những tiêu chí chất lượng nào (liệt kê 4 tính từ)?"}
+{"query_id": "Q218", "query": "Quy chế quy định điểm rèn luyện được đánh giá bằng thang điểm bao nhiêu?"}
+{"query_id": "Q219", "query": "Có bao nhiêu mặt/nội dung chính để đánh giá kết quả rèn luyện của sinh viên?"}
+{"query_id": "Q220", "query": "Mặt đánh giá về ý thức và thái độ tham gia học tập, nghiên cứu khoa học tối đa bao nhiêu điểm?"}
+{"query_id": "Q221", "query": "Mặt đánh giá về ý thức chấp hành nội quy, quy chế, quy định trong cơ sở đào tạo tối đa bao nhiêu điểm?"}
+{"query_id": "Q222", "query": "Mặt đánh giá về tham gia hoạt động chính trị, xã hội, văn hóa, văn nghệ, thể dục-thể thao, phòng chống tội phạm và tệ nạn xã hội tối đa bao nhiêu điểm?"}
+{"query_id": "Q223", "query": "Mặt đánh giá về ý thức công dân trong quan hệ cộng đồng tối đa bao nhiêu điểm?"}
+{"query_id": "Q224", "query": "Mặt 'các nội dung cộng thêm' tối đa bao nhiêu điểm?"}
+{"query_id": "Q225", "query": "Trong Điều 3, nội dung đánh giá kết quả rèn luyện được mô tả là đánh giá cái gì của sinh viên?"}
+{"query_id": "Q226", "query": "Điều 4 nêu tiêu chí nào về học tập liên quan trực tiếp đến 'ý thức và thái độ trong học tập'?"}
+{"query_id": "Q227", "query": "Điều 4 có tiêu chí nào liên quan câu lạc bộ học thuật/hoạt động học thuật/ngoại khóa/nghiên cứu khoa học? Nêu tiêu chí."}
+{"query_id": "Q228", "query": "Trong Điều 4, tiêu chí nào nói về tham gia các kỳ thi, cuộc thi?"}
+{"query_id": "Q229", "query": "Trong Điều 4, tiêu chí nào nói về tinh thần vượt khó, phấn đấu vươn lên?"}
+{"query_id": "Q230", "query": "Trong Điều 4, tiêu chí nào nhắc đến 'kết quả học tập và nghiên cứu khoa học'?"}
+{"query_id": "Q231", "query": "Khung điểm đánh giá của Điều 4 là bao nhiêu?"}
+{"query_id": "Q232", "query": "Điều 5 tiêu chí a đánh giá ý thức chấp hành những gì trong cơ sở đào tạo?"}
+{"query_id": "Q233", "query": "Điều 5 tiêu chí b đánh giá ý thức chấp hành những gì?"}
+{"query_id": "Q234", "query": "Điều 5 tiêu chí c nói gì về Tuần Sinh hoạt công dân - sinh viên?"}
+{"query_id": "Q235", "query": "Nếu sinh viên không tham gia học tập và sinh hoạt trong Tuần Sinh hoạt công dân - sinh viên thì bị xử lý điểm ra sao theo Điều 5?"}
+{"query_id": "Q236", "query": "Khung điểm đánh giá của Điều 5 là bao nhiêu?"}
+{"query_id": "Q237", "query": "Điều 6 tiêu chí a đánh giá điều gì về việc tham gia các hoạt động rèn luyện/chính trị/xã hội/văn hóa/văn nghệ/thể dục-thể thao?"}
+{"query_id": "Q238", "query": "Điều 6 tiêu chí b đánh giá điều gì liên quan đến xây dựng, đóng góp, quảng bá hình ảnh?"}
+{"query_id": "Q239", "query": "Điều 6 tiêu chí c yêu cầu sinh viên tham gia hoạt động gì?"}
+{"query_id": "Q240", "query": "Khung điểm đánh giá của Điều 6 là bao nhiêu?"}
+{"query_id": "Q241", "query": "Điều 7 tiêu chí a đánh giá ý thức công dân qua việc chấp hành và tham gia tuyên truyền những gì?"}
+{"query_id": "Q242", "query": "Điều 7 tiêu chí b đánh giá ý thức và hiệu quả tham gia những hoạt động nào?"}
+{"query_id": "Q243", "query": "Khung điểm đánh giá của Điều 7 là bao nhiêu?"}
+{"query_id": "Q244", "query": "Điều 8 khoản 1: sinh viên được cộng thêm điểm khi được khen thưởng/tặng thưởng ở cấp nào?"}
+{"query_id": "Q245", "query": "Điều 8 khoản 2: những hoàn cảnh nào của sinh viên được xem xét cộng thêm điểm?"}
+{"query_id": "Q246", "query": "Điều 8 khoản 3: cộng thêm điểm dựa trên phẩm chất/công việc nào của sinh viên?"}
+{"query_id": "Q247", "query": "Điểm cộng thêm theo Điều 8 được tính vào tổng điểm như thế nào (có giới hạn không)?"}
+{"query_id": "Q248", "query": "Việc đánh giá kết quả rèn luyện của sinh viên được tiến hành định kỳ theo những mốc thời gian nào?"}
+{"query_id": "Q249", "query": "Điểm rèn luyện của học kỳ chính được tính như thế nào?"}
+{"query_id": "Q250", "query": "Điểm rèn luyện của năm học được tính theo cách nào?"}
+{"query_id": "Q251", "query": "Điểm rèn luyện toàn khóa học được tính theo cách nào theo Quy chế?"}
+{"query_id": "Q252", "query": "Trong công thức tính điểm rèn luyện toàn khóa, ký hiệu R là gì?"}
+{"query_id": "Q253", "query": "Trong công thức tính điểm rèn luyện toàn khóa, ký hiệu r_i là gì?"}
+{"query_id": "Q254", "query": "Trong công thức tính điểm rèn luyện toàn khóa, ký hiệu N là gì?"}
+{"query_id": "Q255", "query": "Kết quả rèn luyện được phân thành những loại nào theo Điều 10?"}
+{"query_id": "Q256", "query": "Sinh viên được xem là 'đạt' khi kết quả rèn luyện xếp loại từ mức nào trở lên?"}
+{"query_id": "Q257", "query": "Điểm bao nhiêu thì xếp loại rèn luyện 'xuất sắc'?"}
+{"query_id": "Q258", "query": "Điểm bao nhiêu thì xếp loại rèn luyện 'tốt'?"}
+{"query_id": "Q259", "query": "Điểm bao nhiêu thì xếp loại rèn luyện 'khá'?"}
+{"query_id": "Q260", "query": "Điểm bao nhiêu thì xếp loại rèn luyện 'trung bình'?"}
+{"query_id": "Q261", "query": "Điểm bao nhiêu thì xếp loại rèn luyện 'yếu'?"}
+{"query_id": "Q262", "query": "Nếu sinh viên đang bị kỷ luật mức khiển trách thì kết quả rèn luyện được đánh giá tối đa ở loại nào?"}
+{"query_id": "Q263", "query": "Nếu sinh viên đang bị kỷ luật mức cảnh cáo thì kết quả rèn luyện được đánh giá tối đa ở loại nào?"}
+{"query_id": "Q264", "query": "Sinh viên bị kỷ luật mức buộc thôi học có được đánh giá kết quả rèn luyện không?"}
+{"query_id": "Q265", "query": "Điều 11 quy định việc hạn chế xếp loại rèn luyện áp dụng trong thời gian nào?"}
+{"query_id": "Q266", "query": "Theo Điều 11, bị buộc thôi học thì trạng thái đánh giá rèn luyện ra sao?"}
+{"query_id": "Q267", "query": "Việc đánh giá rèn luyện của sinh viên tốt nghiệp trễ tiến độ được xử lý thế nào?"}
+{"query_id": "Q268", "query": "Sinh viên khuyết tật hoặc mồ côi, hoàn cảnh gia đình đặc biệt khó khăn (có xác nhận) được xem xét gì nếu không đáp ứng yêu cầu chung các hoạt động rèn luyện?"}
+{"query_id": "Q269", "query": "Sinh viên nghỉ học tạm thời (bảo lưu) được xử lý kết quả rèn luyện như thế nào?"}
+{"query_id": "Q270", "query": "Sinh viên đồng thời học hai chương trình đào tạo sẽ được đánh giá rèn luyện tại đâu?"}
+{"query_id": "Q271", "query": "Sinh viên chương trình liên kết giữa cơ sở đào tạo trong nước và nước ngoài được đánh giá rèn luyện theo mốc nào?"}
+{"query_id": "Q272", "query": "Sinh viên chuyển trường được xử lý kết quả rèn luyện của cơ sở cũ như thế nào?"}
+{"query_id": "Q273", "query": "Bước 1 của quy trình đánh giá (Điều 12 khoản 1) yêu cầu sinh viên làm gì?"}
+{"query_id": "Q274", "query": "Trong quy trình đánh giá, ai phối hợp với Ban cán sự để tổ chức họp lớp, xem xét điểm tự đánh giá?"}
+{"query_id": "Q275", "query": "Việc xem xét và thông qua mức điểm tự đánh giá của sinh viên dựa trên cơ sở gì?"}
+{"query_id": "Q276", "query": "Quy trình đánh giá phải được công khai đến ai?"}
+{"query_id": "Q277", "query": "Kết quả đánh giá và phân loại rèn luyện phải được công bố qua kênh nào?"}
+{"query_id": "Q278", "query": "Theo Điều 12 khoản 5, phải thông báo kết quả cho sinh viên biết trước bao lâu trước khi ban hành quyết định chính thức?"}
+{"query_id": "Q279", "query": "Cơ sở đào tạo có phải ban hành quyết định thành lập Hội đồng đánh giá kết quả rèn luyện không?"}
+{"query_id": "Q280", "query": "Hội đồng cấp cơ sở đào tạo do ai ký quyết định thành lập?"}
+{"query_id": "Q281", "query": "Văn bản hướng dẫn thực hiện thẩm quyền Hội đồng cần quy định rõ những nội dung gì?"}
+{"query_id": "Q282", "query": "Chủ tịch Hội đồng cấp cơ sở đào tạo là ai?"}
+{"query_id": "Q283", "query": "Thường trực Hội đồng cấp cơ sở đào tạo là ai?"}
+{"query_id": "Q284", "query": "Nhiệm vụ của Hội đồng cấp cơ sở đào tạo đối với việc công nhận kết quả rèn luyện là gì?"}
+{"query_id": "Q285", "query": "Kết quả đánh giá rèn luyện từng học kỳ, năm học và toàn khóa của sinh viên được lưu ở đâu?"}
+{"query_id": "Q286", "query": "Kết quả đánh giá rèn luyện toàn khóa có thể được ghi nhận theo những hình thức nào?"}
+{"query_id": "Q287", "query": "Kết quả rèn luyện toàn khóa của sinh viên được dùng làm căn cứ cho việc gì liên quan tốt nghiệp?"}
+{"query_id": "Q288", "query": "Kết quả rèn luyện toàn khóa được sử dụng trong việc xét duyệt học bổng và xét gì nữa?"}
+{"query_id": "Q289", "query": "Kết quả rèn luyện toàn khóa được dùng trong các hoạt động nào liên quan giao lưu/trao đổi sinh viên?"}
+{"query_id": "Q290", "query": "Kết quả rèn luyện toàn khóa có thể liên quan đến việc xét miễn giảm chi phí/dịch vụ ở đâu?"}
+{"query_id": "Q291", "query": "Sinh viên có kết quả rèn luyện xuất sắc được cơ sở đào tạo xem xét gì theo Điều 14?"}
+{"query_id": "Q292", "query": "Nếu sinh viên bị xếp loại rèn luyện yếu trong hai học kỳ chính liên tiếp lần thứ nhất thì bị xem xét kỷ luật mức nào?"}
+{"query_id": "Q293", "query": "Nếu sinh viên bị xếp loại rèn luyện yếu trong hai học kỳ chính liên tiếp lần thứ hai thì bị xử lý thế nào?"}
+{"query_id": "Q294", "query": "Sinh viên có quyền khiếu nại về việc đánh giá kết quả rèn luyện trong trường hợp nào?"}
+{"query_id": "Q295", "query": "Khi nhận được đơn khiếu nại, cơ sở đào tạo có trách nhiệm gì?"}
+{"query_id": "Q296", "query": "ĐHQG-HCM có trách nhiệm gì đối với việc thực hiện công tác đánh giá rèn luyện ở các cơ sở đào tạo?"}
+{"query_id": "Q297", "query": "ĐHQG-HCM giao Ban Công tác Sinh viên làm nhiệm vụ gì?"}
+{"query_id": "Q298", "query": "Thủ trưởng cơ sở đào tạo phải ban hành văn bản gì liên quan thực hiện Quy chế?"}
+{"query_id": "Q299", "query": "Cơ sở đào tạo phải tổng kết và báo cáo công tác thực hiện Quy chế qua Ban Công tác Sinh viên trước thời hạn nào hằng năm?"}
+{"query_id": "Q300", "query": "Trung tâm Quản lý Ký túc xá ĐHQG-HCM phối hợp với cơ sở đào tạo trong công tác gì?"}
+{"query_id": "Q301", "query": "Sinh viên có quyền được nhận vào học theo ngành nào theo quy chế CTSV?"}
+{"query_id": "Q302", "query": "Quy chế CTSV quy định sinh viên được cung cấp những thông tin gì liên quan học tập và rèn luyện?"}
+{"query_id": "Q303", "query": "Theo quy chế CTSV, sinh viên được tạo điều kiện sử dụng những nguồn lực nào để học tập/nghiên cứu?"}
+{"query_id": "Q304", "query": "Theo quy chế CTSV, sinh viên được tham gia những hoạt động học thuật/khuyến khích học tập nào?"}
+{"query_id": "Q305", "query": "Quy chế CTSV nêu quyền lợi nào của sinh viên liên quan đến chăm sóc sức khỏe?"}
+{"query_id": "Q306", "query": "Quy chế CTSV cho phép sinh viên đăng ký tham gia hoạt động quốc tế nào?"}
+{"query_id": "Q307", "query": "Sinh viên có quyền gì để đề đạt nguyện vọng/giải quyết quyền lợi theo quy chế CTSV?"}
+{"query_id": "Q308", "query": "Quy chế CTSV quy định quyền lợi nào về ký túc xá?"}
+{"query_id": "Q309", "query": "Khi đủ điều kiện công nhận tốt nghiệp, sinh viên được Trường cấp những giấy tờ gì?"}
+{"query_id": "Q310", "query": "Theo quy chế CTSV, sinh viên có thể đăng ký để được xem xét khen thưởng ở những cấp nào?"}
+{"query_id": "Q311", "query": "Nhiệm vụ đầu tiên của sinh viên theo Điều 19 quy chế CTSV là gì?"}
+{"query_id": "Q312", "query": "Quy chế CTSV yêu cầu sinh viên thực hiện nhiệm vụ học tập/rèn luyện như thế nào?"}
+{"query_id": "Q313", "query": "Nhiệm vụ của sinh viên đối với cán bộ/nhân viên Trường và bạn học được nêu ra sao?"}
+{"query_id": "Q314", "query": "Quy chế CTSV quy định sinh viên phải thực hiện các đợt khám sức khỏe nào?"}
+{"query_id": "Q315", "query": "Sinh viên có nghĩa vụ tài chính/bảo hiểm nào theo Điều 19 quy chế CTSV?"}
+{"query_id": "Q316", "query": "Quy chế CTSV yêu cầu sinh viên tham gia hoạt động CTXH/tình nguyện như thế nào?"}
+{"query_id": "Q317", "query": "Theo quy chế CTSV, khi phát hiện tiêu cực/gian lận trong học tập hoặc thi cử, sinh viên phải làm gì?"}
+{"query_id": "Q318", "query": "Nhiệm vụ của sinh viên về an ninh trật tự và tài sản theo quy chế CTSV là gì?"}
+{"query_id": "Q319", "query": "Quy chế CTSV yêu cầu sinh viên tham gia bao nhiêu đợt Tuần SHCD và còn phải làm thêm những việc gì liên quan CTSV?"}
+{"query_id": "Q320", "query": "Sinh viên nội trú/ngoại trú có trách nhiệm gì về đăng ký tạm trú/tạm vắng theo quy chế CTSV?"}
+{"query_id": "Q321", "query": "Quy chế CTSV quy định sinh viên bị cấm làm gì đối với giảng viên/cán bộ quản lý/nhân viên và người khác?"}
+{"query_id": "Q322", "query": "Hành vi nào liên quan học tập/kiểm tra/thi cử bị cấm theo quy chế CTSV?"}
+{"query_id": "Q323", "query": "Theo quy chế CTSV, sinh viên bị cấm đăng tải/bình luận/chia sẻ nội dung gì trên mạng internet?"}
+{"query_id": "Q324", "query": "Quy chế CTSV liệt kê các hoạt động trái pháp luật nào mà sinh viên không được tổ chức/tham gia (nêu ví dụ)?"}
+{"query_id": "Q325", "query": "Theo quy chế CTSV, sinh viên bị cấm làm gì liên quan vũ khí, chất nổ và ma túy?"}
+{"query_id": "Q326", "query": "Quy chế CTSV cấm sinh viên tham gia những loại tài liệu/ấn phẩm/thông tin nào?"}
+{"query_id": "Q327", "query": "Quy chế CTSV quy định thế nào về mê tín dị đoan và hoạt động tôn giáo?"}
+{"query_id": "Q328", "query": "Sinh viên có được tham gia hoạt động chính trị trái pháp luật theo quy chế CTSV không?"}
+{"query_id": "Q329", "query": "Quy chế CTSV quy định gì về việc tổ chức/tham gia hoạt động tập thể mang danh nghĩa Trường?"}
+{"query_id": "Q330", "query": "Theo Điều 21, mục đích Tuần SHCD là gì về mặt nhận thức chính trị-xã hội?"}
+{"query_id": "Q331", "query": "Tuần SHCD giúp sinh viên hiểu rõ những nội dung nào theo quy chế CTSV?"}
+{"query_id": "Q332", "query": "Theo Điều 21, Tuần SHCD trang bị thêm cho sinh viên những gì?"}
+{"query_id": "Q333", "query": "Quy chế CTSV yêu cầu việc tổ chức các tuần SHCD phải có những hoạt động nào trong lớp học?"}
+{"query_id": "Q334", "query": "Nội dung Tuần SHCD được xây dựng dựa trên những căn cứ nào?"}
+{"query_id": "Q335", "query": "Tuần SHCD được phân loại thành những loại nào và dành cho nhóm sinh viên nào?"}
+{"query_id": "Q336", "query": "Phòng CTSV có trách nhiệm gì khi tổ chức Tuần SHCD?"}
+{"query_id": "Q337", "query": "Quy định điểm danh Tuần SHCD ĐK: sinh viên vắng quá bao nhiêu buổi thì bị xử lý thế nào?"}
+{"query_id": "Q338", "query": "Quy định điểm danh Tuần SHCD GK/CK: yêu cầu tham dự và hệ quả nếu vắng không có lý do chính đáng?"}
+{"query_id": "Q339", "query": "Ban tổ chức lớp học trong Tuần SHCD phải tổ chức thi như thế nào?"}
+{"query_id": "Q340", "query": "Sau Tuần SHCD, Ban tổ chức lớp cần làm gì với ý kiến sinh viên?"}
+{"query_id": "Q341", "query": "Sinh viên không đạt yêu cầu Tuần SHCD sẽ được xử lý thế nào về học lại và lệ phí?"}
+{"query_id": "Q342", "query": "Nếu sinh viên học vượt, quy chế yêu cầu hoàn thành Tuần SHCD ra sao?"}
+{"query_id": "Q343", "query": "Hoàn thành Tuần SHCD được dùng làm tiêu chí cho những việc gì theo quy chế?"}
+{"query_id": "Q344", "query": "Không tham gia Tuần SHCD ĐK bị trừ bao nhiêu điểm rèn luyện và trừ ở nội dung nào?"}
+{"query_id": "Q345", "query": "Không tham gia Tuần SHCD GK hoặc CK bị trừ bao nhiêu điểm rèn luyện?"}
+{"query_id": "Q346", "query": "Nếu không tham gia Tuần SHCD 02 lần liên tiếp thì bị xử lý gì (về ĐRL và kỷ luật)?"}
+{"query_id": "Q347", "query": "Định mức hỗ trợ kinh phí hoạt động lớp theo Phụ lục I (BCSL) là bao nhiêu và năm học tính mấy tháng?"}
+{"query_id": "Q348", "query": "Kinh phí hỗ trợ hoạt động lớp và Ban cán sự lớp được cấp từ nguồn nào?"}
+{"query_id": "Q349", "query": "Điều kiện để lớp được áp dụng hỗ trợ kinh phí hoạt động lớp và Ban cán sự lớp là gì?"}
+{"query_id": "Q350", "query": "Kinh phí hỗ trợ hoạt động lớp được phân bổ theo tỷ lệ nào cho tập thể lớp và cho Ban cán sự lớp?"}

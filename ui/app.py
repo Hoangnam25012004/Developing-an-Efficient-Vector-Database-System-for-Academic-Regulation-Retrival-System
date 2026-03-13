@@ -1,6 +1,13 @@
 import requests
 import streamlit as st
 
+from pathlib import Path
+import sys
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
+
+from scripts.utils import load_config, vnfold
+
 st.set_page_config(page_title="Reg Retrieval", layout="wide")
 
 st.title("📚 Academic Regulation Retrieval")
