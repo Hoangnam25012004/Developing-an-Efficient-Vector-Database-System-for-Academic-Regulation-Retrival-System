@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 import argparse
 import pickle
+import sys
 from pathlib import Path
 from typing import Dict, List
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
 
 import regex as re
 from rank_bm25 import BM25Okapi
@@ -75,8 +79,11 @@ def main():
             cfg["bm25"]["tokenizer"],
         )
         for r in res:
-            preview = (r["text"][:80]).replace("\n", " ")
-            print(f"{r['score']:.4f}\t{r['doc_id']}\t{r['path_hierarchy']}\t{preview}…")
+            preview  = (r["text"][:80]).replace("\n", " ")
+            group    = r.get("group", "")
+            doc_type = r.get("doc_type", "")
+            src      = r.get("source_file", "")
+            print(f"{r['score']:.4f}\t{r['doc_id']}\t{group}\t{doc_type}\t{src}\t{r['path_hierarchy']}\t{preview}…")
 
 
 if __name__ == "__main__":

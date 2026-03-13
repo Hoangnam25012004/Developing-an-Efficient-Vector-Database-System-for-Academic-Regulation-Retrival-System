@@ -59,7 +59,7 @@ def main():
             for rec, vec in zip(rows[i:i+bs], embs):
                 points.append(
                     PointStruct(
-                        id=str(rec.get("id") or uuid4()),
+                        id=str(uuid4()),
                         vector=vec.tolist(),
                         payload=rec,
                     )

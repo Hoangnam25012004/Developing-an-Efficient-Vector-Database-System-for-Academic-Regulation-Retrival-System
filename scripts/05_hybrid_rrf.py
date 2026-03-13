@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 import argparse
 import pickle
+import sys
 from pathlib import Path
 from typing import List
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
 
 from qdrant_client import QdrantClient
 from rank_bm25 import BM25Okapi
@@ -65,11 +69,14 @@ def main():
     fused_ids = reciprocal_rank_fusion([d_ids, s_ids], k=rrf_k)[:top_k]
 
     for did in fused_ids:
-        p = d_map.get(did) or s_map.get(did)
-        dense = p.get("_dense_score", 0.0)
-        sparse = p.get("_sparse_score", 0.0)
+        p       = d_map.get(did) or s_map.get(did)
+        dense   = p.get("_dense_score", 0.0)
+        sparse  = p.get("_sparse_score", 0.0)
+        group    = p.get("group", "")
+        doc_type = p.get("doc_type", "")
+        src      = p.get("source_file", "")
         preview = (p["text"][:80]).replace("\n", " ")
-        print(f"{dense:.4f}\t{sparse:.4f}\t{p['doc_id']}\t{p['path_hierarchy']}\t{preview}…")
+        print(f"{dense:.4f}\t{sparse:.4f}\t{p['doc_id']}\t{group}\t{doc_type}\t{src}\t{p['path_hierarchy']}\t{preview}…")
 
 
 if __name__ == "__main__":

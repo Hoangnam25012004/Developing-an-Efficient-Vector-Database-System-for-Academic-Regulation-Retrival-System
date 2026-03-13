@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+import sys
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
+
 """
 Cross-encoder reranking.
 
@@ -31,7 +36,7 @@ from qdrant_client import QdrantClient
 from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer
 
-from utils import load_config, read_jsonl, save_jsonl
+from scripts.utils import load_config, read_jsonl, save_jsonl
 
 
 # ── reranker factory ──────────────────────────────────────────────────────────
@@ -120,7 +125,7 @@ def predict_scores(reranker: Any, pairs: List[tuple], batch_size: int,
 
 def _tokenize(query: str, tokenizer_type: str) -> List[str]:
     import regex as re
-    from utils import vnfold
+    from scripts.utils import vnfold
     if tokenizer_type == "vi_basic":
         return re.findall(r"[a-z0-9]+", vnfold(query))
     return query.lower().split()
@@ -264,9 +269,12 @@ def main():
     )[: args.final_k]
 
     for i in order:
-        p       = candidates[i]
-        preview = p["text"][:100].replace("\n", " ")
-        print(f"{float(scores[i]):.4f}\t{p['doc_id']}\t{p['path_hierarchy']}\t{preview}…")
+        p        = candidates[i]
+        preview  = p["text"][:100].replace("\n", " ")
+        group    = p.get("group", "")
+        doc_type = p.get("doc_type", "")
+        src      = p.get("source_file", "")
+        print(f"{float(scores[i]):.4f}\t{p['doc_id']}\t{group}\t{doc_type}\t{src}\t{p['path_hierarchy']}\t{preview}…")
 
 
 if __name__ == "__main__":

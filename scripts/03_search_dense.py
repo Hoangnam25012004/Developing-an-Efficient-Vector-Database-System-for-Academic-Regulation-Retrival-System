@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 import argparse
+import sys
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
 
 from qdrant_client import QdrantClient
 from qdrant_client.http import models as qmodels
@@ -34,7 +38,10 @@ def main():
     for h in hits:
         p = h.payload
         preview = (p["text"][:80]).replace("\n", " ")
-        print(f"{h.score:.4f}\t{p['doc_id']}\t{p['path_hierarchy']}\t{preview}…")
+        group    = p.get("group", "")
+        doc_type = p.get("doc_type", "")
+        src      = p.get("source_file", "")
+        print(f"{h.score:.4f}\t{p['doc_id']}\t{group}\t{doc_type}\t{src}\t{p['path_hierarchy']}\t{preview}…")
 
 
 if __name__ == "__main__":
