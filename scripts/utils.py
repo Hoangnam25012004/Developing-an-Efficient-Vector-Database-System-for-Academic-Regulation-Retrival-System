@@ -768,9 +768,24 @@ def chunk_by_tokens(text: str, target_tokens: int = 220, overlap_ratio: float = 
                 tail = prev_tokens[-tail_tok:] if len(prev_tokens) > tail_tok else prev_tokens
                 prefix = _enc.decode(tail).strip()
 
-                merged = (prefix + "\n\n" + chunks[i]).strip()
-                if chunks[i].startswith(prefix):
-                    merged = chunks[i].strip()
+                # Dedup check: tiktoken often cuts a Vietnamese word at the start of `prefix`
+                # (e.g., prefix = "dạy Ong…" where "dạy" is the tail of prev chunk).
+                # Try stripping 1–3 leading orphan words until we find the match in chunks[i].
+                chunk_s = chunks[i].strip()
+                dedup_found = chunk_s.startswith(prefix)
+                if not dedup_found:
+                    candidate = prefix
+                    for _ in range(3):
+                        candidate = _trim_partial_word_edges(
+                            candidate, trim_left=True, trim_right=False
+                        )
+                        if len(candidate) < 20:   # too short to be a reliable match signal
+                            break
+                        if chunk_s.startswith(candidate):
+                            dedup_found = True
+                            break
+
+                merged = chunk_s if dedup_found else (prefix + "\n\n" + chunk_s).strip()
 
                 out3.append(merged)
                 prev_tokens = _enc.encode(chunks[i])
@@ -917,9 +932,29 @@ def normalize_ocr_text(text: str) -> str:
     s = re2.sub(r"[ \t]+", " ", s)
     s = re2.sub(r"\n{3,}", "\n\n", s)
 
-    # 6) Xóa dòng chỉ gồm dấu chấm/gạch ngang/dấu ba chấm (ô trống form, đường kẻ bảng)
-    #    Ví dụ: "a) ................................" hoặc "_______________"
-    s = re2.sub(r"(?m)^[\s.…_\-~=]{5,}\s*$", "", s)
+    # 6) Xóa dòng chỉ gồm dấu phân cách: gạch ngang ASCII/en-dash/em-dash, dấu bằng, v.v.
+    #    Ví dụ: "——", "— ====", "_______________", "a) ................................"
+    #    (Mở rộng từ bản cũ: thêm –— vào charset, giảm ngưỡng từ 5 xuống 2)
+    s = re2.sub(r"(?m)^\s*[-–—=~_\.…]{2,}\s*$", "", s)
+
+    # 6b) Xóa dòng rác rất ngắn (≤ 5 ký tự) không có ký tự tiếng Việt và không phải
+    #     số thứ tự (1. / 12) / ...). Xuất hiện do OCR đọc nhầm viền/khung trang.
+    #     Ví dụ: "eee:", "HH.", "es 2", "srr |", "th", "|"
+    _noise_filtered: List[str] = []
+    for _ln in s.splitlines():
+        _ls = _ln.strip()
+        if _ls and len(_ls) <= 5:
+            _has_vi = any(
+                0x00C0 <= ord(c) <= 0x024F or 0x1E00 <= ord(c) <= 0x1EFF
+                for c in _ls
+            )
+            _is_num = bool(re2.match(r"\d{1,3}[\.\)]", _ls))
+            if not _has_vi and not _is_num:
+                _noise_filtered.append("")  # thay bằng dòng trống (giữ cấu trúc)
+                continue
+        _noise_filtered.append(_ln)
+    s = "\n".join(_noise_filtered)
+    s = re2.sub(r"\n{3,}", "\n\n", s)  # gộp lại các dòng trống liên tiếp
 
     # 7) Xóa ký tự thay thế U+FFFD (từ watermark/stamp bị OCR đọc sai font)
     s = s.replace("\ufffd", "")
@@ -978,6 +1013,59 @@ def preprocess_ocr_image(img):
     thresh = 200
     img = img.point(lambda x: 0 if x < thresh else 255)
     return img
+
+# -------------------------
+# OCR paragraph repair
+# -------------------------
+def merge_ocr_paragraph_artifacts(text: str) -> str:
+    """Nối các "paragraph" giả do OCR tạo ra khi Tesseract chia một câu thành
+    nhiều text-block riêng biệt, chèn dòng trống giữa chừng câu.
+
+    Nguyên tắc: nếu đoạn trước KHÔNG kết thúc bằng dấu câu (.!?:;) VÀ đoạn
+    tiếp theo bắt đầu bằng chữ thường (continuation), nối lại bằng khoảng trắng.
+
+    Không nối nếu đoạn sau:
+      - là marker cấu trúc (Điều, Khoản, Chương, Phần, mục số "1. ", ...)
+      - là page marker <<<PAGE:N>>>
+    """
+    _SENT_END = re.compile(r'[.!?:;"""»\]\)]\s*$')
+    _STRUCT_START = re2.compile(
+        r"^\s*(dieu\s+\d|khoan\s+\d|chuong\s+[ivx\d]|phan\s+[ivx\d]"
+        r"|\d{1,3}[\.\)]\s|[a-z\u0111]\)\s|<<<page:\d+>>>)",
+        re2.I,
+    )
+
+    paras = re.split(r"\n\n+", (text or "").strip())
+    out: List[str] = []
+    buf = ""
+
+    for para in paras:
+        para = para.strip()
+        if not para:
+            if buf:
+                out.append(buf)
+                buf = ""
+            continue
+
+        if buf:
+            is_struct = bool(_STRUCT_START.match(vnfold(para[:40])))
+            no_punct = not _SENT_END.search(buf)
+            # continuation: starts with lowercase letter (incl. Vietnamese), not a structure marker
+            looks_cont = bool(re.match(r"^[a-zà-ỹ]", para, re.IGNORECASE)) and not is_struct
+
+            if no_punct and looks_cont:
+                buf = buf + " " + para
+                continue
+
+        if buf:
+            out.append(buf)
+        buf = para
+
+    if buf:
+        out.append(buf)
+
+    return "\n\n".join(out)
+
 
 # -------------------------
 # PDF extraction + OCR
@@ -1071,6 +1159,9 @@ def text_from_pdf(path: str) -> Tuple[str, List[str]]:
             # Post-process OCR output: fix item numbering + garbage chars
             full_text = normalize_ocr_text(full_text)
             pages = [normalize_ocr_text(p) for p in (pages or [])]
+            # Nối các "paragraph" giả OCR (câu bị tách ở giữa do text-block boundary)
+            pages = [merge_ocr_paragraph_artifacts(p) for p in pages]
+            full_text = "\n\n".join(pages).strip()
             _used_ocr = True
             _chars = len(full_text)
             print(f"    [OCR] done — extracted {_chars} chars  ({'ok' if _chars > MIN_CHARS else 'WARNING: still short'})")
