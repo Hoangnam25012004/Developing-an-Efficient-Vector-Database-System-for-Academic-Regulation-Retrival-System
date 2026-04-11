@@ -1,0 +1,3271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARRS – Hệ thống Tra cứu Quy chế Học vụ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════════ */
+:root {
+  --primary:       #1B3A6B;
+  --primary-med:   #2458A6;
+  --primary-light: #3B82D9;
+  --primary-xl:    #EBF3FB;
+  --primary-xxl:   #F0F6FF;
+
+  --accent:        #0EA5E9;
+  --accent-light:  #E0F2FE;
+
+  --success:       #16A34A;
+  --success-light: #DCFCE7;
+  --warning:       #D97706;
+  --warning-light: #FEF3C7;
+  --danger:        #DC2626;
+  --danger-light:  #FEE2E2;
+
+  --gray-50:  #F8FAFC;
+  --gray-100: #F1F5F9;
+  --gray-200: #E2E8F0;
+  --gray-300: #CBD5E1;
+  --gray-400: #94A3B8;
+  --gray-500: #64748B;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1E293B;
+  --gray-900: #0F172A;
+
+  --white: #FFFFFF;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.10), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.07);
+  --shadow-xl: 0 20px 50px rgba(0,0,0,.15);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  --transition: all .22s cubic-bezier(.4,0,.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 14px; scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-800);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Screens */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ═══════ NAVBAR ═══════ */
+.navbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+.navbar-brand {
+  display: flex; align-items: center; gap: 12px; text-decoration: none;
+}
+.navbar-logo {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-med) 100%);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 800; font-size: 15px; letter-spacing: -0.5px;
+}
+.navbar-name { display: flex; flex-direction: column; }
+.navbar-name-main { font-size: 15px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+.navbar-name-sub  { font-size: 11px; color: var(--gray-400); font-weight: 400; }
+
+.navbar-nav { display: flex; align-items: center; gap: 4px; }
+.nav-link {
+  padding: 6px 14px; border-radius: var(--radius-full);
+  color: var(--gray-600); font-size: 13.5px; font-weight: 500;
+  cursor: pointer; transition: var(--transition); text-decoration: none;
+  border: none; background: none;
+}
+.nav-link:hover  { color: var(--primary); background: var(--primary-xxl); }
+.nav-link.active { color: var(--primary); background: var(--primary-xl); font-weight: 600; }
+
+.navbar-right { display: flex; align-items: center; gap: 12px; }
+.navbar-badge {
+  background: var(--success-light); color: var(--success);
+  font-size: 11px; font-weight: 600; padding: 3px 10px;
+  border-radius: var(--radius-full); border: 1px solid #BBF7D0;
+  display: flex; align-items: center; gap: 5px;
+}
+.navbar-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--success); }
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  color: white; font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+
+/* ═══════ BUTTONS ═══════ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 20px; border-radius: var(--radius-md);
+  font-family: inherit; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; transition: var(--transition); border: none; outline: none;
+  text-decoration: none; white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-med) 100%);
+  color: white; box-shadow: 0 2px 8px rgba(27,58,107,.35);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(27,58,107,.45); }
+.btn-primary:active { transform: translateY(0); }
+.btn-ghost { background: transparent; color: var(--gray-600); }
+.btn-ghost:hover { background: var(--gray-100); color: var(--gray-800); }
+.btn-outline {
+  background: transparent; color: var(--primary);
+  border: 1.5px solid var(--primary-light);
+}
+.btn-outline:hover { background: var(--primary-xl); }
+.btn-sm { padding: 7px 14px; font-size: 12.5px; border-radius: var(--radius-sm); }
+.btn-lg { padding: 14px 28px; font-size: 15px; }
+.btn-icon { padding: 8px; border-radius: var(--radius-sm); }
+
+/* ═══════ BADGES / CHIPS ═══════ */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 10px; border-radius: var(--radius-full);
+  font-size: 11.5px; font-weight: 600; letter-spacing: .01em;
+}
+.badge-blue  { background: var(--primary-xl); color: var(--primary); border:1px solid #BFDBFE; }
+.badge-green { background: var(--success-light); color: var(--success); border:1px solid #BBF7D0; }
+.badge-amber { background: var(--warning-light); color: var(--warning); border:1px solid #FDE68A; }
+.badge-red   { background: var(--danger-light);  color: var(--danger);  border:1px solid #FECACA; }
+.badge-gray  { background: var(--gray-100); color: var(--gray-600); border:1px solid var(--gray-200); }
+.badge-indigo{ background: #EEF2FF; color: #4338CA; border:1px solid #C7D2FE; }
+.badge-yellow{ background: var(--warning-light); color: var(--warning); border:1px solid #FDE68A; }
+
+/* Score badges */
+.score-badge {
+  display: inline-flex; align-items: center;
+  padding: 4px 12px; border-radius: var(--radius-full);
+  font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.score-high   { background: var(--success-light); color: var(--success); }
+.score-medium { background: var(--warning-light); color: var(--warning); }
+.score-low    { background: var(--gray-100); color: var(--gray-500); }
+
+/* ═══════ CARDS ═══════ */
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-md); border-color: var(--gray-300); }
+.card-body { padding: 20px; }
+
+/* ═══════ INPUTS ═══════ */
+.input-wrap { position: relative; }
+.input {
+  width: 100%; padding: 11px 16px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-family: inherit; font-size: 13.5px; color: var(--gray-800);
+  background: var(--white); transition: var(--transition);
+  outline: none;
+}
+.input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59,130,217,.12); }
+.input::placeholder { color: var(--gray-400); }
+
+/* ═══════ TAGS (MODE PILLS) ═══════ */
+.mode-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.mode-tab {
+  padding: 8px 18px; border-radius: var(--radius-full);
+  border: 1.5px solid var(--gray-200);
+  background: var(--white); font-size: 13px; font-weight: 500;
+  color: var(--gray-600); cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; gap: 6px;
+}
+.mode-tab:hover { border-color: var(--primary-light); color: var(--primary); background: var(--primary-xxl); }
+.mode-tab.selected {
+  border-color: var(--primary); background: var(--primary);
+  color: white; box-shadow: 0 2px 8px rgba(27,58,107,.3);
+}
+.mode-tab .mode-dot { width: 7px; height: 7px; border-radius: 50%; }
+.mode-tab.selected .mode-dot { background: rgba(255,255,255,.7); }
+
+/* ═══════ BREADCRUMB ═══════ */
+.breadcrumb { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.breadcrumb-item {
+  font-size: 12px; color: var(--gray-500); font-weight: 500;
+  padding: 2px 8px; border-radius: 4px; background: var(--gray-100);
+}
+.breadcrumb-sep { color: var(--gray-300); font-size: 11px; }
+.breadcrumb-item:last-child { background: var(--primary-xl); color: var(--primary); }
+
+/* ═══════ HIGHLIGHT ═══════ */
+mark {
+  background: #FEF9C3; color: var(--gray-800);
+  padding: 0 2px; border-radius: 2px; font-style: normal;
+}
+
+/* ═══════ DIVIDER ═══════ */
+.divider { height: 1px; background: var(--gray-200); margin: 16px 0; }
+
+/* ═══════ SPINNER ═══════ */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2.5px solid var(--gray-200);
+  border-top-color: var(--primary);
+  animation: spin .7s linear infinite;
+  display: inline-block;
+}
+
+/* ═══════ LOADING OVERLAY ═══════ */
+.loading-overlay {
+  position: fixed; inset: 0; background: rgba(255,255,255,.85);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 200; backdrop-filter: blur(4px);
+  gap: 16px; opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+.loading-overlay.show { opacity: 1; pointer-events: all; }
+.loading-overlay p { color: var(--gray-600); font-size: 14px; font-weight: 500; }
+
+/* ═══════ TOOLTIP ═══════ */
+[data-tooltip] { position: relative; }
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute; bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--gray-800); color: white;
+  font-size: 11px; padding: 4px 10px; border-radius: 6px;
+  white-space: nowrap; pointer-events: none; z-index: 99;
+}
+
+/* ═══════════════════════════════════════════════
+   SCREEN 1 – HOME
+═══════════════════════════════════════════════ */
+.home-hero {
+  background: linear-gradient(160deg, var(--primary) 0%, #163466 40%, #1E4D8C 70%, #2458A6 100%);
+  position: relative; overflow: hidden;
+  padding: 80px 32px 90px;
+  text-align: center;
+}
+.home-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 50%, rgba(255,255,255,.04) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 600px at 80% 20%, rgba(96,165,250,.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.home-hero-grid {
+  position: absolute; inset: 0; opacity: .06;
+  background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+  color: rgba(255,255,255,.9); font-size: 12.5px; font-weight: 500;
+  padding: 6px 16px; border-radius: var(--radius-full); margin-bottom: 20px;
+  backdrop-filter: blur(8px);
+}
+.hero-title {
+  font-size: 38px; font-weight: 800; color: white;
+  line-height: 1.18; margin-bottom: 12px; letter-spacing: -.5px;
+  position: relative;
+}
+.hero-title span { color: #93C5FD; }
+.hero-subtitle {
+  color: rgba(255,255,255,.7); font-size: 16px;
+  max-width: 560px; margin: 0 auto 40px; line-height: 1.6; font-weight: 400;
+}
+
+/* Search Box */
+.search-box-wrap {
+  max-width: 720px; margin: 0 auto;
+  background: rgba(255,255,255,.12); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: var(--radius-xl); padding: 20px 20px 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25);
+  position: relative;
+}
+.search-input-row {
+  display: flex; gap: 10px; margin-bottom: 16px;
+}
+.search-input {
+  flex: 1; padding: 14px 20px;
+  border: 1.5px solid rgba(255,255,255,.3);
+  border-radius: var(--radius-md);
+  font-family: inherit; font-size: 15px; color: var(--gray-800);
+  background: rgba(255,255,255,.96);
+  outline: none; transition: var(--transition);
+}
+.search-input:focus { border-color: #93C5FD; box-shadow: 0 0 0 3px rgba(147,197,253,.25); }
+.search-input::placeholder { color: var(--gray-400); }
+.search-btn {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #1B3A6B, #2458A6);
+  color: white; border: none; border-radius: var(--radius-md);
+  font-family: inherit; font-size: 14.5px; font-weight: 700;
+  cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.search-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.4); background: linear-gradient(135deg, #163166, #1E4D8C); }
+.search-options { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.search-options-left { display: flex; gap: 6px; flex-wrap: wrap; }
+.search-option-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: var(--radius-full);
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+  color: rgba(255,255,255,.9); font-size: 12.5px; font-weight: 500;
+  cursor: pointer; transition: var(--transition);
+}
+.search-option-pill:hover { background: rgba(255,255,255,.25); }
+.search-option-pill.selected { background: rgba(255,255,255,.9); color: var(--primary); border-color: white; font-weight: 600; }
+.search-option-pill .pill-icon { font-size: 12px; }
+.search-topk { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.75); font-size: 12.5px; }
+.search-topk input[type=range] { width: 90px; accent-color: white; }
+
+/* Suggestions */
+.suggestions {
+  margin-top: 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  position: relative;
+}
+.suggestion-label { width: 100%; text-align: center; font-size: 12px; color: rgba(255,255,255,.5); margin-bottom: 4px; }
+.suggestion-chip {
+  padding: 7px 16px; border-radius: var(--radius-full);
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+  color: rgba(255,255,255,.85); font-size: 12.5px; cursor: pointer;
+  transition: var(--transition);
+}
+.suggestion-chip:hover { background: rgba(255,255,255,.22); color: white; transform: translateY(-1px); }
+
+/* Stats */
+.home-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--gray-200); margin-top: -1px;
+}
+.stat-card {
+  background: var(--white); padding: 24px 28px;
+  display: flex; flex-direction: column; align-items: flex-start;
+  transition: var(--transition);
+}
+.stat-card:hover { background: var(--primary-xxl); }
+.stat-num {
+  font-size: 28px; font-weight: 800; color: var(--primary);
+  line-height: 1; margin-bottom: 4px; letter-spacing: -0.5px;
+}
+.stat-label { font-size: 12px; color: var(--gray-500); font-weight: 500; }
+.stat-icon { font-size: 20px; margin-bottom: 8px; }
+
+/* Doc Groups */
+.home-groups { padding: 48px 32px; max-width: 1100px; margin: 0 auto; }
+.section-title {
+  font-size: 22px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px;
+}
+.section-sub { font-size: 14px; color: var(--gray-500); margin-bottom: 28px; }
+.groups-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.group-card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg); padding: 20px;
+  cursor: pointer; transition: var(--transition);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.group-card:hover {
+  border-color: var(--primary-light); box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.group-icon {
+  width: 42px; height: 42px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center; font-size: 19px;
+}
+.group-name { font-size: 13.5px; font-weight: 700; color: var(--gray-800); }
+.group-meta { font-size: 12px; color: var(--gray-500); }
+.group-count { font-size: 12px; font-weight: 600; color: var(--primary); }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 2 – SEARCH RESULTS
+═══════════════════════════════════════════════ */
+.results-layout { display: flex; flex: 1; }
+
+/* Results Topbar */
+.results-topbar {
+  background: var(--white); border-bottom: 1px solid var(--gray-200);
+  padding: 14px 24px; display: flex; align-items: center; gap: 14px;
+}
+.results-topbar .search-mini {
+  flex: 1; max-width: 560px;
+  display: flex; align-items: center; gap: 8px;
+  border: 1.5px solid var(--gray-300); border-radius: var(--radius-md);
+  padding: 8px 14px; background: var(--gray-50); cursor: text;
+  transition: var(--transition);
+}
+.results-topbar .search-mini:focus-within { border-color: var(--primary-light); background: white; box-shadow: 0 0 0 3px rgba(59,130,217,.1); }
+.search-mini input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-family: inherit; font-size: 13.5px; color: var(--gray-800);
+}
+.search-mini input::placeholder { color: var(--gray-400); }
+
+/* Sidebar filters */
+.results-sidebar {
+  width: 248px; min-width: 248px; background: var(--white);
+  border-right: 1px solid var(--gray-200); padding: 20px 16px;
+  overflow-y: auto;
+}
+.filter-group { margin-bottom: 24px; }
+.filter-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--gray-400); margin-bottom: 10px;
+}
+.filter-option {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: var(--transition); font-size: 13px;
+  color: var(--gray-700);
+}
+.filter-option:hover { background: var(--gray-100); }
+.filter-option.checked { color: var(--primary); font-weight: 500; background: var(--primary-xxl); }
+.filter-checkbox {
+  width: 15px; height: 15px; border-radius: 4px;
+  border: 1.5px solid var(--gray-300);
+  background: white; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.filter-option.checked .filter-checkbox {
+  border-color: var(--primary); background: var(--primary);
+  color: white; font-size: 9px;
+}
+
+/* Results main */
+.results-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.results-content { padding: 20px 24px; overflow-y: auto; flex: 1; }
+.results-info {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+}
+.results-count { font-size: 13.5px; color: var(--gray-600); }
+.results-count strong { color: var(--gray-900); font-weight: 700; }
+.results-sort {
+  display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-600);
+}
+.sort-btn {
+  padding: 5px 12px; border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 12.5px;
+  background: var(--white); color: var(--gray-600); font-family: inherit;
+  transition: var(--transition);
+}
+.sort-btn:hover, .sort-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary-xxl); }
+
+/* Result Card */
+.result-card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg); margin-bottom: 12px;
+  transition: var(--transition); overflow: hidden;
+}
+.result-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow-md); }
+.result-card.expanded { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(36,88,166,.12); }
+.result-card-header {
+  padding: 16px 18px 12px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.result-rank {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gray-100); border: 1.5px solid var(--gray-200);
+  color: var(--gray-500); font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.result-rank-1 { background: #FEF9C3; border-color: #FDE047; color: #92400E; }
+.result-rank-2 { background: #F1F5F9; border-color: #CBD5E1; color: #475569; }
+.result-rank-3 { background: #FEF2F2; border-color: #FECACA; color: #92400E; }
+.result-header-mid { flex: 1; min-width: 0; }
+.result-title {
+  font-size: 14px; font-weight: 700; color: var(--gray-900);
+  margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.result-path { margin-bottom: 8px; }
+.result-snippet {
+  font-size: 13px; color: var(--gray-600); line-height: 1.6;
+  padding: 10px 18px; border-top: 1px solid var(--gray-100);
+  background: var(--gray-50);
+}
+.result-footer {
+  padding: 10px 18px; border-top: 1px solid var(--gray-100);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+}
+.result-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.result-meta-item { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--gray-500); }
+.result-meta-item svg { width: 13px; height: 13px; color: var(--gray-400); }
+.result-actions { display: flex; gap: 6px; }
+.result-expand-btn {
+  padding: 5px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-200); background: white;
+  font-size: 12.5px; font-weight: 600; color: var(--primary);
+  cursor: pointer; transition: var(--transition); font-family: inherit;
+  display: flex; align-items: center; gap: 5px;
+}
+.result-expand-btn:hover { background: var(--primary-xxl); border-color: var(--primary-light); }
+.btn-pdf {
+  padding: 5px 13px; border-radius: var(--radius-sm);
+  border: 1px solid #DC2626; background: #FEF2F2;
+  font-size: 12.5px; font-weight: 600; color: #DC2626;
+  cursor: pointer; transition: var(--transition); font-family: inherit;
+  display: flex; align-items: center; gap: 5px; text-decoration: none;
+}
+.btn-pdf:hover { background: #DC2626; color: white; border-color: #DC2626; }
+
+/* Expanded content */
+.result-expanded-body {
+  display: none; padding: 16px 18px;
+  border-top: 1px solid var(--primary-xl);
+  background: #FAFCFF;
+}
+.result-card.expanded .result-expanded-body { display: block; }
+.full-text {
+  font-size: 13px; line-height: 1.75; color: var(--gray-700);
+  white-space: pre-wrap; font-family: 'Inter', monospace;
+  border-left: 3px solid var(--primary-light); padding-left: 16px;
+  margin-bottom: 12px;
+}
+.meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.meta-box {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+}
+.meta-box-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); font-weight: 600; margin-bottom: 3px; }
+.meta-box-value { font-size: 12.5px; font-weight: 600; color: var(--gray-800); }
+
+/* Pagination */
+.pagination {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 20px;
+}
+.page-btn {
+  width: 34px; height: 34px; border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-200); background: white;
+  font-size: 13px; font-weight: 500; color: var(--gray-600);
+  cursor: pointer; transition: var(--transition); font-family: inherit;
+  display: flex; align-items: center; justify-content: center;
+}
+.page-btn:hover { border-color: var(--primary-light); color: var(--primary); background: var(--primary-xxl); }
+.page-btn.active { background: var(--primary); border-color: var(--primary); color: white; font-weight: 700; }
+.page-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 3 – DETAIL MODAL
+═══════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,.55);
+  z-index: 300; display: flex; align-items: center; justify-content: center;
+  padding: 24px; backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--white); border-radius: var(--radius-xl);
+  width: 100%; max-width: 860px; max-height: 88vh;
+  display: flex; flex-direction: column;
+  box-shadow: var(--shadow-xl);
+  transform: scale(.97) translateY(12px);
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.modal-close {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: none; background: var(--gray-100); color: var(--gray-600);
+  font-size: 16px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+}
+.modal-close:hover { background: var(--gray-200); color: var(--gray-800); }
+.modal-body {
+  overflow-y: auto; flex: 1; display: flex;
+}
+.modal-content { flex: 1; padding: 24px; }
+.modal-sidebar { width: 240px; border-left: 1px solid var(--gray-200); padding: 20px; background: var(--gray-50); }
+.modal-sidebar-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-400); margin-bottom: 12px; }
+.modal-meta-item { margin-bottom: 14px; }
+.modal-meta-label { font-size: 11px; color: var(--gray-500); font-weight: 500; margin-bottom: 3px; }
+.modal-meta-value { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 4 – ADMIN DASHBOARD
+═══════════════════════════════════════════════ */
+.admin-layout { display: flex; flex: 1; }
+.admin-sidebar {
+  width: 220px; background: var(--primary);
+  padding: 20px 12px; display: flex; flex-direction: column; gap: 4px;
+}
+.admin-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; border-radius: var(--radius-md);
+  color: rgba(255,255,255,.65); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: var(--transition);
+}
+.admin-nav-item:hover { background: rgba(255,255,255,.1); color: white; }
+.admin-nav-item.active { background: rgba(255,255,255,.15); color: white; font-weight: 600; }
+.admin-nav-section { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); padding: 12px 14px 6px; }
+.admin-main { flex: 1; overflow-y: auto; }
+.admin-content { padding: 28px 32px; }
+.admin-page-title { font-size: 22px; font-weight: 800; color: var(--gray-900); margin-bottom: 4px; }
+.admin-page-sub { font-size: 13.5px; color: var(--gray-500); margin-bottom: 28px; }
+
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.metric-card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg); padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.metric-icon {
+  width: 38px; height: 38px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.metric-value { font-size: 26px; font-weight: 800; color: var(--gray-900); line-height: 1; }
+.metric-label { font-size: 12px; color: var(--gray-500); font-weight: 500; }
+.metric-change { font-size: 11.5px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+.metric-up   { color: var(--success); }
+.metric-down { color: var(--danger); }
+
+.pipeline-steps { display: flex; flex-direction: column; gap: 10px; }
+.pipeline-step {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md); padding: 14px 18px;
+  display: flex; align-items: center; gap: 16px;
+}
+.step-status {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.status-done    { background: var(--success); }
+.status-running { background: var(--warning); animation: pulse 1.5s infinite; }
+.status-waiting { background: var(--gray-300); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.step-name  { font-size: 13.5px; font-weight: 600; color: var(--gray-800); }
+.step-desc  { font-size: 12px; color: var(--gray-500); margin-top: 1px; }
+.step-meta  { margin-left: auto; text-align: right; }
+.step-time  { font-size: 12px; color: var(--gray-500); }
+.step-count { font-size: 12px; font-weight: 600; color: var(--primary); }
+
+.model-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; }
+.model-card {
+  background: var(--white); border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md); padding: 16px; cursor: pointer;
+  transition: var(--transition); display: flex; flex-direction: column; gap: 8px;
+}
+.model-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow-sm); }
+.model-card.active { border-color: var(--primary); background: var(--primary-xxl); }
+.model-name { font-size: 13px; font-weight: 700; color: var(--gray-800); }
+.model-type { font-size: 11px; color: var(--gray-500); }
+.model-scores { display: flex; gap: 12px; flex-wrap: wrap; }
+.model-score-item { display: flex; flex-direction: column; gap: 1px; }
+.model-score-label { font-size: 10px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; }
+.model-score-val { font-size: 15px; font-weight: 800; color: var(--primary); }
+
+/* ═══════════════════════════════════════════════
+   UTILITIES & MISC
+═══════════════════════════════════════════════ */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.text-sm { font-size: 12px; }
+.text-xs { font-size: 11px; }
+.text-muted { color: var(--gray-500); }
+.font-bold { font-weight: 700; }
+.mt-4 { margin-top: 4px; }
+.mt-8 { margin-top: 8px; }
+.mb-16 { margin-bottom: 16px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+
+/* Transitions between screens */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.screen.active { animation: fadeSlideIn .3s ease; }
+
+/* Empty state */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px 24px; text-align: center;
+}
+.empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state-title { font-size: 17px; font-weight: 700; color: var(--gray-700); margin-bottom: 6px; }
+.empty-state-sub { font-size: 13.5px; color: var(--gray-500); max-width: 360px; }
+
+/* Tag filter row */
+.active-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.active-filter {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: var(--radius-full);
+  background: var(--primary-xl); border: 1px solid #BFDBFE;
+  color: var(--primary); font-size: 12px; font-weight: 500;
+}
+.active-filter-remove {
+  border: none; background: none; color: var(--primary-light);
+  cursor: pointer; font-size: 14px; line-height: 1; padding: 0;
+}
+.active-filter-remove:hover { color: var(--danger); }
+
+/* Progress bar */
+.progress-bar-wrap { background: var(--gray-200); border-radius: 99px; height: 6px; }
+.progress-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), var(--primary-light)); transition: width .5s; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ LOADING OVERLAY ══════════════════════ -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner" style="width:32px;height:32px;border-width:3px"></div>
+  <p>Đang tìm kiếm quy chế liên quan…</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 1 – HOME
+══════════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="navbar-brand" href="#" onclick="showScreen('home')">
+      <div class="navbar-logo">IU</div>
+      <div class="navbar-name">
+        <span class="navbar-name-main">ARRS</span>
+        <span class="navbar-name-sub">Academic Regulation Retrieval</span>
+      </div>
+    </a>
+    <div class="navbar-nav">
+      <button class="nav-link active" onclick="showScreen('home')">🏠 Tra cứu</button>
+      <button class="nav-link" onclick="showScreen('results')">📄 Kết quả</button>
+      <button class="nav-link" onclick="showScreen('admin')">⚙️ Quản trị</button>
+    </div>
+    <div class="navbar-right">
+      <div class="navbar-badge">API Online</div>
+      <div class="avatar" data-tooltip="Sinh viên ĐHQT">SV</div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="home-hero">
+    <div class="home-hero-grid"></div>
+    <div class="hero-eyebrow">
+      <span>✦</span>
+      <span>Hệ thống RAG – Hybrid Search + Reranking</span>
+    </div>
+    <h1 class="hero-title">
+      Tra cứu <span>Quy chế Học vụ</span><br>nhanh chóng & chính xác
+    </h1>
+    <p class="hero-subtitle">
+      Tìm kiếm ngữ nghĩa thông minh trên toàn bộ quy chế, nội quy, thông báo
+      của Trường Đại học Quốc tế – ĐHQG-HCM.
+    </p>
+
+    <!-- Search Box -->
+    <div class="search-box-wrap">
+      <div class="search-input-row">
+        <input class="search-input" id="homeSearchInput" type="text"
+          placeholder="Ví dụ: Điều kiện miễn giảm học phí cho sinh viên khuyết tật?"
+          onkeydown="if(event.key==='Enter') doSearch()">
+        <button class="search-btn" onclick="doSearch()">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Tìm kiếm
+        </button>
+      </div>
+      <div class="search-options">
+        <div class="search-options-left" id="modeSelector">
+          <div class="search-option-pill selected" onclick="selectMode(this,'hybrid_rerank')">
+            <span class="pill-icon">⚡</span> Hybrid Rerank
+          </div>
+          <div class="search-option-pill" onclick="selectMode(this,'hybrid')">
+            <span class="pill-icon">🔀</span> Hybrid
+          </div>
+          <div class="search-option-pill" onclick="selectMode(this,'dense')">
+            <span class="pill-icon">🧠</span> Dense
+          </div>
+          <div class="search-option-pill" onclick="selectMode(this,'sparse')">
+            <span class="pill-icon">🔑</span> Sparse
+          </div>
+        </div>
+        <div class="search-topk">
+          <span>Top</span>
+          <input type="range" min="1" max="50" value="10" id="topkSlider" oninput="document.getElementById('topkVal').textContent=this.value">
+          <span id="topkVal" style="color:white;font-weight:700;min-width:20px">10</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggestions -->
+    <div class="suggestions">
+      <span class="suggestion-label">Câu hỏi phổ biến:</span>
+      <span class="suggestion-chip" onclick="fillSearch(this)">Điều kiện xét học bổng khuyến khích học tập</span>
+      <span class="suggestion-chip" onclick="fillSearch(this)">Quy định về vắng mặt thi cuối kỳ</span>
+      <span class="suggestion-chip" onclick="fillSearch(this)">Miễn giảm học phí sinh viên khuyết tật</span>
+      <span class="suggestion-chip" onclick="fillSearch(this)">Điểm rèn luyện tối thiểu để không bị cảnh báo</span>
+      <span class="suggestion-chip" onclick="fillSearch(this)">Thủ tục xin bảo lưu kết quả học tập</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="home-stats">
+    <div class="stat-card">
+      <div class="stat-icon">📁</div>
+      <div class="stat-num">7</div>
+      <div class="stat-label">Nhóm văn bản pháp lý</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📄</div>
+      <div class="stat-num">35+</div>
+      <div class="stat-label">Tài liệu PDF/DOCX</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✂️</div>
+      <div class="stat-num">2,400+</div>
+      <div class="stat-label">Chunk đã lập chỉ mục</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⚡</div>
+      <div class="stat-num">&lt; 3s</div>
+      <div class="stat-label">Thời gian phản hồi (p95)</div>
+    </div>
+  </div>
+
+  <!-- Doc Groups -->
+  <div class="home-groups">
+    <div class="section-title">Nguồn tài liệu được lập chỉ mục</div>
+    <div class="section-sub">7 nhóm văn bản pháp lý từ Quốc gia đến Trường ĐHQT</div>
+    <div class="groups-grid">
+      <div class="group-card" onclick="filterGroup('luat_quoc_gia')">
+        <div class="group-icon" style="background:#EFF6FF">⚖️</div>
+        <div>
+          <div class="group-name">Luật Quốc gia</div>
+          <div class="group-meta">Quốc hội ban hành • Phạm vi: Quốc gia</div>
+        </div>
+        <div class="flex items-center gap-8" style="margin-top:4px">
+          <span class="badge badge-blue">Luật</span>
+          <span class="group-count">3 văn bản</span>
+        </div>
+      </div>
+      <div class="group-card" onclick="filterGroup('thong_tu_bo_gd')">
+        <div class="group-icon" style="background:#F0FDF4">📋</div>
+        <div>
+          <div class="group-name">Thông tư – Bộ GD&ĐT</div>
+          <div class="group-meta">Bộ Giáo dục và Đào tạo • Phạm vi: Quốc gia</div>
+        </div>
+        <div class="flex items-center gap-8" style="margin-top:4px">
+          <span class="badge badge-green">Thông tư</span>
+          <span class="group-count">4 văn bản</span>
+        </div>
+      </div>
+      <div class="group-card" onclick="filterGroup('qd_qc_dhqg_hcm')">
+        <div class="group-icon" style="background:#FFF7ED">🏛️</div>
+        <div>
+          <div class="group-name">Quyết định – ĐHQG-HCM</div>
+          <div class="group-meta">ĐHQG-HCM • Phạm vi: Toàn ĐHQG</div>
+        </div>
+        <div class="flex items-center gap-8" style="margin-top:4px">
+          <span class="badge badge-amber">Quyết định</span>
+          <span class="group-count">4 văn bản</span>
+        </div>
+      </div>
+      <div class="group-card" onclick="filterGroup('qd_qc_dhqt')">
+        <div class="group-icon" style="background:#EEF2FF">🎓</div>
+        <div>
+          <div class="group-name">Quy chế – Trường ĐHQT</div>
+          <div class="group-meta">Hiệu trưởng ĐHQT • Phạm vi: Trường</div>
+        </div>
+        <div class="flex items-center gap-8" style="margin-top:4px">
+          <span class="badge badge-indigo">Quyết định</span>
+          <span class="group-count">12 văn bản</span>
+        </div>
+      </div>
+      <div class="group-card" onclick="filterGroup('qd_ngan_dhqt')">
+        <div class="group-icon" style="background:#FFF1F2">📌</div>
+        <div>
+          <div class="group-name">Nội quy ngắn – ĐHQT</div>
+          <div class="group-meta">Hiệu trưởng ĐHQT • Phạm vi: Trường</div>
+        </div>
+        <div class="flex items-center gap-8" style="margin-top:4px">
+          <span class="badge badge-red">Nội quy</span>
+          <span class="group-count">5 văn bản</span>
+        </div>
+      </div>
+      <div class="group-card" onclick="filterGroup('thong_bao')">
+        <div class="group-icon" style="background:#F0FDFA">📢</div>
+        <div>
+          <div class="group-name">Thông báo – P. CTSV</div>
+          <div class="group-meta">Phòng CTSV – ĐHQT • Phạm vi: Sinh viên</div>
+        </div>
+        <div class="flex items-center gap-8" style="margin-top:4px">
+          <span class="badge badge-gray">Thông báo</span>
+          <span class="group-count">1 văn bản</span>
+        </div>
+      </div>
+      <div class="group-card" onclick="filterGroup('phu_luc')">
+        <div class="group-icon" style="background:#F1F5F9">📎</div>
+        <div>
+          <div class="group-name">Phụ lục</div>
+          <div class="group-meta">Trường ĐHQT • Phạm vi: Trường</div>
+        </div>
+        <div class="flex items-center gap-8" style="margin-top:4px">
+          <span class="badge badge-gray">Phụ lục</span>
+          <span class="group-count">2 văn bản</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /screen-home -->
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 2 – SEARCH RESULTS
+══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-results">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="navbar-brand" href="#" onclick="showScreen('home')">
+      <div class="navbar-logo">IU</div>
+      <div class="navbar-name">
+        <span class="navbar-name-main">ARRS</span>
+        <span class="navbar-name-sub">Academic Regulation Retrieval</span>
+      </div>
+    </a>
+    <div class="navbar-nav">
+      <button class="nav-link" onclick="showScreen('home')">🏠 Tra cứu</button>
+      <button class="nav-link active">📄 Kết quả</button>
+      <button class="nav-link" onclick="showScreen('admin')">⚙️ Quản trị</button>
+    </div>
+    <div class="navbar-right">
+      <div class="navbar-badge">API Online</div>
+      <div class="avatar">SV</div>
+    </div>
+  </nav>
+
+  <!-- Search Topbar -->
+  <div class="results-topbar">
+    <button class="btn btn-ghost btn-sm btn-icon" onclick="showScreen('home')" style="color:var(--gray-500)">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <div class="results-topbar search-mini" style="max-width:540px;flex:1">
+      <svg width="15" height="15" fill="none" stroke="#94A3B8" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="resultsSearchInput" value="Điều kiện miễn giảm học phí cho sinh viên khuyết tật" onkeydown="if(event.key==='Enter') doSearch()">
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="doSearch()">Tìm lại</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <span class="badge badge-blue">⚡ hybrid_rerank</span>
+      <span class="text-sm text-muted">Top 10</span>
+      <span class="text-sm text-muted">· 1.84s</span>
+    </div>
+  </div>
+
+  <div class="results-layout" style="flex:1;overflow:hidden">
+    <!-- Sidebar -->
+    <aside class="results-sidebar">
+      <div class="filter-group" data-filter-type="mode">
+        <div class="filter-title">Chế độ tìm kiếm</div>
+        <div class="filter-option checked" data-value="hybrid_rerank" onclick="toggleFilter(this)">
+          <div class="filter-checkbox">✓</div> ⚡ Hybrid Rerank
+        </div>
+        <div class="filter-option" data-value="hybrid" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> 🔀 Hybrid RRF
+        </div>
+        <div class="filter-option" data-value="dense" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> 🧠 Dense
+        </div>
+        <div class="filter-option" data-value="sparse" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> 🔑 Sparse (BM25)
+        </div>
+      </div>
+      <div class="divider" style="margin:0 0 20px"></div>
+      <div class="filter-group" data-filter-type="loai">
+        <div class="filter-title">Loại văn bản</div>
+        <div class="filter-option checked" data-value="tatca" onclick="toggleFilter(this)">
+          <div class="filter-checkbox">✓</div> Tất cả
+        </div>
+        <div class="filter-option" data-value="quyet-dinh" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Quyết định
+        </div>
+        <div class="filter-option" data-value="thong-tu" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Thông tư
+        </div>
+        <div class="filter-option" data-value="luat" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Luật
+        </div>
+        <div class="filter-option" data-value="thong-bao" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Thông báo
+        </div>
+        <div class="filter-option" data-value="phu-luc" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Phụ lục
+        </div>
+      </div>
+      <div class="divider" style="margin:0 0 20px"></div>
+      <div class="filter-group" data-filter-type="coquan">
+        <div class="filter-title">Cơ quan ban hành</div>
+        <div class="filter-option checked" data-value="tatca" onclick="toggleFilter(this)">
+          <div class="filter-checkbox">✓</div> Tất cả
+        </div>
+        <div class="filter-option" data-value="dhqt" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Trường ĐHQT
+        </div>
+        <div class="filter-option" data-value="dhqg" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> ĐHQG-HCM
+        </div>
+        <div class="filter-option" data-value="bgddt" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Bộ GD&ĐT
+        </div>
+        <div class="filter-option" data-value="quoc-hoi" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Quốc hội
+        </div>
+      </div>
+      <div class="divider" style="margin:0 0 20px"></div>
+      <div class="filter-group" data-filter-type="hieuluc">
+        <div class="filter-title">Hiệu lực</div>
+        <div class="filter-option checked" data-value="tatca" onclick="toggleFilter(this)">
+          <div class="filter-checkbox">✓</div> Tất cả
+        </div>
+        <div class="filter-option" data-value="hieuluc" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Đang hiệu lực
+        </div>
+        <div class="filter-option" data-value="het-hieuluc" onclick="toggleFilter(this)">
+          <div class="filter-checkbox"></div> Hết hiệu lực
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Results -->
+    <div class="results-main">
+      <div class="results-content">
+        <!-- Info bar -->
+        <div class="results-info">
+          <div>
+            <div class="results-count">Tìm thấy <strong>10 kết quả</strong> cho <em>"Điều kiện miễn giảm học phí cho sinh viên khuyết tật"</em></div>
+            <div class="active-filters" style="margin-top:8px">
+              <span style="font-size:12px;color:var(--gray-500)">Bộ lọc:</span>
+              <span class="active-filter">hybrid_rerank <button class="active-filter-remove">×</button></span>
+              <span class="active-filter">Đang hiệu lực <button class="active-filter-remove">×</button></span>
+            </div>
+          </div>
+          <div class="results-sort">
+            <span>Sắp xếp:</span>
+            <button class="sort-btn active">Độ liên quan</button>
+            <button class="sort-btn">Mới nhất</button>
+          </div>
+        </div>
+
+        <!-- Result Cards -->
+        <div id="resultsList">
+
+          <!-- Card 1 -->
+          <div class="result-card expanded" id="card-1">
+            <div class="result-card-header">
+              <div class="result-rank result-rank-1">1</div>
+              <div class="result-header-mid">
+                <div class="result-title">
+                  QĐ 688 – Quy định Miễn Giảm Học phí (2024)
+                  <span class="badge badge-indigo">Quyết định</span>
+                  <span class="badge badge-green">Hiệu lực</span>
+                </div>
+                <div class="result-path">
+                  <div class="breadcrumb">
+                    <span class="breadcrumb-item">Chương I</span>
+                    <span class="breadcrumb-sep">›</span>
+                    <span class="breadcrumb-item">Điều 4</span>
+                    <span class="breadcrumb-sep">›</span>
+                    <span class="breadcrumb-item">Khoản 3</span>
+                    <span class="breadcrumb-sep">›</span>
+                    <span class="breadcrumb-item">Điểm b</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="score-badge score-high">0.96</div>
+              </div>
+            </div>
+            <div class="result-snippet">
+              Sinh viên là người <mark>khuyết tật</mark> theo quy định của Luật người <mark>khuyết tật</mark> được <mark>miễn giảm học phí</mark>
+              theo chính sách của Nhà nước và Trường ĐHQT. Mức <mark>miễn giảm</mark>: 100% học phí thực thu đối với người khuyết tật
+              đặc biệt nặng; 50% đối với người <mark>khuyết tật</mark> nặng thuộc hộ nghèo, cận nghèo…
+            </div>
+            <div class="result-footer">
+              <div class="result-meta">
+                <div class="result-meta-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  688/QĐ-ĐHQT
+                </div>
+                <div class="result-meta-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  2024-01-01
+                </div>
+                <div class="result-meta-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  Hiệu trưởng Trường ĐHQT
+                </div>
+              </div>
+              <div class="result-actions">
+                <button class="result-expand-btn" onclick="toggleExpand('card-1', this)">
+                  <span>Thu gọn</span>
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>
+                </button>
+                <button class="result-expand-btn" onclick="openDetail(1)">Chi tiết</button>
+                <a class="btn-pdf" href="javascript:void(0)" onclick="openPDF('9.-QD688-MGHP-2024.pdf')">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Xem PDF
+                </a>
+              </div>
+            </div>
+            <div class="result-expanded-body">
+              <div class="full-text">Điều 4. Đối tượng được miễn, giảm học phí
+
+Khoản 3. Sinh viên là người khuyết tật:
+  b) Sinh viên là người khuyết tật theo quy định của Luật người khuyết tật số 51/2010/QH12 được hưởng chính sách miễn, giảm học phí như sau:
+  - Miễn 100% học phí: Người khuyết tật đặc biệt nặng; Người khuyết tật nặng thuộc hộ nghèo, hộ cận nghèo.
+  - Giảm 50% học phí: Người khuyết tật nặng không thuộc diện nghèo, cận nghèo.
+  - Giảm 25% học phí: Người khuyết tật nhẹ.
+
+  Hồ sơ cần nộp: Đơn xin miễn giảm học phí (mẫu Phòng CTSV), Giấy xác nhận mức độ khuyết tật do cơ quan có thẩm quyền cấp, Bản sao sổ hộ khẩu hoặc giấy tờ xác nhận hộ nghèo/cận nghèo (nếu có).</div>
+              <div class="meta-grid">
+                <div class="meta-box">
+                  <div class="meta-box-label">Điều</div>
+                  <div class="meta-box-value">Điều 4</div>
+                </div>
+                <div class="meta-box">
+                  <div class="meta-box-label">Khoản</div>
+                  <div class="meta-box-value">Khoản 3</div>
+                </div>
+                <div class="meta-box">
+                  <div class="meta-box-label">Điểm</div>
+                  <div class="meta-box-value">Điểm b</div>
+                </div>
+                <div class="meta-box">
+                  <div class="meta-box-label">Phiên bản</div>
+                  <div class="meta-box-value">2024</div>
+                </div>
+                <div class="meta-box">
+                  <div class="meta-box-label">Nhóm</div>
+                  <div class="meta-box-value">qd_ngan_dhqt</div>
+                </div>
+                <div class="meta-box">
+                  <div class="meta-box-label">doc_id</div>
+                  <div class="meta-box-value">A-4-3-b-0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="result-card" id="card-2">
+            <div class="result-card-header">
+              <div class="result-rank result-rank-2">2</div>
+              <div class="result-header-mid">
+                <div class="result-title">
+                  QĐ 191 – Quy định Chế độ Chính sách (2011)
+                  <span class="badge badge-indigo">Quyết định</span>
+                </div>
+                <div class="result-path">
+                  <div class="breadcrumb">
+                    <span class="breadcrumb-item">Điều 2</span>
+                    <span class="breadcrumb-sep">›</span>
+                    <span class="breadcrumb-item">Khoản 4</span>
+                  </div>
+                </div>
+              </div>
+              <div><div class="score-badge score-high">0.91</div></div>
+            </div>
+            <div class="result-snippet">
+              Đối tượng 04: Sinh viên bị tàn tật, <mark>khuyết tật</mark> thuộc hộ cận nghèo theo quy định của Thủ tướng Chính phủ.
+              Mức <mark>miễn giảm</mark>: 100% học phí thực thu (bao gồm 100% mức trần học phí theo quy định của Nhà nước tùy mức nào cao hơn)…
+            </div>
+            <div class="result-footer">
+              <div class="result-meta">
+                <div class="result-meta-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  191/QĐ-ĐHQT
+                </div>
+                <div class="result-meta-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  2011-01-01
+                </div>
+              </div>
+              <div class="result-actions">
+                <button class="result-expand-btn" onclick="toggleExpand('card-2', this)">
+                  <span>Xem thêm</span>
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <button class="result-expand-btn" onclick="openDetail(2)">Chi tiết</button>
+                <a class="btn-pdf" href="javascript:void(0)" onclick="openPDF('6.-QD-191_2011_Quy-dinh-che-do-chinh-sach.pdf')">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Xem PDF
+                </a>
+              </div>
+            </div>
+            <div class="result-expanded-body">
+              <div class="full-text">Điều 2. Đối tượng 04: Sinh viên bị tàn tật, khuyết tật thuộc hộ cận nghèo
+Khoản 4. Mức miễn giảm: 100% học phí thực thu (bao gồm 100% mức trần học phí theo quy định của Nhà nước tùy mức nào cao hơn).
+Yêu cầu hồ sơ: Mẫu đơn MGHP của nhà trường, bản photo công chứng giấy chứng nhận khuyết tật, xác nhận cận nghèo của UBND.</div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="result-card" id="card-3">
+            <div class="result-card-header">
+              <div class="result-rank result-rank-3">3</div>
+              <div class="result-header-mid">
+                <div class="result-title">
+                  Quy chế Học vụ ĐHQT (QĐ 719/2021)
+                  <span class="badge badge-indigo">Quyết định</span>
+                  <span class="badge badge-green">Hiệu lực</span>
+                </div>
+                <div class="result-path">
+                  <div class="breadcrumb">
+                    <span class="breadcrumb-item">Chương II</span>
+                    <span class="breadcrumb-sep">›</span>
+                    <span class="breadcrumb-item">Điều 7</span>
+                    <span class="breadcrumb-sep">›</span>
+                    <span class="breadcrumb-item">Khoản 2</span>
+                  </div>
+                </div>
+              </div>
+              <div><div class="score-badge score-medium">0.84</div></div>
+            </div>
+            <div class="result-snippet">
+              Sinh viên thuộc diện hỗ trợ đặc biệt (bao gồm người <mark>khuyết tật</mark>, hộ nghèo, cận nghèo, dân tộc thiểu số)
+              có thể được xem xét <mark>miễn giảm</mark> hoặc hỗ trợ học phí theo chính sách hiện hành của Nhà nước và Trường…
+            </div>
+            <div class="result-footer">
+              <div class="result-meta">
+                <div class="result-meta-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  719/QĐ-ĐHQT
+                </div>
+                <div class="result-meta-item">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  2021-12-06
+                </div>
+              </div>
+              <div class="result-actions">
+                <button class="result-expand-btn" onclick="toggleExpand('card-3', this)">
+                  <span>Xem thêm</span>
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <button class="result-expand-btn" onclick="openDetail(3)">Chi tiết</button>
+                <a class="btn-pdf" href="javascript:void(0)" onclick="openPDF('15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf')">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Xem PDF
+                </a>
+              </div>
+            </div>
+            <div class="result-expanded-body">
+              <div class="full-text">Chương II. Học phí và Chính sách Hỗ trợ Người học
+Điều 7. Chính sách miễn, giảm học phí
+Khoản 2. Sinh viên thuộc diện hỗ trợ đặc biệt (người khuyết tật, hộ nghèo, cận nghèo, dân tộc thiểu số rất ít người) được xem xét miễn, giảm học phí theo đúng chính sách hiện hành của Nhà nước và Nhà trường. Thủ tục và mức miễn giảm cụ thể được quy định tại Quyết định số 688/QĐ-ĐHQT.</div>
+            </div>
+          </div>
+
+          <!-- Cards 4-10 (compact) -->
+          <div id="moreResults">
+            <div class="result-card" id="card-4">
+              <div class="result-card-header">
+                <div class="result-rank">4</div>
+                <div class="result-header-mid">
+                  <div class="result-title">Quy chế CTSV (QĐ 967/2022) – Điều 15, Khoản 1 <span class="badge badge-indigo">Quyết định</span></div>
+                  <div class="result-path"><div class="breadcrumb"><span class="breadcrumb-item">Chương III</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-item">Điều 15</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-item">Khoản 1</span></div></div>
+                </div>
+                <div><div class="score-badge score-medium">0.79</div></div>
+              </div>
+              <div class="result-snippet">…Sinh viên <mark>khuyết tật</mark> và gia đình chính sách được ưu tiên trong xét <mark>miễn giảm</mark> học phí đầu mỗi học kỳ. Hạn nộp hồ sơ không quá 4 tuần kể từ ngày khai giảng…</div>
+              <div class="result-footer">
+                <div class="result-meta"><div class="result-meta-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>967/QĐ-ĐHQT</div><div class="result-meta-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>2022-12-30</div></div>
+                <div class="result-actions"><button class="result-expand-btn" onclick="toggleExpand('card-4',this)"><span>Xem thêm</span><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><button class="result-expand-btn" onclick="openDetail(4)">Chi tiết</button><a class="btn-pdf" href="javascript:void(0)" onclick="openPDF('Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Xem PDF</a></div>
+              </div>
+              <div class="result-expanded-body"><div class="full-text">Điều 15. Hỗ trợ sinh viên có hoàn cảnh khó khăn\nKhoản 1. Sinh viên thuộc diện khuyết tật và gia đình chính sách được Phòng CTSV xem xét và đề xuất miễn, giảm học phí đầu mỗi học kỳ. Hạn nộp hồ sơ: không quá 4 tuần kể từ ngày khai giảng học kỳ đó.</div></div>
+            </div>
+
+            <div class="result-card" id="card-5">
+              <div class="result-card-header">
+                <div class="result-rank">5</div>
+                <div class="result-header-mid">
+                  <div class="result-title">Thông tư 14/2019/TT-BGDĐT – Điều 9 <span class="badge badge-green">Thông tư</span></div>
+                  <div class="result-path"><div class="breadcrumb"><span class="breadcrumb-item">Chương II</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-item">Điều 9</span></div></div>
+                </div>
+                <div><div class="score-badge score-medium">0.73</div></div>
+              </div>
+              <div class="result-snippet">…Người học là người <mark>khuyết tật</mark> được hưởng chính sách <mark>miễn</mark>, <mark>giảm học phí</mark> theo quy định tại Nghị định số 86/2015/NĐ-CP và các văn bản sửa đổi, bổ sung…</div>
+              <div class="result-footer">
+                <div class="result-meta"><div class="result-meta-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>14/2019/TT-BGDĐT</div></div>
+                <div class="result-actions"><button class="result-expand-btn" onclick="toggleExpand('card-5',this)"><span>Xem thêm</span><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><button class="result-expand-btn" onclick="openDetail(5)">Chi tiết</button></div>
+              </div>
+              <div class="result-expanded-body"><div class="full-text">Điều 9. Miễn, giảm học phí cho người học khuyết tật\nNgười học là người khuyết tật được hưởng chính sách miễn, giảm học phí theo quy định tại Nghị định số 86/2015/NĐ-CP ngày 02/10/2015 và các văn bản sửa đổi, bổ sung có liên quan.</div></div>
+            </div>
+
+            <div class="result-card" id="card-6">
+              <div class="result-card-header">
+                <div class="result-rank">6</div>
+                <div class="result-header-mid">
+                  <div class="result-title">Luật Người Khuyết tật số 51/2010/QH12 – Điều 30 <span class="badge badge-amber">Luật</span></div>
+                  <div class="result-path"><div class="breadcrumb"><span class="breadcrumb-item">Chương IV</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-item">Điều 30</span></div></div>
+                </div>
+                <div><div class="score-badge score-low">0.67</div></div>
+              </div>
+              <div class="result-snippet">…Người <mark>khuyết tật</mark> đang học tại các cơ sở giáo dục được <mark>miễn</mark>, <mark>giảm học phí</mark>; được hưởng học bổng và trợ cấp xã hội theo quy định của pháp luật…</div>
+              <div class="result-footer">
+                <div class="result-meta"><div class="result-meta-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>51/2010/QH12</div></div>
+                <div class="result-actions"><button class="result-expand-btn" onclick="toggleExpand('card-6',this)"><span>Xem thêm</span><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><button class="result-expand-btn" onclick="openDetail(6)">Chi tiết</button></div>
+              </div>
+              <div class="result-expanded-body"><div class="full-text">Chương IV. Chính sách của Nhà nước đối với người khuyết tật\nĐiều 30. Hỗ trợ giáo dục đối với người khuyết tật\nNgười khuyết tật đang theo học tại các cơ sở giáo dục được miễn, giảm học phí; được hưởng học bổng và trợ cấp xã hội theo quy định của pháp luật.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <button class="page-btn" disabled>‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /screen-results -->
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 4 – ADMIN DASHBOARD
+══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-admin">
+  <nav class="navbar">
+    <a class="navbar-brand" href="#" onclick="showScreen('home')">
+      <div class="navbar-logo">IU</div>
+      <div class="navbar-name">
+        <span class="navbar-name-main">ARRS Admin</span>
+        <span class="navbar-name-sub">Pipeline & Evaluation</span>
+      </div>
+    </a>
+    <div class="navbar-nav">
+      <button class="nav-link" onclick="showScreen('home')">🏠 Tra cứu</button>
+      <button class="nav-link" onclick="showScreen('results')">📄 Kết quả</button>
+      <button class="nav-link active">⚙️ Quản trị</button>
+    </div>
+    <div class="navbar-right">
+      <div class="navbar-badge">API Online</div>
+      <div class="avatar" style="background:linear-gradient(135deg,#DC2626,#7C3AED)">AD</div>
+    </div>
+  </nav>
+
+  <div class="admin-layout" style="flex:1">
+    <!-- Admin Sidebar -->
+    <div class="admin-sidebar">
+      <div class="admin-nav-section">Tổng quan</div>
+      <div class="admin-nav-item active" onclick="switchAdminPage('dashboard',this)">
+        <span>📊</span> Dashboard
+      </div>
+      <div class="admin-nav-item" onclick="switchAdminPage('sources',this)">
+        <span>📁</span> Tài liệu nguồn
+      </div>
+      <div class="admin-nav-section" style="margin-top:8px">Pipeline</div>
+      <div class="admin-nav-item" onclick="switchAdminPage('parse',this)">
+        <span>⚙️</span> Parse & Chunk
+      </div>
+      <div class="admin-nav-item" onclick="switchAdminPage('embedding',this)">
+        <span>🧠</span> Embedding
+      </div>
+      <div class="admin-nav-item" onclick="switchAdminPage('indexing',this)">
+        <span>📦</span> Indexing
+      </div>
+      <div class="admin-nav-section" style="margin-top:8px">Đánh giá</div>
+      <div class="admin-nav-item" onclick="switchAdminPage('metrics',this)">
+        <span>📐</span> Metrics
+      </div>
+      <div class="admin-nav-item" onclick="switchAdminPage('benchmark',this)">
+        <span>🏆</span> Model Benchmark
+      </div>
+      <div class="admin-nav-section" style="margin-top:8px">Hệ thống</div>
+      <div class="admin-nav-item" onclick="switchAdminPage('apihealth',this)">
+        <span>🖥️</span> API Health
+      </div>
+      <div class="admin-nav-item" onclick="switchAdminPage('config',this)">
+        <span>⚙️</span> Cấu hình
+      </div>
+    </div>
+
+    <!-- Admin Main -->
+    <div class="admin-main">
+      <div class="admin-content">
+
+      <!-- ═══ PAGE: DASHBOARD ═══ -->
+      <div id="admin-page-dashboard">
+        <div class="admin-page-title">Dashboard Quản trị</div>
+        <div class="admin-page-sub">Tổng quan hệ thống ARRS · Cập nhật lần cuối: hôm nay, 08:45</div>
+
+        <!-- Metrics -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon" style="background:#EFF6FF">📄</div>
+            <div class="metric-value">35</div>
+            <div class="metric-label">Tài liệu đã index</div>
+            <div class="metric-change metric-up">↑ +2 tuần này</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" style="background:#F0FDF4">✂️</div>
+            <div class="metric-value">2,412</div>
+            <div class="metric-label">Chunk trong Qdrant</div>
+            <div class="metric-change metric-up">↑ +184 mới</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" style="background:#FFF7ED">⚡</div>
+            <div class="metric-value">0.88</div>
+            <div class="metric-label">nDCG@10 (Rerank)</div>
+            <div class="metric-change metric-up">↑ +0.03 so với tuần trước</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" style="background:#FFF1F2">🕐</div>
+            <div class="metric-value">1.84s</div>
+            <div class="metric-label">Latency p95 (hybrid)</div>
+            <div class="metric-change metric-down">↓ cải thiện 0.2s</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <!-- Pipeline Status -->
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--gray-900);margin-bottom:16px">
+              Trạng thái Pipeline
+              <button class="btn btn-primary btn-sm" style="margin-left:12px" onclick="simulatePipeline()">▶ Chạy lại</button>
+            </div>
+            <div class="pipeline-steps">
+              <div class="pipeline-step">
+                <div class="step-status status-done"></div>
+                <div>
+                  <div class="step-name">01 Parse & Chunk</div>
+                  <div class="step-desc">35 files PDF/DOCX → 2,412 chunks JSONL</div>
+                </div>
+                <div class="step-meta">
+                  <div class="step-count">2,412 chunks</div>
+                  <div class="step-time">8m 24s</div>
+                </div>
+              </div>
+              <div class="pipeline-step">
+                <div class="step-status status-done"></div>
+                <div>
+                  <div class="step-name">02 Embedding & Ingest</div>
+                  <div class="step-desc">multilingual-e5-base · batch 64 · Qdrant</div>
+                </div>
+                <div class="step-meta">
+                  <div class="step-count">768-dim vectors</div>
+                  <div class="step-time">12m 03s</div>
+                </div>
+              </div>
+              <div class="pipeline-step">
+                <div class="step-status status-done"></div>
+                <div>
+                  <div class="step-name">04 BM25 Index</div>
+                  <div class="step-desc">vi_basic tokenizer · rank-bm25</div>
+                </div>
+                <div class="step-meta">
+                  <div class="step-count">bm25.pkl</div>
+                  <div class="step-time">1m 12s</div>
+                </div>
+              </div>
+              <div class="pipeline-step" id="pipelineEvalStep">
+                <div class="step-status status-waiting" id="evalDot"></div>
+                <div>
+                  <div class="step-name">07 Eval Metrics</div>
+                  <div class="step-desc" id="evalDesc">Chờ chạy · 200 queries · qrels.jsonl</div>
+                </div>
+                <div class="step-meta">
+                  <div class="step-count" id="evalCount">–</div>
+                  <div class="step-time" id="evalTime">–</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress (visible when running) -->
+            <div id="pipelineProgress" style="display:none;margin-top:16px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:6px">
+                <span>Đang xử lý embedding…</span>
+                <span id="progressPct">0%</span>
+              </div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" id="progressBar" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Model Benchmark -->
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--gray-900);margin-bottom:16px">Model Benchmark</div>
+            <div class="model-cards">
+              <div class="model-card active">
+                <div class="model-name">bge-reranker-v2-m3</div>
+                <div class="model-type">CrossEncoder · BAAI · Đang dùng</div>
+                <div class="model-scores">
+                  <div class="model-score-item">
+                    <div class="model-score-label">nDCG@10</div>
+                    <div class="model-score-val">0.88</div>
+                  </div>
+                  <div class="model-score-item">
+                    <div class="model-score-label">Recall@10</div>
+                    <div class="model-score-val">91%</div>
+                  </div>
+                  <div class="model-score-item">
+                    <div class="model-score-label">MRR</div>
+                    <div class="model-score-val">0.82</div>
+                  </div>
+                </div>
+              </div>
+              <div class="model-card">
+                <div class="model-name">PhoRanker</div>
+                <div class="model-type">CrossEncoder · itdainb · Tiếng Việt</div>
+                <div class="model-scores">
+                  <div class="model-score-item">
+                    <div class="model-score-label">nDCG@10</div>
+                    <div class="model-score-val">0.83</div>
+                  </div>
+                  <div class="model-score-item">
+                    <div class="model-score-label">Recall@10</div>
+                    <div class="model-score-val">87%</div>
+                  </div>
+                  <div class="model-score-item">
+                    <div class="model-score-label">MRR</div>
+                    <div class="model-score-val">0.77</div>
+                  </div>
+                </div>
+              </div>
+              <div class="model-card">
+                <div class="model-name">jina-reranker-v2-multilingual</div>
+                <div class="model-type">CrossEncoder · jinaai</div>
+                <div class="model-scores">
+                  <div class="model-score-item">
+                    <div class="model-score-label">nDCG@10</div>
+                    <div class="model-score-val">0.85</div>
+                  </div>
+                  <div class="model-score-item">
+                    <div class="model-score-label">Recall@10</div>
+                    <div class="model-score-val">88%</div>
+                  </div>
+                </div>
+              </div>
+              <div class="model-card">
+                <div class="model-name">No reranking (Hybrid RRF)</div>
+                <div class="model-type">Baseline</div>
+                <div class="model-scores">
+                  <div class="model-score-item">
+                    <div class="model-score-label">nDCG@10</div>
+                    <div class="model-score-val">0.75</div>
+                  </div>
+                  <div class="model-score-item">
+                    <div class="model-score-label">Recall@10</div>
+                    <div class="model-score-val">82%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Health -->
+        <div style="margin-top:28px;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+          <div style="font-size:15px;font-weight:700;color:var(--gray-900);margin-bottom:16px">Trạng thái API Endpoints</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--gray-50);border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="badge badge-green">GET</span>
+                <code style="font-size:13px;color:var(--gray-700)">/health</code>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span class="badge badge-green">200 OK</span>
+                <span style="font-size:12px;color:var(--gray-500)">12ms</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--gray-50);border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="badge badge-green">GET</span>
+                <code style="font-size:13px;color:var(--gray-700)">/search?mode=hybrid_rerank</code>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span class="badge badge-green">200 OK</span>
+                <span style="font-size:12px;color:var(--gray-500)">1,840ms</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--gray-50);border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="badge badge-green">GET</span>
+                <code style="font-size:13px;color:var(--gray-700)">/search?mode=hybrid</code>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span class="badge badge-green">200 OK</span>
+                <span style="font-size:12px;color:var(--gray-500)">920ms</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--gray-50);border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="badge badge-green">GET</span>
+                <code style="font-size:13px;color:var(--gray-700)">/search?mode=dense</code>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span class="badge badge-green">200 OK</span>
+                <span style="font-size:12px;color:var(--gray-500)">480ms</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /admin-page-dashboard -->
+
+      <!-- ═══ PAGE: TÀI LIỆU NGUỒN ═══ -->
+      <div id="admin-page-sources" style="display:none">
+        <div class="admin-page-title">Tài liệu nguồn</div>
+        <div class="admin-page-sub">34 tài liệu PDF/DOCX đã được index · 7 nhóm tài liệu</div>
+
+        <!-- Toolbar -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+          <input type="text" placeholder="Tìm theo tên tài liệu…" style="flex:1;padding:9px 14px;border:1px solid var(--gray-200);border-radius:var(--radius-md);font-size:13px;outline:none">
+          <select id="srcGroupFilter" onchange="onSrcGroupChange(this.value)" style="padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-md);font-size:13px;color:var(--gray-700);background:white">
+            <option value="">Tất cả nhóm</option>
+            <option value="luat_quoc_gia">luat_quoc_gia</option>
+            <option value="thong_tu_bo_gd">thong_tu_bo_gd</option>
+            <option value="qd_qc_dhqg_hcm">qd_qc_dhqg_hcm</option>
+            <option value="qd_qc_dhqt">qd_qc_dhqt</option>
+            <option value="qd_ngan_dhqt">qd_ngan_dhqt</option>
+            <option value="thong_bao">thong_bao</option>
+            <option value="phu_luc">phu_luc</option>
+          </select>
+          <select style="padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-md);font-size:13px;color:var(--gray-700);background:white">
+            <option>Trạng thái</option>
+            <option>Đã index</option>
+            <option>Lỗi OCR</option>
+            <option>Chờ xử lý</option>
+          </select>
+          <button class="btn btn-primary btn-sm">+ Thêm tài liệu</button>
+        </div>
+
+        <!-- Table -->
+        <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="background:var(--gray-50);border-bottom:1px solid var(--gray-200)">
+                <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--gray-700)">Tên tài liệu</th>
+                <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--gray-700)">Nhóm</th>
+                <th style="padding:12px 16px;text-align:center;font-weight:600;color:var(--gray-700)">Trang</th>
+                <th style="padding:12px 16px;text-align:center;font-weight:600;color:var(--gray-700)">Chunks</th>
+                <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--gray-700)">Loại</th>
+                <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--gray-700)">Trạng thái</th>
+                <th style="padding:12px 16px;text-align:left;font-weight:600;color:var(--gray-700)">Ngày thêm</th>
+                <th style="padding:12px 16px;text-align:center;font-weight:600;color:var(--gray-700)"></th>
+              </tr>
+            </thead>
+            <tbody id="srcTableBody"></tbody>
+          </table>
+          <div id="srcTableFooter" style="padding:12px 16px;border-top:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;color:var(--gray-500);font-size:12px">
+            <span id="srcTableInfo">Hiển thị 1–10 / 34 tài liệu</span>
+            <div id="srcPagination" style="display:flex;gap:6px"></div>
+          </div>
+        </div>
+      </div><!-- /admin-page-sources -->
+
+      <!-- ═══ PAGE: PARSE & CHUNK ═══ -->
+      <div id="admin-page-parse" style="display:none">
+        <div class="admin-page-title">Parse & Chunk</div>
+        <div class="admin-page-sub">Script 01_parse_chunk.py · Semantic chunking với TF-IDF lite</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+          <!-- Config panel -->
+          <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+            <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:16px">⚙️ Cấu hình Chunking</div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div>
+                <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Target tokens</label>
+                <input type="number" value="320" style="width:100%;padding:8px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Overlap ratio</label>
+                <input type="number" value="0.08" step="0.01" style="width:100%;padding:8px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px">
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--primary-xxl);border-radius:var(--radius-sm)">
+                <span style="font-size:13px;font-weight:600;color:var(--primary)">Semantic chunking</span>
+                <div onclick="this.classList.toggle('tog-on')" class="toggle-switch tog-on" style="width:36px;height:20px;border-radius:10px;background:var(--primary);cursor:pointer;position:relative;transition:.2s">
+                  <div style="position:absolute;right:2px;top:2px;width:16px;height:16px;border-radius:50%;background:white;transition:.2s"></div>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Breakpoint percentile</label>
+                <input type="range" min="80" max="99" value="92" style="width:100%" oninput="document.getElementById('bpVal').textContent=this.value">
+                <span style="font-size:12px;color:var(--primary);font-weight:600" id="bpVal">92</span>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Min / Max tokens per chunk</label>
+                <div style="display:flex;gap:8px">
+                  <input type="number" value="60" style="flex:1;padding:8px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px">
+                  <input type="number" value="480" style="flex:1;padding:8px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px">
+                </div>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Embedding model (semantic)</label>
+                <select style="width:100%;padding:8px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px">
+                  <option value="">TF-IDF lite (không cần GPU)</option>
+                  <option>intfloat/multilingual-e5-base</option>
+                  <option>sentence-transformers/paraphrase-multilingual-mpnet-base-v2</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:4px">
+                <button class="btn btn-primary btn-sm" style="flex:1" onclick="runParseSim()">▶ Chạy lại parse</button>
+                <button class="btn btn-outline btn-sm">Lưu config</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats panel -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+              <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:14px">📊 Thống kê chunks hiện tại</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="text-align:center;padding:12px;background:var(--primary-xxl);border-radius:var(--radius-md)">
+                  <div style="font-size:22px;font-weight:800;color:var(--primary)">2,412</div>
+                  <div style="font-size:11px;color:var(--gray-500);margin-top:2px">Tổng chunks</div>
+                </div>
+                <div style="text-align:center;padding:12px;background:var(--success-light);border-radius:var(--radius-md)">
+                  <div style="font-size:22px;font-weight:800;color:var(--success)">247</div>
+                  <div style="font-size:11px;color:var(--gray-500);margin-top:2px">Tokens TB/chunk</div>
+                </div>
+                <div style="text-align:center;padding:12px;background:var(--warning-light);border-radius:var(--radius-md)">
+                  <div style="font-size:22px;font-weight:800;color:var(--warning)">60</div>
+                  <div style="font-size:11px;color:var(--gray-500);margin-top:2px">Min tokens</div>
+                </div>
+                <div style="text-align:center;padding:12px;background:var(--danger-light);border-radius:var(--radius-md)">
+                  <div style="font-size:22px;font-weight:800;color:var(--danger)">478</div>
+                  <div style="font-size:11px;color:var(--gray-500);margin-top:2px">Max tokens</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;flex:1">
+              <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:12px">Phân bố token/chunk</div>
+              <div style="display:flex;flex-direction:column;gap:8px" id="parseDistChart">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+                  <span style="width:70px;color:var(--gray-600)">60–120</span>
+                  <div style="flex:1;height:14px;background:var(--gray-100);border-radius:4px;overflow:hidden">
+                    <div style="height:100%;width:12%;background:var(--primary-light);border-radius:4px"></div>
+                  </div>
+                  <span style="color:var(--gray-500);width:30px;text-align:right">289</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+                  <span style="width:70px;color:var(--gray-600)">120–200</span>
+                  <div style="flex:1;height:14px;background:var(--gray-100);border-radius:4px;overflow:hidden">
+                    <div style="height:100%;width:28%;background:var(--primary-light);border-radius:4px"></div>
+                  </div>
+                  <span style="color:var(--gray-500);width:30px;text-align:right">675</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+                  <span style="width:70px;color:var(--gray-600)">200–320</span>
+                  <div style="flex:1;height:14px;background:var(--gray-100);border-radius:4px;overflow:hidden">
+                    <div style="height:100%;width:48%;background:var(--primary);border-radius:4px"></div>
+                  </div>
+                  <span style="color:var(--gray-500);width:30px;text-align:right">1158</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+                  <span style="width:70px;color:var(--gray-600)">320–480</span>
+                  <div style="flex:1;height:14px;background:var(--gray-100);border-radius:4px;overflow:hidden">
+                    <div style="height:100%;width:12%;background:var(--warning);border-radius:4px"></div>
+                  </div>
+                  <span style="color:var(--gray-500);width:30px;text-align:right">290</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Run log -->
+        <div style="background:#0F172A;border-radius:var(--radius-lg);padding:16px;font-family:monospace;font-size:12px;color:#94A3B8;line-height:1.8" id="parseLog">
+          <span style="color:#4ADE80">[08:45:01]</span> Loaded config: configs/default.yaml<br>
+          <span style="color:#4ADE80">[08:45:01]</span> semantic_chunking.enabled = True, model = TF-IDF lite<br>
+          <span style="color:#4ADE80">[08:45:02]</span> Processing 35 files from data/raw/<br>
+          <span style="color:#4ADE80">[08:52:14]</span> ✓ QD-688.pdf → 214 chunks (semantic: 187 / token-window: 27)<br>
+          <span style="color:#4ADE80">[08:52:31]</span> ✓ TB-486.pdf → 98 chunks (OCR mode, scanned)<br>
+          <span style="color:#4ADE80">[08:53:02]</span> ✓ Noi-Quy-SV.pdf → 143 chunks<br>
+          <span style="color:#60A5FA">[08:53:22]</span> ⚠ QC-191.pdf: 3 pages low OCR confidence (&lt;0.5)<br>
+          <span style="color:#4ADE80">[08:54:10]</span> Done: 2,412 chunks → data/processed/*.jsonl
+        </div>
+      </div><!-- /admin-page-parse -->
+
+      <!-- ═══ PAGE: EMBEDDING ═══ -->
+      <div id="admin-page-embedding" style="display:none">
+        <div class="admin-page-title">Embedding</div>
+        <div class="admin-page-sub">Script 02_embed_ingest.py · intfloat/multilingual-e5-base · 768 dimensions</div>
+
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <!-- Model info -->
+            <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+              <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:14px">🧠 Model đang dùng</div>
+              <div style="display:flex;align-items:center;gap:16px;padding:14px;background:var(--primary-xxl);border-radius:var(--radius-md)">
+                <div style="width:48px;height:48px;border-radius:var(--radius-md);background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:22px">🤗</div>
+                <div>
+                  <div style="font-size:15px;font-weight:700;color:var(--primary)">intfloat/multilingual-e5-base</div>
+                  <div style="font-size:12px;color:var(--gray-500);margin-top:2px">278M params · 768-dim · Hỗ trợ 100+ ngôn ngữ · Max seq: 512 tokens</div>
+                </div>
+                <span class="badge badge-green" style="margin-left:auto">Active</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px">
+                <div style="text-align:center;padding:10px;border:1px solid var(--gray-100);border-radius:var(--radius-md)">
+                  <div style="font-size:18px;font-weight:700;color:var(--gray-900)">768</div>
+                  <div style="font-size:11px;color:var(--gray-500)">Vector dims</div>
+                </div>
+                <div style="text-align:center;padding:10px;border:1px solid var(--gray-100);border-radius:var(--radius-md)">
+                  <div style="font-size:18px;font-weight:700;color:var(--gray-900)">64</div>
+                  <div style="font-size:11px;color:var(--gray-500)">Batch size</div>
+                </div>
+                <div style="text-align:center;padding:10px;border:1px solid var(--gray-100);border-radius:var(--radius-md)">
+                  <div style="font-size:18px;font-weight:700;color:var(--gray-900)">12m 03s</div>
+                  <div style="font-size:11px;color:var(--gray-500)">Thời gian chạy</div>
+                </div>
+              </div>
+            </div>
+            <!-- Batch progress -->
+            <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+              <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:14px">Batch processing (lần chạy cuối)</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600)">
+                  <span>2,412 chunks đã embed</span><span>100%</span>
+                </div>
+                <div style="height:10px;background:var(--gray-100);border-radius:var(--radius-full)">
+                  <div style="height:100%;width:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:var(--radius-full)"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-400)">
+                  <span>37 batches × 64 chunks</span><span>~0.3s/batch trên CPU</span>
+                </div>
+              </div>
+              <div style="margin-top:16px;display:flex;gap:8px">
+                <button class="btn btn-primary btn-sm">▶ Re-embed tất cả</button>
+                <button class="btn btn-outline btn-sm">Re-embed tài liệu mới</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Config sidebar -->
+          <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+            <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:14px">Cấu hình</div>
+            <div style="display:flex;flex-direction:column;gap:12px;font-size:13px">
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Model</label>
+                <select style="width:100%;padding:8px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:12px">
+                  <option>intfloat/multilingual-e5-base</option>
+                  <option>intfloat/multilingual-e5-large</option>
+                  <option>BAAI/bge-m3</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Normalize vectors</label>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:32px;height:18px;border-radius:9px;background:var(--primary);cursor:pointer;position:relative">
+                    <div style="position:absolute;right:2px;top:2px;width:14px;height:14px;border-radius:50%;background:white"></div>
+                  </div>
+                  <span style="color:var(--gray-600)">Bật (L2 norm)</span>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Batch size</label>
+                <input type="number" value="64" style="width:100%;padding:8px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:12px">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Device</label>
+                <select style="width:100%;padding:8px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:12px">
+                  <option>cpu</option>
+                  <option>cuda</option>
+                  <option>mps</option>
+                </select>
+              </div>
+              <button class="btn btn-outline btn-sm" style="margin-top:4px">Lưu cấu hình</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /admin-page-embedding -->
+
+      <!-- ═══ PAGE: INDEXING ═══ -->
+      <div id="admin-page-indexing" style="display:none">
+        <div class="admin-page-title">Indexing</div>
+        <div class="admin-page-sub">Qdrant (dense vector) + BM25 (sparse keyword) · Hybrid RRF search</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <!-- Qdrant -->
+          <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+              <div style="width:36px;height:36px;border-radius:var(--radius-md);background:#EF4444;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px">Q</div>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--gray-900)">Qdrant</div>
+                <div style="font-size:11px;color:var(--gray-500)">localhost:6333 · collection: reg_chunks</div>
+              </div>
+              <span class="badge badge-green" style="margin-left:auto">Online</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+              <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);text-align:center">
+                <div style="font-size:20px;font-weight:700;color:var(--gray-900)">2,412</div>
+                <div style="font-size:11px;color:var(--gray-500)">Vectors</div>
+              </div>
+              <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);text-align:center">
+                <div style="font-size:20px;font-weight:700;color:var(--gray-900)">768</div>
+                <div style="font-size:11px;color:var(--gray-500)">Dimensions</div>
+              </div>
+              <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);text-align:center">
+                <div style="font-size:20px;font-weight:700;color:var(--gray-900)">Cosine</div>
+                <div style="font-size:11px;color:var(--gray-500)">Distance</div>
+              </div>
+              <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);text-align:center">
+                <div style="font-size:20px;font-weight:700;color:var(--gray-900)">14.2 MB</div>
+                <div style="font-size:11px;color:var(--gray-500)">Disk usage</div>
+              </div>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:8px">HNSW Config</div>
+            <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--gray-600)">
+              <div style="display:flex;justify-content:space-between"><span>m</span><span style="font-weight:600">16</span></div>
+              <div style="display:flex;justify-content:space-between"><span>ef_construct</span><span style="font-weight:600">128</span></div>
+              <div style="display:flex;justify-content:space-between"><span>ef (search)</span><span style="font-weight:600">128</span></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:16px">
+              <button class="btn btn-outline btn-sm">Re-index</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger)">Xóa collection</button>
+            </div>
+          </div>
+
+          <!-- BM25 -->
+          <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+              <div style="width:36px;height:36px;border-radius:var(--radius-md);background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px">BM</div>
+              <div>
+                <div style="font-size:14px;font-weight:700;color:var(--gray-900)">BM25 Index</div>
+                <div style="font-size:11px;color:var(--gray-500)">data/indexes/bm25.pkl · vi_basic tokenizer</div>
+              </div>
+              <span class="badge badge-green" style="margin-left:auto">Loaded</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+              <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);text-align:center">
+                <div style="font-size:20px;font-weight:700;color:var(--gray-900)">2,412</div>
+                <div style="font-size:11px;color:var(--gray-500)">Tài liệu</div>
+              </div>
+              <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);text-align:center">
+                <div style="font-size:20px;font-weight:700;color:var(--gray-900)">48,291</div>
+                <div style="font-size:11px;color:var(--gray-500)">Vocabulary size</div>
+              </div>
+              <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);text-align:center">
+                <div style="font-size:20px;font-weight:700;color:var(--gray-900)">1.2 MB</div>
+                <div style="font-size:11px;color:var(--gray-500)">File size</div>
+              </div>
+              <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);text-align:center">
+                <div style="font-size:20px;font-weight:700;color:var(--gray-900)">1m 12s</div>
+                <div style="font-size:11px;color:var(--gray-500)">Build time</div>
+              </div>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:8px">BM25 Parameters (k1=1.5, b=0.75)</div>
+            <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);font-size:12px;color:var(--gray-600)">
+              Tokenizer: <code style="color:var(--primary)">vi_basic</code> (underthesea word tokenizer với fallback regex)<br>
+              Corpus avg doc len: 247 tokens<br>
+              IDF floor: 0.01
+            </div>
+            <div style="display:flex;gap:8px;margin-top:16px">
+              <button class="btn btn-outline btn-sm">Rebuild BM25</button>
+              <button class="btn btn-ghost btn-sm">Export vocab</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hybrid search config -->
+        <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;margin-top:20px">
+          <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:14px">⚖️ Hybrid RRF Config</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:center">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Dense weight</label>
+              <input type="range" min="0" max="1" step="0.05" value="0.5" style="width:100%" oninput="document.getElementById('denseW').textContent=parseFloat(this.value).toFixed(2);document.getElementById('sparseW').textContent=(1-parseFloat(this.value)).toFixed(2)">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-400)"><span>0</span><span id="denseW" style="color:var(--primary);font-weight:700">0.50</span><span>1</span></div>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Sparse weight</label>
+              <div style="padding:10px;background:var(--gray-50);border-radius:var(--radius-md);text-align:center">
+                <span id="sparseW" style="font-size:18px;font-weight:700;color:var(--primary)">0.50</span>
+                <div style="font-size:11px;color:var(--gray-400)">(1 − dense)</div>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">RRF k</label>
+              <input type="number" value="60" style="width:100%;padding:8px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px">
+            </div>
+          </div>
+        </div>
+      </div><!-- /admin-page-indexing -->
+
+      <!-- ═══ PAGE: METRICS ═══ -->
+      <div id="admin-page-metrics" style="display:none">
+        <div class="admin-page-title">Evaluation Metrics</div>
+        <div class="admin-page-sub">Script 07_eval_metrics.py · 200 test queries · qrels.jsonl</div>
+
+        <!-- KPI row -->
+        <div class="metrics-grid" style="grid-template-columns:repeat(5,1fr)">
+          <div class="metric-card">
+            <div class="metric-value" style="font-size:28px">0.88</div>
+            <div class="metric-label">nDCG@10</div>
+            <div class="metric-change metric-up">↑ +0.03 vs baseline</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" style="font-size:28px">91%</div>
+            <div class="metric-label">Recall@10</div>
+            <div class="metric-change metric-up">↑ +4%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" style="font-size:28px">0.82</div>
+            <div class="metric-label">MRR@10</div>
+            <div class="metric-change metric-up">↑ +0.05</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" style="font-size:28px">0.79</div>
+            <div class="metric-label">Precision@5</div>
+            <div class="metric-change metric-up">↑ +0.02</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" style="font-size:28px">1.84s</div>
+            <div class="metric-label">Latency p95</div>
+            <div class="metric-change metric-down">↓ cải thiện</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <!-- Per-category breakdown -->
+          <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+            <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:14px">nDCG@10 theo nhóm tài liệu</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span style="color:var(--gray-700)">qd_ngan_dhqt (Quyết định)</span>
+                  <span style="font-weight:700;color:var(--primary)">0.91</span>
+                </div>
+                <div style="height:8px;background:var(--gray-100);border-radius:4px"><div style="height:100%;width:91%;background:var(--primary);border-radius:4px"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span style="color:var(--gray-700)">qc_hv_dhqt (Quy chế)</span>
+                  <span style="font-weight:700;color:var(--primary)">0.89</span>
+                </div>
+                <div style="height:8px;background:var(--gray-100);border-radius:4px"><div style="height:100%;width:89%;background:var(--primary);border-radius:4px"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span style="color:var(--gray-700)">tb_dhqt (Thông báo)</span>
+                  <span style="font-weight:700;color:var(--warning)">0.83</span>
+                </div>
+                <div style="height:8px;background:var(--gray-100);border-radius:4px"><div style="height:100%;width:83%;background:var(--warning);border-radius:4px"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span style="color:var(--gray-700)">noi_quy_sv (Nội quy SV)</span>
+                  <span style="font-weight:700;color:var(--primary)">0.88</span>
+                </div>
+                <div style="height:8px;background:var(--gray-100);border-radius:4px"><div style="height:100%;width:88%;background:var(--primary);border-radius:4px"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span style="color:var(--gray-700)">ck_chuyen_nganh (Chuẩn đầu ra)</span>
+                  <span style="font-weight:700;color:var(--danger)">0.76</span>
+                </div>
+                <div style="height:8px;background:var(--gray-100);border-radius:4px"><div style="height:100%;width:76%;background:var(--danger);border-radius:4px"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                  <span style="color:var(--gray-700)">bieu_mau (Biểu mẫu)</span>
+                  <span style="font-weight:700;color:var(--warning)">0.81</span>
+                </div>
+                <div style="height:8px;background:var(--gray-100);border-radius:4px"><div style="height:100%;width:81%;background:var(--warning);border-radius:4px"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Latency breakdown -->
+          <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+            <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:14px">Latency breakdown (ms, p50/p95)</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--gray-50);border-radius:var(--radius-md)">
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--gray-800)">Dense search (Qdrant)</div>
+                  <div style="font-size:11px;color:var(--gray-500)">ANN với HNSW ef=128</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-size:14px;font-weight:700;color:var(--primary)">38ms</div>
+                  <div style="font-size:11px;color:var(--gray-400)">p50 / <span style="color:var(--warning)">74ms p95</span></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--gray-50);border-radius:var(--radius-md)">
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--gray-800)">BM25 search</div>
+                  <div style="font-size:11px;color:var(--gray-500)">In-memory rank-bm25</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-size:14px;font-weight:700;color:var(--primary)">12ms</div>
+                  <div style="font-size:11px;color:var(--gray-400)">p50 / <span style="color:var(--success)">28ms p95</span></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--gray-50);border-radius:var(--radius-md)">
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--gray-800)">RRF fusion</div>
+                  <div style="font-size:11px;color:var(--gray-500)">top-k=10, k=60</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-size:14px;font-weight:700;color:var(--primary)">3ms</div>
+                  <div style="font-size:11px;color:var(--gray-400)">p50 / 5ms p95</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--primary-xxl);border-radius:var(--radius-md);border:1px solid var(--primary-xl)">
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--primary)">Reranking (bge-m3)</div>
+                  <div style="font-size:11px;color:var(--gray-500)">CrossEncoder · 10 candidates · CPU</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-size:14px;font-weight:700;color:var(--primary)">1,680ms</div>
+                  <div style="font-size:11px;color:var(--gray-400)">p50 / <span style="color:var(--danger)">1,840ms p95</span></div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:12px;padding:10px;background:var(--warning-light);border-radius:var(--radius-md);font-size:12px;color:var(--warning)">
+              💡 Reranking chiếm 91% latency. Cân nhắc GPU hoặc giảm candidates xuống 5.
+            </div>
+          </div>
+        </div>
+
+        <!-- Failure analysis -->
+        <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;margin-top:20px">
+          <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:14px">Top 5 queries có recall thấp nhất</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+            <thead><tr style="background:var(--gray-50)">
+              <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-600)">Query</th>
+              <th style="padding:8px 12px;text-align:center;font-weight:600;color:var(--gray-600)">nDCG@10</th>
+              <th style="padding:8px 12px;text-align:center;font-weight:600;color:var(--gray-600)">Recall@10</th>
+              <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-600)">Ghi chú</th>
+            </tr></thead>
+            <tbody>
+              <tr style="border-top:1px solid var(--gray-100)"><td style="padding:8px 12px">Quy định về cấp bằng tốt nghiệp loại xuất sắc</td><td style="padding:8px 12px;text-align:center"><span style="color:var(--danger);font-weight:700">0.41</span></td><td style="padding:8px 12px;text-align:center"><span style="color:var(--danger)">40%</span></td><td style="padding:8px 12px;color:var(--gray-500)">Nằm rải rác ở nhiều QĐ</td></tr>
+              <tr style="border-top:1px solid var(--gray-100)"><td style="padding:8px 12px">Biểu mẫu đăng ký học lại môn</td><td style="padding:8px 12px;text-align:center"><span style="color:var(--danger);font-weight:700">0.52</span></td><td style="padding:8px 12px;text-align:center"><span style="color:var(--danger)">50%</span></td><td style="padding:8px 12px;color:var(--gray-500)">OCR bieu_mau kém</td></tr>
+              <tr style="border-top:1px solid var(--gray-100)"><td style="padding:8px 12px">Điều kiện chuyển ngành từ CNTT sang QTKD</td><td style="padding:8px 12px;text-align:center"><span style="color:var(--warning);font-weight:700">0.61</span></td><td style="padding:8px 12px;text-align:center"><span style="color:var(--warning)">60%</span></td><td style="padding:8px 12px;color:var(--gray-500)">Chuẩn đầu ra thiếu chunk</td></tr>
+              <tr style="border-top:1px solid var(--gray-100)"><td style="padding:8px 12px">Nghỉ học có phép tối đa bao nhiêu buổi</td><td style="padding:8px 12px;text-align:center"><span style="color:var(--warning);font-weight:700">0.63</span></td><td style="padding:8px 12px;text-align:center"><span style="color:var(--warning)">70%</span></td><td style="padding:8px 12px;color:var(--gray-500)">Nội dung ở nội quy + thông báo</td></tr>
+              <tr style="border-top:1px solid var(--gray-100)"><td style="padding:8px 12px">Hạn nộp đơn xin rút môn học kỳ 2 2024</td><td style="padding:8px 12px;text-align:center"><span style="color:var(--warning);font-weight:700">0.65</span></td><td style="padding:8px 12px;text-align:center"><span style="color:var(--warning)">70%</span></td><td style="padding:8px 12px;color:var(--gray-500)">Thông báo thời vụ</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div><!-- /admin-page-metrics -->
+
+      <!-- ═══ PAGE: MODEL BENCHMARK ═══ -->
+      <div id="admin-page-benchmark" style="display:none">
+        <div class="admin-page-title">Model Benchmark</div>
+        <div class="admin-page-sub">So sánh reranker models trên 200 test queries · Chỉnh sửa model_name trong default.yaml để đổi</div>
+
+        <!-- Comparison table -->
+        <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="background:var(--primary);color:white">
+                <th style="padding:14px 16px;text-align:left;font-weight:600">Model</th>
+                <th style="padding:14px 16px;text-align:center;font-weight:600">Loại</th>
+                <th style="padding:14px 16px;text-align:center;font-weight:600">nDCG@10</th>
+                <th style="padding:14px 16px;text-align:center;font-weight:600">Recall@10</th>
+                <th style="padding:14px 16px;text-align:center;font-weight:600">MRR</th>
+                <th style="padding:14px 16px;text-align:center;font-weight:600">Latency p95</th>
+                <th style="padding:14px 16px;text-align:center;font-weight:600">Trạng thái</th>
+                <th style="padding:14px 16px;text-align:center;font-weight:600"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:var(--primary-xxl);border-bottom:1px solid var(--gray-200)">
+                <td style="padding:12px 16px;font-weight:700;color:var(--primary)">BAAI/bge-reranker-v2-m3</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge badge-indigo">CrossEncoder</span></td>
+                <td style="padding:12px 16px;text-align:center;font-weight:700;color:var(--success)">0.88</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:700;color:var(--success)">91%</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:700;color:var(--success)">0.82</td>
+                <td style="padding:12px 16px;text-align:center">1,840ms</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge badge-green">Đang dùng</span></td>
+                <td style="padding:12px 16px;text-align:center"><button class="btn btn-ghost btn-sm" disabled>Active</button></td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--gray-100)">
+                <td style="padding:12px 16px">jinaai/jina-reranker-v2-base-multilingual</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge badge-indigo">CrossEncoder</span></td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600">0.85</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600">88%</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600">0.79</td>
+                <td style="padding:12px 16px;text-align:center">1,620ms</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge" style="background:var(--gray-100);color:var(--gray-600)">Standby</span></td>
+                <td style="padding:12px 16px;text-align:center"><button class="btn btn-outline btn-sm" onclick="switchModel(this,'jina')">Dùng model này</button></td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--gray-100)">
+                <td style="padding:12px 16px">itdainb/PhoRanker</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge badge-indigo">CrossEncoder</span></td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600">0.83</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600">87%</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600">0.77</td>
+                <td style="padding:12px 16px;text-align:center">980ms</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge" style="background:var(--gray-100);color:var(--gray-600)">Standby</span></td>
+                <td style="padding:12px 16px;text-align:center"><button class="btn btn-outline btn-sm" onclick="switchModel(this,'pho')">Dùng model này</button></td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--gray-100)">
+                <td style="padding:12px 16px">BAAI/bge-reranker-v2-minicpm-layerwise</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge" style="background:#FEF3C7;color:#92400E">LLM-based</span></td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600">0.91</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600">94%</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600">0.86</td>
+                <td style="padding:12px 16px;text-align:center;color:var(--danger)">8,200ms</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge" style="background:var(--danger-light);color:var(--danger)">Cần GPU</span></td>
+                <td style="padding:12px 16px;text-align:center"><button class="btn btn-ghost btn-sm" disabled>GPU required</button></td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--gray-100)">
+                <td style="padding:12px 16px;color:var(--gray-500)">Hybrid RRF (no reranking)</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge" style="background:var(--gray-100);color:var(--gray-600)">Baseline</span></td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600;color:var(--gray-500)">0.75</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600;color:var(--gray-500)">82%</td>
+                <td style="padding:12px 16px;text-align:center;font-weight:600;color:var(--gray-500)">0.69</td>
+                <td style="padding:12px 16px;text-align:center;color:var(--success)">55ms</td>
+                <td style="padding:12px 16px;text-align:center"><span class="badge" style="background:var(--gray-100);color:var(--gray-600)">Baseline</span></td>
+                <td style="padding:12px 16px;text-align:center"><button class="btn btn-outline btn-sm" onclick="switchModel(this,'none')">Dùng baseline</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Run new benchmark -->
+        <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+          <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:12px">Chạy benchmark mới</div>
+          <div style="display:flex;gap:12px;align-items:flex-end">
+            <div style="flex:1">
+              <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Model HuggingFace</label>
+              <input type="text" placeholder="VD: BAAI/bge-reranker-v2-m3" style="width:100%;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-md);font-size:13px">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Số queries</label>
+              <input type="number" value="200" style="width:90px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-md);font-size:13px">
+            </div>
+            <button class="btn btn-primary">▶ Chạy benchmark</button>
+          </div>
+        </div>
+      </div><!-- /admin-page-benchmark -->
+
+      <!-- ═══ PAGE: API HEALTH ═══ -->
+      <div id="admin-page-apihealth" style="display:none">
+        <div class="admin-page-title">API Health</div>
+        <div class="admin-page-sub">FastAPI · localhost:8000 · Uptime 99.7% (30 ngày)</div>
+
+        <!-- Status overview -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+          <div style="background:white;border:2px solid var(--success);border-radius:var(--radius-lg);padding:16px;text-align:center">
+            <div style="font-size:28px">✅</div>
+            <div style="font-size:18px;font-weight:700;color:var(--success);margin-top:4px">Online</div>
+            <div style="font-size:11px;color:var(--gray-500)">API Server</div>
+          </div>
+          <div style="background:white;border:2px solid var(--success);border-radius:var(--radius-lg);padding:16px;text-align:center">
+            <div style="font-size:28px">🟢</div>
+            <div style="font-size:18px;font-weight:700;color:var(--success);margin-top:4px">Online</div>
+            <div style="font-size:11px;color:var(--gray-500)">Qdrant :6333</div>
+          </div>
+          <div style="background:white;border:2px solid var(--success);border-radius:var(--radius-lg);padding:16px;text-align:center">
+            <div style="font-size:28px">🟢</div>
+            <div style="font-size:18px;font-weight:700;color:var(--success);margin-top:4px">Loaded</div>
+            <div style="font-size:11px;color:var(--gray-500)">BM25 Index</div>
+          </div>
+          <div style="background:white;border:2px solid var(--success);border-radius:var(--radius-lg);padding:16px;text-align:center">
+            <div style="font-size:28px">🟢</div>
+            <div style="font-size:18px;font-weight:700;color:var(--success);margin-top:4px">Loaded</div>
+            <div style="font-size:11px;color:var(--gray-500)">Reranker model</div>
+          </div>
+        </div>
+
+        <!-- Endpoints table -->
+        <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--gray-100);font-size:14px;font-weight:700;color:var(--gray-900)">Tất cả API Endpoints</div>
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead><tr style="background:var(--gray-50);border-bottom:1px solid var(--gray-200)">
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--gray-600)">Method</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--gray-600)">Endpoint</th>
+              <th style="padding:10px 16px;text-align:left;font-weight:600;color:var(--gray-600)">Mô tả</th>
+              <th style="padding:10px 16px;text-align:center;font-weight:600;color:var(--gray-600)">Status</th>
+              <th style="padding:10px 16px;text-align:right;font-weight:600;color:var(--gray-600)">p50</th>
+              <th style="padding:10px 16px;text-align:right;font-weight:600;color:var(--gray-600)">p95</th>
+              <th style="padding:10px 16px;text-align:right;font-weight:600;color:var(--gray-600)">Req/h</th>
+            </tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:10px 16px"><span class="badge badge-green">GET</span></td><td style="padding:10px 16px"><code>/health</code></td><td style="padding:10px 16px;color:var(--gray-500)">Health check</td><td style="padding:10px 16px;text-align:center"><span class="badge badge-green">200</span></td><td style="padding:10px 16px;text-align:right">8ms</td><td style="padding:10px 16px;text-align:right">12ms</td><td style="padding:10px 16px;text-align:right">420</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:10px 16px"><span class="badge badge-green">GET</span></td><td style="padding:10px 16px"><code>/search?mode=hybrid_rerank</code></td><td style="padding:10px 16px;color:var(--gray-500)">Hybrid + rerank</td><td style="padding:10px 16px;text-align:center"><span class="badge badge-green">200</span></td><td style="padding:10px 16px;text-align:right">1,420ms</td><td style="padding:10px 16px;text-align:right;color:var(--danger)">1,840ms</td><td style="padding:10px 16px;text-align:right">1,847</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:10px 16px"><span class="badge badge-green">GET</span></td><td style="padding:10px 16px"><code>/search?mode=hybrid</code></td><td style="padding:10px 16px;color:var(--gray-500)">Hybrid RRF</td><td style="padding:10px 16px;text-align:center"><span class="badge badge-green">200</span></td><td style="padding:10px 16px;text-align:right">52ms</td><td style="padding:10px 16px;text-align:right">91ms</td><td style="padding:10px 16px;text-align:right">312</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:10px 16px"><span class="badge badge-green">GET</span></td><td style="padding:10px 16px"><code>/search?mode=dense</code></td><td style="padding:10px 16px;color:var(--gray-500)">Dense only</td><td style="padding:10px 16px;text-align:center"><span class="badge badge-green">200</span></td><td style="padding:10px 16px;text-align:right">38ms</td><td style="padding:10px 16px;text-align:right">74ms</td><td style="padding:10px 16px;text-align:right">89</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:10px 16px"><span class="badge badge-green">GET</span></td><td style="padding:10px 16px"><code>/search?mode=bm25</code></td><td style="padding:10px 16px;color:var(--gray-500)">BM25 only</td><td style="padding:10px 16px;text-align:center"><span class="badge badge-green">200</span></td><td style="padding:10px 16px;text-align:right">11ms</td><td style="padding:10px 16px;text-align:right">28ms</td><td style="padding:10px 16px;text-align:right">54</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:10px 16px"><span class="badge badge-indigo">POST</span></td><td style="padding:10px 16px"><code>/admin/reindex</code></td><td style="padding:10px 16px;color:var(--gray-500)">Trigger re-index</td><td style="padding:10px 16px;text-align:center"><span class="badge badge-green">200</span></td><td style="padding:10px 16px;text-align:right">—</td><td style="padding:10px 16px;text-align:right">—</td><td style="padding:10px 16px;text-align:right">3</td></tr>
+              <tr><td style="padding:10px 16px"><span class="badge badge-green">GET</span></td><td style="padding:10px 16px"><code>/docs</code></td><td style="padding:10px 16px;color:var(--gray-500)">Swagger UI</td><td style="padding:10px 16px;text-align:center"><span class="badge badge-green">200</span></td><td style="padding:10px 16px;text-align:right">14ms</td><td style="padding:10px 16px;text-align:right">22ms</td><td style="padding:10px 16px;text-align:right">17</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Request log -->
+        <div style="background:#0F172A;border-radius:var(--radius-lg);padding:16px;font-family:monospace;font-size:11.5px;color:#94A3B8;line-height:1.8;max-height:180px;overflow-y:auto">
+          <span style="color:#64748B">INFO</span> &nbsp;2026-03-23 08:45:01 GET /health 200 8ms<br>
+          <span style="color:#64748B">INFO</span> &nbsp;2026-03-23 08:45:12 GET /search?mode=hybrid_rerank&amp;q=miễn+học+phí 200 1,412ms<br>
+          <span style="color:#64748B">INFO</span> &nbsp;2026-03-23 08:45:24 GET /search?mode=hybrid_rerank&amp;q=điều+kiện+tốt+nghiệp 200 1,389ms<br>
+          <span style="color:#FBBF24">WARN</span> &nbsp;2026-03-23 08:45:38 GET /search?mode=hybrid_rerank&amp;q=chuẩn+ra+CNTT 200 1,924ms [slow]<br>
+          <span style="color:#64748B">INFO</span> &nbsp;2026-03-23 08:46:01 GET /search?mode=hybrid&amp;q=quy+định+nghỉ+học 200 61ms<br>
+          <span style="color:#64748B">INFO</span> &nbsp;2026-03-23 08:46:14 GET /health 200 9ms
+        </div>
+      </div><!-- /admin-page-apihealth -->
+
+      <!-- ═══ PAGE: CẤU HÌNH ═══ -->
+      <div id="admin-page-config" style="display:none">
+        <div class="admin-page-title">Cấu hình hệ thống</div>
+        <div class="admin-page-sub">configs/default.yaml · Chỉnh sửa trực tiếp hoặc qua form bên dưới</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <!-- YAML editor -->
+          <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:13px;font-weight:700;color:var(--gray-900)">📄 configs/default.yaml</span>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost btn-sm">Đặt lại mặc định</button>
+                <button class="btn btn-primary btn-sm">Lưu & Áp dụng</button>
+              </div>
+            </div>
+            <textarea style="width:100%;height:520px;border:none;outline:none;padding:16px;font-family:monospace;font-size:12px;line-height:1.7;color:#334155;background:#F8FAFC;resize:none;box-sizing:border-box">chunking:
+  target_tokens: 320
+  overlap_ratio: 0.08
+
+semantic_chunking:
+  enabled: true
+  model_name: null
+  window: 2
+  breakpoint_percentile: 92
+  min_tokens: 60
+  max_tokens: 480
+
+embedding:
+  model_name: "intfloat/multilingual-e5-base"
+  normalize: true
+  batch_size: 64
+
+paths:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  indexes_dir: data/indexes
+  bm25_index_path: data/indexes/bm25.pkl
+  jsonl_glob: data/processed/*.jsonl
+
+reranker:
+  model_name: "BAAI/bge-reranker-v2-m3"
+  batch_size: 32
+  use_fp16: false
+
+qdrant:
+  url: "http://localhost:6333"
+  collection: "reg_chunks"
+  vector_size: 768
+  distance: "Cosine"
+  hnsw:
+    m: 16
+    ef_construct: 128
+    ef: 128
+
+bm25:
+  tokenizer: "vi_basic"
+
+search:
+  top_k: 10
+  rrf_k: 60
+  hybrid_dense_weight: 0.5</textarea>
+          </div>
+
+          <!-- Quick settings form -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+              <div style="font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:14px">⚡ Cài nhanh</div>
+              <div style="display:flex;flex-direction:column;gap:12px;font-size:13px">
+                <div>
+                  <label style="font-size:11px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Search mode mặc định</label>
+                  <select style="width:100%;padding:8px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px">
+                    <option>hybrid_rerank</option>
+                    <option>hybrid</option>
+                    <option>dense</option>
+                    <option>bm25</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:11px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Top-K kết quả trả về</label>
+                  <input type="number" value="10" style="width:100%;padding:8px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px">
+                </div>
+                <div>
+                  <label style="font-size:11px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Dense/Sparse weight</label>
+                  <input type="range" min="0" max="1" step="0.05" value="0.5" style="width:100%" oninput="document.getElementById('cfgDenseW').textContent=parseFloat(this.value).toFixed(2)">
+                  <div style="font-size:11px;color:var(--gray-500)">Dense: <strong id="cfgDenseW">0.50</strong> / Sparse: <strong>0.50</strong></div>
+                </div>
+                <div>
+                  <label style="font-size:11px;font-weight:600;color:var(--gray-500);display:block;margin-bottom:4px">Reranker model</label>
+                  <select style="width:100%;padding:8px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px">
+                    <option>BAAI/bge-reranker-v2-m3</option>
+                    <option>jinaai/jina-reranker-v2-base-multilingual</option>
+                    <option>itdainb/PhoRanker</option>
+                    <option>(tắt reranking)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px">
+              <div style="font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:12px">🚨 Vùng nguy hiểm</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-outline btn-sm" style="justify-content:flex-start;border-color:var(--warning);color:var(--warning)">🔄 Reset toàn bộ index</button>
+                <button class="btn btn-outline btn-sm" style="justify-content:flex-start;border-color:var(--danger);color:var(--danger)">🗑️ Xóa tất cả processed data</button>
+                <button class="btn btn-outline btn-sm" style="justify-content:flex-start;border-color:var(--danger);color:var(--danger)">💣 Re-run toàn bộ pipeline từ đầu</button>
+              </div>
+            </div>
+
+            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px;font-size:12px;color:var(--gray-500)">
+              <strong style="color:var(--gray-700)">Phiên bản</strong><br>
+              ARRS v0.1.0-alpha · Python 3.11.9<br>
+              sentence-transformers 2.7.0 · qdrant-client 1.9.1<br>
+              rank-bm25 0.2.2 · underthesea 6.8.4
+            </div>
+          </div>
+        </div>
+      </div><!-- /admin-page-config -->
+
+      </div><!-- /admin-content -->
+    </div>
+  </div>
+</div><!-- /screen-admin -->
+
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL – DOCUMENT DETAIL
+══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="detailModal" onclick="closeDetail(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span class="badge badge-indigo">Quyết định</span>
+          <span class="badge badge-green">Đang hiệu lực</span>
+          <span class="score-badge score-high" style="margin-left:auto">Score: 0.96</span>
+        </div>
+        <div style="font-size:17px;font-weight:700;color:var(--gray-900)">QĐ 688 – Quy định Miễn Giảm Học phí (2024)</div>
+        <div class="breadcrumb" style="margin-top:8px">
+          <span class="breadcrumb-item">Chương I</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-item">Điều 4</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-item">Khoản 3</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-item">Điểm b</span>
+        </div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('detailModal').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-content">
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:12px">Nội dung đoạn văn bản</div>
+        <div class="full-text" style="font-size:13.5px;line-height:1.8">Điều 4. Đối tượng được miễn, giảm học phí
+
+Khoản 3. Sinh viên là người <mark>khuyết tật</mark>:
+  b) Sinh viên là người <mark>khuyết tật</mark> theo quy định của Luật người <mark>khuyết tật</mark>
+  số 51/2010/QH12 được hưởng chính sách <mark>miễn, giảm học phí</mark> như sau:
+
+  ▸ Miễn 100% học phí:
+    – Người khuyết tật đặc biệt nặng
+    – Người khuyết tật nặng thuộc hộ nghèo, hộ cận nghèo
+
+  ▸ Giảm 50% học phí:
+    – Người khuyết tật nặng không thuộc diện nghèo, cận nghèo
+
+  ▸ Giảm 25% học phí:
+    – Người khuyết tật nhẹ
+
+  Hồ sơ cần nộp:
+  • Đơn xin miễn giảm học phí (mẫu Phòng CTSV)
+  • Giấy xác nhận mức độ khuyết tật do cơ quan có thẩm quyền cấp
+  • Bản sao sổ hộ khẩu hoặc giấy tờ xác nhận hộ nghèo/cận nghèo (nếu có)
+
+  Thời hạn nộp hồ sơ: Không quá 4 tuần kể từ ngày khai giảng mỗi học kỳ.</div>
+
+        <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Sao chép văn bản
+          </button>
+          <button class="btn btn-ghost btn-sm">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            Xem tài liệu gốc
+          </button>
+          <button class="btn btn-ghost btn-sm">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Chia sẻ
+          </button>
+        </div>
+      </div>
+      <div class="modal-sidebar">
+        <div class="modal-sidebar-title">Thông tin tài liệu</div>
+        <div class="modal-meta-item">
+          <div class="modal-meta-label">Số văn bản</div>
+          <div class="modal-meta-value">688/QĐ-ĐHQT</div>
+        </div>
+        <div class="modal-meta-item">
+          <div class="modal-meta-label">Cơ quan ban hành</div>
+          <div class="modal-meta-value">Hiệu trưởng Trường ĐHQT</div>
+        </div>
+        <div class="modal-meta-item">
+          <div class="modal-meta-label">Ngày hiệu lực</div>
+          <div class="modal-meta-value">01/01/2024</div>
+        </div>
+        <div class="modal-meta-item">
+          <div class="modal-meta-label">Nhóm tài liệu</div>
+          <div class="modal-meta-value">qd_ngan_dhqt</div>
+        </div>
+        <div class="divider"></div>
+        <div class="modal-sidebar-title">Vị trí trong văn bản</div>
+        <div class="modal-meta-item">
+          <div class="modal-meta-label">Điều</div>
+          <div class="modal-meta-value">Điều 4</div>
+        </div>
+        <div class="modal-meta-item">
+          <div class="modal-meta-label">Khoản</div>
+          <div class="modal-meta-value">Khoản 3</div>
+        </div>
+        <div class="modal-meta-item">
+          <div class="modal-meta-label">Điểm</div>
+          <div class="modal-meta-value">Điểm b</div>
+        </div>
+        <div class="modal-meta-item">
+          <div class="modal-meta-label">Trang</div>
+          <div class="modal-meta-value">Trang 3</div>
+        </div>
+        <div class="divider"></div>
+        <div class="modal-sidebar-title">Chunk ID</div>
+        <div style="font-size:11.5px;font-family:monospace;color:var(--primary);background:var(--primary-xxl);padding:6px 10px;border-radius:6px">A-4-3-b-0</div>
+        <div style="margin-top:8px">
+          <div class="modal-meta-label">Rerank Score</div>
+          <div class="score-badge score-high" style="margin-top:4px">0.9612</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ SCRIPT ════════════════════════════════ -->
+<script>
+// ── Screen routing ──────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('screen-' + name);
+  if (target) target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Search ──────────────────────────────────────────────────────────────────
+let selectedMode = 'hybrid_rerank';
+
+function selectMode(el, mode) {
+  document.querySelectorAll('#modeSelector .search-option-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedMode = mode;
+}
+
+// Clicking a suggestion chip fills the input AND immediately searches
+function fillSearch(el) {
+  document.getElementById('homeSearchInput').value = el.textContent.trim();
+  doSearch();
+}
+
+function doSearch() {
+  const query = (document.getElementById('homeSearchInput')?.value ||
+                 document.getElementById('resultsSearchInput')?.value || '').trim();
+  if (!query) return;
+
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('show');
+
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    const ri = document.getElementById('resultsSearchInput');
+    if (ri) ri.value = query;
+    // Update topbar badge
+    const modeBadge = document.getElementById('activeModeBadge');
+    if (modeBadge) modeBadge.textContent = '⚡ ' + selectedMode;
+    // Update results count line
+    const countEl = document.getElementById('resultsCountText');
+    if (countEl) {
+      const n = QUERY_RESULTS[query] ? QUERY_RESULTS[query].length : 6;
+      countEl.innerHTML = `Tìm thấy <strong>${n} kết quả</strong> cho <em>"${query}"</em>`;
+    }
+    renderResults(query);
+    showScreen('results');
+  }, 900);
+}
+
+// ── Sample results per popular query ─────────────────────────────────────────
+const QUERY_RESULTS = {
+
+  "Điều kiện xét học bổng khuyến khích học tập": [
+    {
+      id:'hb-1', rank:1, rankCls:'result-rank-1', score:'0.94', scoreCls:'score-high',
+      title:'Quy định xét cấp Học bổng Khuyến khích Học tập – Điều 3',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Điều 3','Khoản 1'],
+      docNo:'QĐ-HBKKHT/ĐHQT', date:'2023-09-01',
+      snippet:`Để được xét <mark>học bổng khuyến khích học tập</mark>, sinh viên phải đáp ứng <em>đồng thời</em>
+ các điều kiện: (1) Điểm trung bình học kỳ ≥ <strong>3.20/4.0</strong> (tương đương 8.0/10);
+ (2) Không có môn điểm F hoặc chưa hoàn thành; (3) Điểm rèn luyện ≥ 65 (Loại Khá);
+ (4) Không bị kỷ luật trong học kỳ xét.`,
+      full:`Điều 3. Điều kiện xét học bổng khuyến khích học tập
+Khoản 1. Sinh viên được xét học bổng KKHT khi đáp ứng đủ các điều kiện sau:
+  a) Điểm trung bình học kỳ (GPA học kỳ) đạt từ 3.20/4.0 trở lên;
+  b) Không có môn học nào bị điểm F, I hoặc W trong học kỳ;
+  c) Điểm rèn luyện đạt từ 65/100 (Loại Khá) trở lên;
+  d) Không bị xử lý kỷ luật từ mức khiển trách trở lên trong học kỳ xét duyệt.`,
+      article:'Điều 3', clause:'Khoản 1', point:'a–d', version:'2023', group:'qd_qc_dhqt', sourceFile:'16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf',
+    },
+    {
+      id:'hb-2', rank:2, rankCls:'result-rank-2', score:'0.89', scoreCls:'score-high',
+      title:'Quy chế Học vụ ĐHQT (QĐ 719/2021) – Điều 25 · Mức học bổng',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Chương IV','Điều 25','Khoản 2'],
+      docNo:'719/QĐ-ĐHQT', date:'2021-12-06',
+      snippet:`<mark>Học bổng KKHT</mark> được xét định kỳ sau mỗi học kỳ. Mức cụ thể:
+ <strong>100% học phí</strong> (GPA ≥ 3.60 – Xuất sắc),
+ <strong>50% học phí</strong> (GPA 3.20–3.59 – Giỏi),
+ <strong>25% học phí</strong> (GPA 3.00–3.19 – Khá).
+ Số lượng suất không vượt quá 15% tổng sinh viên toàn khóa mỗi học kỳ.`,
+      full:`Điều 25. Học bổng khuyến khích học tập
+Khoản 2. Mức học bổng KKHT được quy định như sau:
+  - Loại Xuất sắc (GPA ≥ 3.60/4.0): Miễn 100% học phí học kỳ tiếp theo;
+  - Loại Giỏi (GPA 3.20–3.59/4.0): Giảm 50% học phí học kỳ tiếp theo;
+  - Loại Khá (GPA 3.00–3.19/4.0): Giảm 25% học phí học kỳ tiếp theo.
+Tổng số suất học bổng mỗi học kỳ không vượt quá 15% tổng số sinh viên đang học chính quy.`,
+      article:'Điều 25', clause:'Khoản 2', point:'—', version:'2021', group:'qd_qc_dhqt', sourceFile:'15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf',
+    },
+    {
+      id:'hb-3', rank:3, rankCls:'result-rank-3', score:'0.81', scoreCls:'score-medium',
+      title:'Quy chế CTSV (QĐ 967/2022) – Điều 18 · Quy trình xét duyệt',
+      badge:'badge-indigo', badgeText:'Quyết định', status:false,
+      path:['Chương III','Điều 18'],
+      docNo:'967/QĐ-ĐHQT', date:'2022-12-30',
+      snippet:`Hồ sơ xét <mark>học bổng</mark> gồm: Đơn đề nghị (mẫu Phòng CTSV), bảng điểm học kỳ,
+ bảng điểm rèn luyện. Nộp trong tuần 1–2 của học kỳ mới. Kết quả công bố trong vòng
+ <strong>15 ngày làm việc</strong> kể từ hạn nộp hồ sơ.`,
+      full:`Điều 18. Quy trình xét và cấp học bổng KKHT
+Sinh viên nộp hồ sơ tại Phòng CTSV trong tuần 1–2 của học kỳ mới. Hồ sơ gồm: Đơn đề nghị cấp học bổng theo mẫu; Bảng điểm học kỳ có xác nhận của Phòng Đào tạo; Bảng điểm rèn luyện có xác nhận của Phòng CTSV.
+Phòng CTSV tổng hợp, trình Hiệu trưởng phê duyệt và công bố kết quả trong vòng 15 ngày làm việc.`,
+      article:'Điều 18', clause:'—', point:'—', version:'2022', group:'qd_qc_dhqt', sourceFile:'Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf',
+    },
+  ],
+
+  "Quy định về vắng mặt thi cuối kỳ": [
+    {
+      id:'thi-1', rank:1, rankCls:'result-rank-1', score:'0.96', scoreCls:'score-high',
+      title:'Quy chế Tổ chức Thi HK (2025) – Điều 8 · Vắng thi',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Điều 8','Khoản 2'],
+      docNo:'QĐ-TCThi/ĐHQT-2025', date:'2025-01-05',
+      snippet:`Sinh viên <mark>vắng thi</mark> không có lý do hợp lệ bị cho điểm <strong>0 (không)</strong> môn học đó.
+ Lý do hợp lệ gồm: bệnh cấp cứu (kèm giấy xác nhận BV), tai nạn, hoặc tang lễ thân nhân
+ trực tiếp. Sinh viên được <mark>thi bù</mark> trong vòng <strong>2 tuần</strong> kể từ ngày thi chính thức.`,
+      full:`Điều 8. Xử lý trường hợp vắng thi
+Khoản 2. Sinh viên vắng mặt trong kỳ thi cuối học kỳ mà không có lý do hợp lệ sẽ nhận điểm 0 cho môn học tương ứng.
+Các lý do được coi là hợp lệ:
+  a) Bệnh cấp cứu hoặc nhập viện điều trị (kèm giấy xác nhận của cơ sở y tế có thẩm quyền);
+  b) Tai nạn giao thông hoặc thiên tai (kèm biên bản hoặc giấy xác nhận);
+  c) Tang lễ thân nhân trực tiếp (cha, mẹ, vợ/chồng, con ruột).
+Sinh viên có lý do hợp lệ được sắp xếp thi bù trong vòng 2 tuần làm việc kể từ ngày thi chính thức. Thủ tục: nộp đơn + minh chứng tại Phòng Đào tạo trong vòng 3 ngày làm việc sau ngày thi.`,
+      article:'Điều 8', clause:'Khoản 2', point:'a–c', version:'2025', group:'qd_qc_dhqt', sourceFile:'17.-Quy-che_To-chuc-thi-HK_Tr-Tiep.ban-hanh_05.01.25-Signed-8.pdf',
+    },
+    {
+      id:'thi-2', rank:2, rankCls:'result-rank-2', score:'0.88', scoreCls:'score-high',
+      title:'Quy chế Học vụ (QĐ 719/2021) – Điều 30 · Quy tắc phòng thi',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Chương V','Điều 30','Khoản 4'],
+      docNo:'719/QĐ-ĐHQT', date:'2021-12-06',
+      snippet:`Sinh viên phải có mặt tại phòng thi <strong>trước 15 phút</strong> so với giờ thi.
+ Không được vào phòng sau <strong>15 phút đầu</strong> của buổi thi. Được ra khỏi phòng
+ sau khi đã nộp bài và không được ở lại khu vực thi sau khi ra ngoài.`,
+      full:`Điều 30. Quy định trong phòng thi
+Khoản 4. Thời gian và ra vào phòng thi:
+  - Sinh viên có mặt tại phòng thi trước giờ khai báo ít nhất 15 phút;
+  - Không được vào phòng thi sau 15 phút kể từ khi phát đề;
+  - Chỉ được ra khỏi phòng thi sau khi đã hết ít nhất 2/3 thời gian làm bài;
+  - Không được quay lại phòng thi sau khi đã nộp bài hoặc ra khỏi phòng.`,
+      article:'Điều 30', clause:'Khoản 4', point:'—', version:'2021', group:'qd_qc_dhqt', sourceFile:'15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf',
+    },
+    {
+      id:'thi-3', rank:3, rankCls:'result-rank-3', score:'0.76', scoreCls:'score-medium',
+      title:'Quy chế CTSV (QĐ 967/2022) – Điều 12 · Thủ tục xin thi bù',
+      badge:'badge-indigo', badgeText:'Quyết định', status:false,
+      path:['Điều 12'],
+      docNo:'967/QĐ-ĐHQT', date:'2022-12-30',
+      snippet:`Sinh viên xin phép <mark>thi bù</mark> phải nộp đơn kèm minh chứng tại Phòng CTSV
+ trong vòng <strong>3 ngày làm việc</strong> kể từ ngày thi. Quá thời hạn sẽ không
+ được xét thi bù và giữ nguyên điểm 0.`,
+      full:`Điều 12. Thủ tục xin thi bù / thi muộn
+Sinh viên có lý do vắng thi hợp lệ nộp hồ sơ tại Phòng CTSV gồm: Đơn xin thi bù theo mẫu; Giấy tờ minh chứng lý do vắng thi có xác nhận của cơ quan/tổ chức liên quan.
+Thời hạn nộp: không quá 3 ngày làm việc kể từ ngày thi chính thức. Nộp muộn sau thời hạn sẽ không được chấp nhận.`,
+      article:'Điều 12', clause:'—', point:'—', version:'2022', group:'qd_qc_dhqt', sourceFile:'Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf',
+    },
+  ],
+
+  "Miễn giảm học phí sinh viên khuyết tật": [
+    {
+      id:'mghp-1', rank:1, rankCls:'result-rank-1', score:'0.96', scoreCls:'score-high',
+      title:'QĐ 688 – Quy định Miễn Giảm Học phí (2024)',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Chương I','Điều 4','Khoản 3','Điểm b'],
+      docNo:'688/QĐ-ĐHQT', date:'2024-01-01',
+      snippet:`Sinh viên là người <mark>khuyết tật</mark> theo quy định của Luật người <mark>khuyết tật</mark>
+ được <mark>miễn giảm học phí</mark> theo chính sách của Nhà nước và Trường ĐHQT.
+ Mức <mark>miễn giảm</mark>: <strong>100%</strong> (khuyết tật đặc biệt nặng);
+ <strong>50%</strong> (khuyết tật nặng thuộc hộ nghèo, cận nghèo).`,
+      full:`Điều 4. Đối tượng được miễn, giảm học phí
+Khoản 3. Sinh viên là người khuyết tật:
+  b) Sinh viên là người khuyết tật theo quy định của Luật người khuyết tật số 51/2010/QH12 được hưởng chính sách miễn, giảm học phí như sau:
+  - Miễn 100% học phí: Người khuyết tật đặc biệt nặng; Người khuyết tật nặng thuộc hộ nghèo, hộ cận nghèo.
+  - Giảm 50% học phí: Người khuyết tật nặng không thuộc diện nghèo, cận nghèo.
+  - Giảm 25% học phí: Người khuyết tật nhẹ.
+Hồ sơ cần nộp: Đơn xin miễn giảm học phí (mẫu Phòng CTSV), Giấy xác nhận mức độ khuyết tật, Bản sao sổ hộ khẩu hoặc giấy xác nhận hộ nghèo/cận nghèo (nếu có).`,
+      article:'Điều 4', clause:'Khoản 3', point:'Điểm b', version:'2024', group:'qd_ngan_dhqt', sourceFile:'9.-QD688-MGHP-2024.pdf',
+    },
+    {
+      id:'mghp-2', rank:2, rankCls:'result-rank-2', score:'0.91', scoreCls:'score-high',
+      title:'QĐ 191 – Quy định Chế độ Chính sách (2011)',
+      badge:'badge-indigo', badgeText:'Quyết định', status:false,
+      path:['Điều 2','Khoản 4'],
+      docNo:'191/QĐ-ĐHQT', date:'2011-01-01',
+      snippet:`Đối tượng 04: Sinh viên bị tàn tật, <mark>khuyết tật</mark> thuộc hộ cận nghèo.
+ Mức <mark>miễn giảm</mark>: <strong>100%</strong> học phí thực thu
+ (bao gồm 100% mức trần học phí theo quy định của Nhà nước tùy mức nào cao hơn).`,
+      full:`Điều 2. Đối tượng 04: Sinh viên bị tàn tật, khuyết tật thuộc hộ cận nghèo
+Khoản 4. Mức miễn giảm: 100% học phí thực thu (bao gồm 100% mức trần học phí theo quy định của Nhà nước tùy mức nào cao hơn).
+Yêu cầu hồ sơ: Mẫu đơn MGHP của nhà trường, bản photo công chứng giấy chứng nhận khuyết tật, xác nhận cận nghèo của UBND.`,
+      article:'Điều 2', clause:'Khoản 4', point:'—', version:'2011', group:'qd_ngan_dhqt', sourceFile:'6.-QD-191_2011_Quy-dinh-che-do-chinh-sach.pdf',
+    },
+    {
+      id:'mghp-3', rank:3, rankCls:'result-rank-3', score:'0.84', scoreCls:'score-medium',
+      title:'Quy chế Học vụ ĐHQT (QĐ 719/2021) – Điều 7 · Hỗ trợ đặc biệt',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Chương II','Điều 7','Khoản 2'],
+      docNo:'719/QĐ-ĐHQT', date:'2021-12-06',
+      snippet:`Sinh viên thuộc diện hỗ trợ đặc biệt (bao gồm người <mark>khuyết tật</mark>, hộ nghèo,
+ cận nghèo, dân tộc thiểu số) có thể được xem xét <mark>miễn giảm</mark> hoặc
+ hỗ trợ học phí theo chính sách hiện hành. Thủ tục và mức cụ thể theo QĐ 688/QĐ-ĐHQT.`,
+      full:`Chương II. Học phí và Chính sách Hỗ trợ Người học
+Điều 7. Chính sách miễn, giảm học phí
+Khoản 2. Sinh viên thuộc diện hỗ trợ đặc biệt (người khuyết tật, hộ nghèo, cận nghèo, dân tộc thiểu số rất ít người) được xem xét miễn, giảm học phí theo đúng chính sách hiện hành của Nhà nước và Nhà trường. Thủ tục và mức miễn giảm cụ thể được quy định tại Quyết định số 688/QĐ-ĐHQT.`,
+      article:'Điều 7', clause:'Khoản 2', point:'—', version:'2021', group:'qd_qc_dhqt', sourceFile:'15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf',
+    },
+  ],
+
+  "Điểm rèn luyện tối thiểu để không bị cảnh báo": [
+    {
+      id:'rl-1', rank:1, rankCls:'result-rank-1', score:'0.93', scoreCls:'score-high',
+      title:'Quy chế CTSV (QĐ 967/2022) – Điều 21 · Phân loại rèn luyện',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Chương IV','Điều 21','Khoản 1'],
+      docNo:'967/QĐ-ĐHQT', date:'2022-12-30',
+      snippet:`Thang điểm <mark>rèn luyện</mark>: <strong>Xuất sắc</strong> 90–100,
+ <strong>Tốt</strong> 80–89, <strong>Khá</strong> 65–79,
+ <strong>Trung bình</strong> 50–64, <strong>Yếu</strong> &lt;50.
+ Sinh viên bị xếp loại <mark>Yếu</mark> (dưới 50 điểm) hai học kỳ liên tiếp
+ sẽ bị <mark>cảnh báo học vụ</mark> và có thể bị buộc thôi học.`,
+      full:`Điều 21. Phân loại kết quả rèn luyện
+Khoản 1. Căn cứ điểm rèn luyện, sinh viên được phân loại như sau:
+  - Loại Xuất sắc:  từ 90 đến 100 điểm;
+  - Loại Tốt:       từ 80 đến dưới 90 điểm;
+  - Loại Khá:       từ 65 đến dưới 80 điểm;
+  - Loại Trung bình: từ 50 đến dưới 65 điểm;
+  - Loại Yếu:       dưới 50 điểm.
+Sinh viên bị xếp loại Yếu (< 50 điểm) hai học kỳ liên tiếp sẽ bị đưa vào diện cảnh báo rèn luyện, thông báo về gia đình và có thể bị buộc thôi học nếu không cải thiện trong học kỳ tiếp theo.`,
+      article:'Điều 21', clause:'Khoản 1', point:'—', version:'2022', group:'qd_qc_dhqt', sourceFile:'Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf',
+    },
+    {
+      id:'rl-2', rank:2, rankCls:'result-rank-2', score:'0.87', scoreCls:'score-high',
+      title:'Nội quy Sinh viên Trường ĐHQT – Điều 7 · Cảnh báo rèn luyện',
+      badge:'badge-red', badgeText:'Nội quy', status:true,
+      path:['Điều 7','Khoản 5'],
+      docNo:'Nội quy SV – ĐHQT', date:'2023-09-01',
+      snippet:`Mức điểm <mark>tối thiểu để không bị cảnh báo rèn luyện</mark> là
+ <strong>50/100</strong> (Loại Trung bình). Sinh viên đạt dưới 50 điểm trong một
+ học kỳ sẽ bị nhắc nhở chính thức và ảnh hưởng đến việc xét <mark>học bổng</mark>,
+ khen thưởng và xét tốt nghiệp.`,
+      full:`Điều 7. Hệ quả của điểm rèn luyện thấp
+Khoản 5. Sinh viên đạt điểm rèn luyện dưới 50/100 (Loại Yếu) trong một học kỳ:
+  - Bị nhắc nhở chính thức tại lớp và thông báo về gia đình;
+  - Không được xét học bổng, khen thưởng trong học kỳ đó;
+  - Bị đưa vào diện theo dõi đặc biệt của Phòng CTSV.
+Sinh viên Loại Yếu hai học kỳ liên tiếp sẽ bị xét buộc thôi học theo quy định.`,
+      article:'Điều 7', clause:'Khoản 5', point:'—', version:'2023', group:'qd_ngan_dhqt', sourceFile:'10.-Noi-Quy-SV-truong-DHQT-cap-nhat-08-2009.pdf',
+    },
+    {
+      id:'rl-3', rank:3, rankCls:'result-rank-3', score:'0.74', scoreCls:'score-medium',
+      title:'Quy chế Học vụ (QĐ 719/2021) – Điều 35 · Điều kiện tốt nghiệp',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Chương VIII','Điều 35'],
+      docNo:'719/QĐ-ĐHQT', date:'2021-12-06',
+      snippet:`Điều kiện tốt nghiệp: sinh viên phải đạt <mark>điểm rèn luyện</mark> toàn khóa
+ từ <strong>Trung bình trở lên</strong> (≥ 50/100). Điểm rèn luyện thấp hơn mức này
+ sẽ không đủ điều kiện xét tốt nghiệp dù đã hoàn thành tín chỉ.`,
+      full:`Điều 35. Điều kiện xét công nhận tốt nghiệp
+Ngoài các điều kiện về tín chỉ và GPA, sinh viên phải đáp ứng: Điểm rèn luyện trung bình toàn khóa đạt từ Loại Trung bình (50/100) trở lên. Điểm rèn luyện được tính trung bình cộng của tất cả các học kỳ chính thức (không tính học kỳ hè).`,
+      article:'Điều 35', clause:'—', point:'—', version:'2021', group:'qd_qc_dhqt', sourceFile:'15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf',
+    },
+  ],
+
+  "Thủ tục xin bảo lưu kết quả học tập": [
+    {
+      id:'bl-1', rank:1, rankCls:'result-rank-1', score:'0.95', scoreCls:'score-high',
+      title:'Quy chế Học vụ (QĐ 719/2021) – Điều 14 · Điều kiện bảo lưu',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Chương III','Điều 14','Khoản 1'],
+      docNo:'719/QĐ-ĐHQT', date:'2021-12-06',
+      snippet:`Sinh viên được <mark>bảo lưu kết quả học tập</mark> tối đa <strong>1 năm học</strong>
+ (2 học kỳ chính). Điều kiện: đã hoàn thành ít nhất <strong>1 học kỳ</strong>,
+ không còn nợ học phí, có lý do chính đáng được Nhà trường chấp thuận.`,
+      full:`Điều 14. Bảo lưu kết quả học tập
+Khoản 1. Sinh viên được xét bảo lưu kết quả học tập khi đáp ứng đủ các điều kiện:
+  a) Đã hoàn thành ít nhất 01 học kỳ chính thức tại Trường;
+  b) Không còn nợ học phí các học kỳ trước;
+  c) Có lý do chính đáng: sức khỏe (có xác nhận y tế), hoàn cảnh gia đình đặc biệt, hoặc lý do khác được Hiệu trưởng chấp thuận;
+  d) Nộp đơn trước tuần thứ 8 của học kỳ đang học.
+Thời gian bảo lưu tối đa: 02 học kỳ chính liên tiếp. Thời gian bảo lưu không tính vào thời gian đào tạo tối đa.`,
+      article:'Điều 14', clause:'Khoản 1', point:'a–d', version:'2021', group:'qd_qc_dhqt', sourceFile:'15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf',
+    },
+    {
+      id:'bl-2', rank:2, rankCls:'result-rank-2', score:'0.86', scoreCls:'score-high',
+      title:'Quy chế Học vụ (QĐ 719/2021) – Điều 14 · Hồ sơ & thời hạn',
+      badge:'badge-indigo', badgeText:'Quyết định', status:true,
+      path:['Chương III','Điều 14','Khoản 3'],
+      docNo:'719/QĐ-ĐHQT', date:'2021-12-06',
+      snippet:`Hồ sơ <mark>xin bảo lưu</mark>: Đơn xin bảo lưu (mẫu Phòng Đào tạo), giấy tờ
+ minh chứng lý do. Nộp tại Phòng Đào tạo <strong>trước tuần 8</strong> của học kỳ.
+ Phòng Đào tạo giải quyết trong <strong>5 ngày làm việc</strong>.`,
+      full:`Điều 14. Bảo lưu kết quả học tập
+Khoản 3. Hồ sơ xin bảo lưu:
+  - Đơn xin bảo lưu kết quả học tập theo mẫu của Phòng Đào tạo;
+  - Giấy tờ minh chứng lý do (giấy xác nhận y tế, giấy của cơ quan/địa phương, v.v.);
+  - Bản sao thẻ sinh viên (nếu cần).
+Thời hạn nộp: Trước tuần 8 của học kỳ đang theo học. Nộp sau thời hạn sẽ không được xem xét cho học kỳ hiện tại.
+Thời gian xử lý: 05 ngày làm việc kể từ ngày nhận đủ hồ sơ hợp lệ.`,
+      article:'Điều 14', clause:'Khoản 3', point:'—', version:'2021', group:'qd_qc_dhqt', sourceFile:'15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf',
+    },
+    {
+      id:'bl-3', rank:3, rankCls:'result-rank-3', score:'0.79', scoreCls:'score-medium',
+      title:'Quy chế CTSV (QĐ 967/2022) – Điều 9 · Quyền lợi khi bảo lưu',
+      badge:'badge-indigo', badgeText:'Quyết định', status:false,
+      path:['Điều 9'],
+      docNo:'967/QĐ-ĐHQT', date:'2022-12-30',
+      snippet:`Sinh viên <mark>bảo lưu</mark> trong thời hạn cho phép được: miễn học phí học kỳ
+ bảo lưu nếu nộp đơn trước hạn; bảo toàn toàn bộ kết quả học tập và điểm rèn luyện
+ đã tích lũy; được ưu tiên sắp xếp lại lịch học khi quay lại.`,
+      full:`Điều 9. Quyền lợi và nghĩa vụ của sinh viên bảo lưu
+Sinh viên được chấp thuận bảo lưu trong thời hạn quy định được hưởng:
+  a) Không phải đóng học phí học kỳ bảo lưu nếu nộp đơn trước thời hạn tuần 8;
+  b) Toàn bộ kết quả học tập (điểm số, số tín chỉ) và điểm rèn luyện đã tích lũy được bảo toàn;
+  c) Được ưu tiên xếp thời khóa biểu khi quay lại học.
+Nghĩa vụ: Thông báo ngay cho Phòng Đào tạo khi muốn quay lại học trước thời hạn bảo lưu.`,
+      article:'Điều 9', clause:'—', point:'a–c', version:'2022', group:'qd_qc_dhqt', sourceFile:'Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf',
+    },
+  ],
+};
+
+// ── Render results dynamically ────────────────────────────────────────────────
+function makeCardHTML(r) {
+  const pathHTML = r.path.map((p,i) =>
+    `<span class="breadcrumb-item">${p}</span>` +
+    (i < r.path.length-1 ? '<span class="breadcrumb-sep">›</span>' : '')
+  ).join('');
+
+  const statusBadge = r.status
+    ? `<span class="badge badge-green">Hiệu lực</span>` : '';
+
+  return `
+  <div class="result-card" id="${r.id}">
+    <div class="result-card-header">
+      <div class="result-rank ${r.rankCls}">${r.rank}</div>
+      <div class="result-header-mid">
+        <div class="result-title">
+          ${r.title}
+          <span class="badge ${r.badge}">${r.badgeText}</span>
+          ${statusBadge}
+        </div>
+        <div class="result-path">
+          <div class="breadcrumb">${pathHTML}</div>
+        </div>
+      </div>
+      <div><div class="score-badge ${r.scoreCls}">${r.score}</div></div>
+    </div>
+    <div class="result-snippet">${r.snippet}</div>
+    <div class="result-footer">
+      <div class="result-meta">
+        <div class="result-meta-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          ${r.docNo}
+        </div>
+        <div class="result-meta-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${r.date}
+        </div>
+      </div>
+      <div class="result-actions">
+        <button class="result-expand-btn" onclick="toggleExpand('${r.id}',this)">
+          <span>Xem thêm</span>
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <button class="result-expand-btn" onclick="openDetail(${r.rank})">Chi tiết</button>
+        ${r.sourceFile ? `<a class="btn-pdf" href="javascript:void(0)" onclick="openPDF('${r.sourceFile}')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Xem PDF
+        </a>` : ''}
+      </div>
+    </div>
+    <div class="result-expanded-body">
+      <div class="full-text">${r.full}</div>
+      <div class="meta-grid">
+        <div class="meta-box"><div class="meta-box-label">Điều</div><div class="meta-box-value">${r.article}</div></div>
+        <div class="meta-box"><div class="meta-box-label">Khoản</div><div class="meta-box-value">${r.clause}</div></div>
+        <div class="meta-box"><div class="meta-box-label">Điểm</div><div class="meta-box-value">${r.point}</div></div>
+        <div class="meta-box"><div class="meta-box-label">Phiên bản</div><div class="meta-box-value">${r.version}</div></div>
+        <div class="meta-box"><div class="meta-box-label">Nhóm</div><div class="meta-box-value">${r.group}</div></div>
+        <div class="meta-box"><div class="meta-box-label">doc_id</div><div class="meta-box-value">${r.id}</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderResults(query) {
+  const list = document.getElementById('resultsList');
+  if (!list) return;
+  const results = QUERY_RESULTS[query];
+  if (results) {
+    list.innerHTML = results.map(makeCardHTML).join('');
+    // Auto-expand first card
+    const firstCard = document.getElementById(results[0].id);
+    if (firstCard) firstCard.classList.add('expanded');
+  }
+  // Update active-filter tag
+  const filterTag = document.querySelector('.active-filter');
+  if (filterTag) filterTag.childNodes[0].textContent = selectedMode + ' ';
+}
+
+// ── Result card expand/collapse ──────────────────────────────────────────────
+function toggleExpand(cardId, btn) {
+  const card = document.getElementById(cardId);
+  const isExpanded = card.classList.contains('expanded');
+  // collapse all others
+  document.querySelectorAll('.result-card').forEach(c => {
+    c.classList.remove('expanded');
+    const b = c.querySelector('.result-expand-btn');
+    if (b) { b.querySelector('span').textContent = 'Xem thêm'; b.querySelector('svg path').setAttribute('d','M6 9l6 6 6-6'); }
+  });
+  if (!isExpanded) {
+    card.classList.add('expanded');
+    btn.querySelector('span').textContent = 'Thu gọn';
+    btn.querySelector('svg path').setAttribute('d','M18 15l-6-6-6 6');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+// ── Detail modal ─────────────────────────────────────────────────────────────
+// ── PDF viewer ───────────────────────────────────────────────────────────────
+const API_BASE = 'http://localhost:8000';
+function openPDF(filename) {
+  window.open(`${API_BASE}/pdf/${encodeURIComponent(filename)}`, '_blank');
+}
+
+function openDetail(n) {
+  document.getElementById('detailModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDetail(e) {
+  if (e.target === document.getElementById('detailModal')) {
+    document.getElementById('detailModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+document.getElementById('detailModal').querySelector('.modal-close').addEventListener('click', () => {
+  document.getElementById('detailModal').classList.remove('open');
+  document.body.style.overflow = '';
+});
+
+// ── Filter toggle ─────────────────────────────────────────────────────────────
+function toggleFilter(el) {
+  const group = el.closest('.filter-group');
+  const filterType = group ? group.dataset.filterType : null;
+  const val = el.dataset.value || '';
+  const isTatCa = val === 'tatca';
+
+  function setChecked(item, on) {
+    item.classList.toggle('checked', on);
+    item.querySelector('.filter-checkbox').textContent = on ? '✓' : '';
+  }
+
+  if (filterType === 'mode') {
+    // Radio: only one active at a time
+    group.querySelectorAll('.filter-option').forEach(o => setChecked(o, false));
+    setChecked(el, true);
+  } else {
+    // Multi-select with "Tất cả" exclusive
+    const allItems = Array.from(group.querySelectorAll('.filter-option'));
+    const tatCaEl = allItems.find(o => o.dataset.value === 'tatca');
+
+    if (isTatCa) {
+      // Clicking "Tất cả" → uncheck everything else, check only Tất cả
+      allItems.forEach(o => setChecked(o, false));
+      setChecked(el, true);
+    } else {
+      const wasChecked = el.classList.contains('checked');
+      if (!wasChecked) {
+        // Checking specific item → uncheck "Tất cả"
+        if (tatCaEl) setChecked(tatCaEl, false);
+        setChecked(el, true);
+      } else {
+        // Unchecking specific item
+        setChecked(el, false);
+        // If nothing remains checked, restore "Tất cả"
+        const anySpecific = allItems
+          .filter(o => o.dataset.value !== 'tatca')
+          .some(o => o.classList.contains('checked'));
+        if (!anySpecific && tatCaEl) setChecked(tatCaEl, true);
+      }
+    }
+  }
+}
+
+// ── Group filter (from home) ──────────────────────────────────────────────────
+function filterGroup(group) {
+  // Navigate to admin sources and pre-filter by group
+  showScreen('admin');
+  // Activate "Tài liệu nguồn" admin page
+  const navItems = document.querySelectorAll('.admin-nav-item');
+  navItems.forEach(el => el.classList.remove('active'));
+  const sourcesNav = Array.from(navItems).find(el => el.textContent.includes('Tài liệu nguồn'));
+  if (sourcesNav) sourcesNav.classList.add('active');
+  switchAdminPage('sources', null);
+  // Apply group filter
+  const sel = document.getElementById('srcGroupFilter');
+  if (sel) { sel.value = group; onSrcGroupChange(group); }
+}
+
+// ── Admin pipeline simulation ─────────────────────────────────────────────────
+function simulatePipeline() {
+  const dot   = document.getElementById('evalDot');
+  const desc  = document.getElementById('evalDesc');
+  const count = document.getElementById('evalCount');
+  const time  = document.getElementById('evalTime');
+  const prog  = document.getElementById('pipelineProgress');
+  const bar   = document.getElementById('progressBar');
+  const pct   = document.getElementById('progressPct');
+
+  dot.className = 'step-status status-running';
+  desc.textContent = 'Đang chạy… 200 queries';
+  prog.style.display = 'block';
+
+  let p = 0;
+  const iv = setInterval(() => {
+    p = Math.min(100, p + Math.random() * 8 + 2);
+    bar.style.width = p + '%';
+    pct.textContent = Math.round(p) + '%';
+    if (p >= 100) {
+      clearInterval(iv);
+      dot.className = 'step-status status-done';
+      desc.textContent = 'Hoàn thành · nDCG@10=0.88 · Recall@10=91%';
+      count.textContent = '200 queries';
+      time.textContent = '3m 41s';
+      setTimeout(() => { prog.style.display = 'none'; }, 800);
+    }
+  }, 120);
+}
+
+// ── Admin page routing ────────────────────────────────────────────────────────
+function switchAdminPage(page, navEl) {
+  // Update nav active state
+  document.querySelectorAll('.admin-nav-item').forEach(el => el.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+
+  // Show/hide pages
+  const pages = ['dashboard','sources','parse','embedding','indexing','metrics','benchmark','apihealth','config'];
+  pages.forEach(p => {
+    const el = document.getElementById('admin-page-' + p);
+    if (el) el.style.display = (p === page) ? '' : 'none';
+  });
+
+  // Init source table once
+  if (page === 'sources' && !window._srcTableInit) {
+    window._srcTableInit = true;
+    renderSourceTable();
+  }
+}
+
+// ── Source table data (all 34 documents) ─────────────────────────────────────
+const SOURCE_DOCS = [
+  // luat_quoc_gia (9)
+  ['Luat-BHYT-2008.pdf','luat_quoc_gia',45,623,'Text PDF','Đã index','2023-09-01'],
+  ['Luat-Giao-duc-dai-hoc-2012.pdf','luat_quoc_gia',32,445,'Text PDF','Đã index','2023-09-01'],
+  ['Luat-SDBS-cua-Luat-BHYT_2014.pdf','luat_quoc_gia',8,112,'Text PDF','Đã index','2023-09-01'],
+  ['Luat-Nghia-vu-quan-su-2015-QH13.pdf','luat_quoc_gia',62,856,'Text PDF','Đã index','2023-09-01'],
+  ['Luat-An-ninh-mang-2018.pdf','luat_quoc_gia',28,387,'Text PDF','Đã index','2023-09-01'],
+  ['Luat-Giao-duc-dai-hoc-sua-doi-bo-sung-2018.pdf','luat_quoc_gia',14,195,'Text PDF','Đã index','2023-09-01'],
+  ['Luat-Giao-duc-2019.pdf','luat_quoc_gia',56,772,'Text PDF','Đã index','2023-09-01'],
+  ['Luat-Thanh-nien-2020.pdf','luat_quoc_gia',22,304,'Text PDF','Đã index','2023-09-01'],
+  ['Luat-Cu-tru-2020.pdf','luat_quoc_gia',38,523,'Text PDF','Đã index','2023-09-01'],
+  // thong_tu_bo_gd (3)
+  ['2016-Quy-che-CTSV-Bo-GD-DT.pdf','thong_tu_bo_gd',24,331,'Text PDF','Đã index','2023-09-01'],
+  ['2015-Quy-che-DGKQRL-Bo-GD-DT.pdf','thong_tu_bo_gd',18,248,'Text PDF','Đã index','2023-09-01'],
+  ['2013-Quy-che-CTSV-noi-tru.pdf','thong_tu_bo_gd',12,166,'Text PDF','Đã index','2023-09-01'],
+  // qd_qc_dhqg_hcm (4)
+  ['2019-Quy-che-CTSV-DHQG-HCM.pdf','qd_qc_dhqg_hcm',20,277,'Text PDF','Đã index','2023-09-01'],
+  ['2019-Quy-che-DGKQRL-DHQG-HCM.pdf','qd_qc_dhqg_hcm',16,221,'Text PDF','Đã index','2023-09-01'],
+  ['QD1133-Khen-thuong-HSSV-VNU.pdf','qd_qc_dhqg_hcm',10,138,'Text PDF','Đã index','2023-09-01'],
+  ['QD1342-Quy-che-dao-tao-DH.pdf','qd_qc_dhqg_hcm',34,470,'Text PDF','Đã index','2023-09-01'],
+  // qd_qc_dhqt (11)
+  ['QD-586-Quy-tac-ung-xu-nguoi-hoc.pdf','qd_qc_dhqt',8,111,'Text PDF','Đã index','2023-09-01'],
+  ['QD-515-Quy-che-to-chuc-P.CTSV.pdf','qd_qc_dhqt',12,166,'Text PDF','Đã index','2022-09-08'],
+  ['Quy-dinh-chinh-sach-ho-tro-khuyet-tat.pdf','qd_qc_dhqt',6,83,'Text PDF','Đã index','2023-09-01'],
+  ['Quy-dinh-Ban-can-su-lop-2025.pdf','qd_qc_dhqt',10,138,'Text PDF','Đã index','2025-01-01'],
+  ['QD-719-Quy-che-Hoc-vu-2021.pdf','qd_qc_dhqt',45,621,'Text PDF','Đã index','2021-12-06'],
+  ['Quy-dinh-xet-cap-hoc-bong.pdf','qd_qc_dhqt',8,111,'Text PDF','Đã index','2023-09-01'],
+  ['QD-Quy-che-To-chuc-thi-HK-2025.pdf','qd_qc_dhqt',14,193,'Text PDF','Đã index','2025-01-05'],
+  ['QD-Quy-dinh-Co-van-hoc-tap.pdf','qd_qc_dhqt',10,138,'Text PDF','Đã index','2023-09-01'],
+  ['QD-Quy-dinh-khen-thuong-sinh-vien.pdf','qd_qc_dhqt',8,111,'Text PDF','Đã index','2023-09-01'],
+  ['QD-688-MGHP-2024.pdf','qd_qc_dhqt',8,214,'Scanned PDF','Đã index','2024-01-15'],
+  ['Quy-che-CTSV-QD-967-2022.pdf','qd_qc_dhqt',36,497,'Text PDF','Đã index','2022-12-30'],
+  // qd_ngan_dhqt (4)
+  ['Noi-Quy-SV-truong-DHQT-2009.pdf','qd_ngan_dhqt',12,143,'Scanned PDF','Đã index','2023-09-01'],
+  ['QD-dieu-chinh-Quy-che-CTSV-2025.pdf','qd_ngan_dhqt',4,55,'Text PDF','Đã index','2025-01-09'],
+  ['272-Phu-luc-Quy-dinh-BCSL.pdf','qd_ngan_dhqt',6,83,'Text PDF','Đã index','2025-05-13'],
+  ['QD-191-Quy-dinh-che-do-chinh-sach.pdf','qd_ngan_dhqt',4,61,'Scanned PDF','Đã index','2023-09-01'],
+  // thong_bao (1)
+  ['TB-486-MGHP-CTSV-2014.pdf','thong_bao',3,98,'Scanned PDF','Đã index','2014-11-04'],
+  // phu_luc (2)
+  ['Phu-luc-1-Tieu-chi-DRL-2022.pdf','phu_luc',4,55,'Text PDF','Đã index','2022-12-30'],
+  ['Phu-luc-II-Khung-DRL-2022.pdf','phu_luc',8,111,'Text PDF','Đã index','2022-12-30'],
+];
+
+// ── Source table state ────────────────────────────────────────────────────────
+let _srcPage = 1;
+const SRC_PAGE_SIZE = 10;
+let _srcGroupFilter = '';
+
+function onSrcGroupChange(val) {
+  _srcGroupFilter = val;
+  _srcPage = 1;
+  renderSourceTable();
+}
+
+function renderSourceTable(page) {
+  if (page !== undefined) _srcPage = page;
+  const tbody = document.getElementById('srcTableBody');
+  const info  = document.getElementById('srcTableInfo');
+  const pgDiv = document.getElementById('srcPagination');
+  if (!tbody) return;
+
+  // Filter
+  const filtered = _srcGroupFilter
+    ? SOURCE_DOCS.filter(d => d[1] === _srcGroupFilter)
+    : SOURCE_DOCS;
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / SRC_PAGE_SIZE));
+  if (_srcPage > totalPages) _srcPage = totalPages;
+
+  const start = (_srcPage - 1) * SRC_PAGE_SIZE;
+  const page_docs = filtered.slice(start, start + SRC_PAGE_SIZE);
+
+  // Info text
+  if (info) info.textContent = `Hiển thị ${start + 1}–${Math.min(start + SRC_PAGE_SIZE, total)} / ${total} tài liệu`;
+
+  // Table rows
+  const statusColors = {'Đã index':'badge-green','Lỗi OCR':'badge-red','Chờ xử lý':'badge-yellow'};
+  tbody.innerHTML = page_docs.map(([name,group,pages,chunks,type,status,date]) => `
+    <tr style="border-bottom:1px solid var(--gray-100);font-size:12.5px">
+      <td style="padding:10px 16px;color:var(--gray-800);font-weight:500">${name}</td>
+      <td style="padding:10px 16px"><code style="font-size:11px;background:var(--primary-xxl);color:var(--primary);padding:2px 6px;border-radius:4px">${group}</code></td>
+      <td style="padding:10px 16px;text-align:center;color:var(--gray-600)">${pages}</td>
+      <td style="padding:10px 16px;text-align:center;font-weight:600;color:var(--gray-800)">${chunks}</td>
+      <td style="padding:10px 16px;color:var(--gray-500);font-size:11.5px">${type}</td>
+      <td style="padding:10px 16px"><span class="badge ${statusColors[status]||'badge-green'}">${status}</span></td>
+      <td style="padding:10px 16px;color:var(--gray-500);font-size:11.5px">${date}</td>
+      <td style="padding:10px 16px;text-align:center">
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:3px 8px">Re-index</button>
+      </td>
+    </tr>`).join('');
+
+  // Pagination buttons
+  if (pgDiv) {
+    const btnStyle = (active) =>
+      `padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid ` +
+      (active ? `var(--primary);background:var(--primary);color:white;` : `var(--gray-200);background:white;color:var(--gray-700);`);
+
+    let html = `<button style="${btnStyle(false)}" ${_srcPage<=1?'disabled':''} onclick="renderSourceTable(${_srcPage-1})">← Trước</button>`;
+    for (let p = 1; p <= totalPages; p++) {
+      html += `<button style="${btnStyle(p === _srcPage)}" onclick="renderSourceTable(${p})">${p}</button>`;
+    }
+    html += `<button style="${btnStyle(false)}" ${_srcPage>=totalPages?'disabled':''} onclick="renderSourceTable(${_srcPage+1})">Sau →</button>`;
+    pgDiv.innerHTML = html;
+  }
+}
+
+// ── Parse page: run simulation ────────────────────────────────────────────────
+function runParseSim() {
+  const log = document.getElementById('parseLog');
+  if (!log) return;
+  const ts = new Date().toTimeString().slice(0,8);
+  log.innerHTML += `<br><span style="color:#FBBF24">[${ts}]</span> Bắt đầu re-parse với cấu hình mới…<br>`;
+  setTimeout(() => {
+    log.innerHTML += `<span style="color:#4ADE80">[${ts}]</span> ✓ Hoàn thành · 2,398 chunks → data/processed/<br>`;
+    log.scrollTop = log.scrollHeight;
+  }, 2000);
+}
+
+// ── Benchmark: switch model ───────────────────────────────────────────────────
+function switchModel(btn, model) {
+  // reset all rows
+  document.querySelectorAll('#admin-page-benchmark tbody tr').forEach(tr => {
+    tr.style.background = '';
+    const statusCell = tr.cells[6];
+    if (statusCell) statusCell.innerHTML = '<span class="badge" style="background:var(--gray-100);color:var(--gray-600)">Standby</span>';
+    const actionCell = tr.cells[7];
+    if (actionCell) {
+      const b = actionCell.querySelector('button');
+      if (b) { b.disabled = false; b.textContent = 'Dùng model này'; }
+    }
+  });
+  // activate row
+  const row = btn.closest('tr');
+  row.style.background = 'var(--primary-xxl)';
+  const statusCell = row.cells[6];
+  if (statusCell) statusCell.innerHTML = '<span class="badge badge-green">Đang dùng</span>';
+  btn.disabled = true; btn.textContent = 'Active';
+}
+
+// ── Keyboard shortcuts ─────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('detailModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+</script>
+</body>
+</html>

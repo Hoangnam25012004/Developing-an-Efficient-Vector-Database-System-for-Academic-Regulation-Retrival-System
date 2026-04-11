@@ -38,7 +38,10 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
 
-from utils import read_jsonl
+import sys
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
+from scripts.utils import read_jsonl
 
 
 # ── qrels helpers ─────────────────────────────────────────────────────────────

@@ -1,23 +1,32 @@
+import json
 import os
 import pickle
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import regex as re
-from fastapi import FastAPI, Query
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, RedirectResponse
+from pydantic import BaseModel, ConfigDict
 from qdrant_client import QdrantClient
 from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer
 from scripts.utils import load_config, vnfold
-from fastapi.responses import RedirectResponse
 
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "scripts"))
 
 app = FastAPI(title="Reg Retrieval API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 cfg = load_config("configs/default.yaml")
 
@@ -33,23 +42,105 @@ if bm25_path.exists():
 
 
 class SearchHit(BaseModel):
+    model_config = ConfigDict(extra="allow")   # pass ALL payload fields through
+
     score: float
     doc_id: str
-    title: Optional[str]
+    title: Optional[str] = None
     path_hierarchy: List[str] = []
-    article_no: Optional[int]
-    clause_no: Optional[int]
-    point: Optional[str]
-    version: Optional[str]
-    effective_date: Optional[str]
-    faculty: Optional[str]
-    language: Optional[str]
+    article_no: Optional[int] = None
+    clause_no: Optional[int] = None
+    point: Optional[str] = None
+    version: Optional[str] = None
+    effective_date: Optional[str] = None
+    faculty: Optional[str] = None
+    language: Optional[str] = None
+    source_file: Optional[str] = None
+    # Fields from processed JSONL (may be present depending on ingestion)
+    doc_type: Optional[str] = None
+    issuing_authority: Optional[str] = None
+    group: Optional[str] = None
+    doc_number: Optional[str] = None
+    scope: Optional[str] = None
+    page: Optional[Any] = None
     text: str
 
 
 @app.get("/health")
 def health():
     return {"ok": True}
+
+
+# ── PDF serving ──────────────────────────────────────────────────────────────
+_RAW_DIR = Path("data/Raw")
+
+def _find_pdf(filename: str) -> Path | None:
+    """Search recursively in data/Raw for the given PDF filename."""
+    for pdf_path in _RAW_DIR.rglob("*.pdf"):
+        if pdf_path.name == filename:
+            return pdf_path
+    return None
+
+@app.get("/pdf/{filename:path}")
+def serve_pdf(filename: str):
+    """Serve a PDF file from data/Raw by filename."""
+    pdf_path = _find_pdf(filename)
+    if pdf_path is None:
+        raise HTTPException(status_code=404, detail=f"PDF '{filename}' not found")
+    return FileResponse(
+        path=str(pdf_path),
+        media_type="application/pdf",
+        filename=filename,
+        headers={"Content-Disposition": f'inline; filename="{filename}"'},
+    )
+
+
+@app.get("/stats")
+def get_stats():
+    """Return basic statistics about indexed documents."""
+    processed = Path(cfg["paths"]["processed_dir"])
+    jsonl_files = list(processed.glob("*.jsonl"))
+    total_docs = len(jsonl_files)
+    total_chunks = len(bm25_obj["metas"]) if bm25_obj else 0
+    return {
+        "total_docs": total_docs,
+        "total_chunks": total_chunks,
+        "collection": cfg["qdrant"]["collection"],
+        "embedding_model": cfg["embedding"]["model_name"],
+        "reranker_model": cfg["reranker"]["model_name"],
+    }
+
+
+@app.get("/doc-list")
+def list_docs():
+    """List all processed documents with metadata."""
+    processed = Path(cfg["paths"]["processed_dir"])
+    result = []
+    for fpath in sorted(processed.glob("*.jsonl")):
+        rows = []
+        with open(fpath, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    try:
+                        rows.append(json.loads(line))
+                    except Exception:
+                        pass
+        if rows:
+            first = rows[0]
+            result.append({
+                "filename": fpath.name,
+                "pdf_name": first.get("source_file", fpath.stem + ".pdf"),
+                "group": first.get("group", ""),
+                "doc_type": first.get("doc_type", ""),
+                "title": first.get("title", ""),
+                "doc_number": first.get("doc_number", ""),
+                "chunk_count": len(rows),
+                "version": first.get("version", ""),
+                "effective_date": first.get("effective_date", ""),
+                "issuing_authority": first.get("issuing_authority", ""),
+            })
+    return result
 
 
 def tok_fn(s: str, mode: str):

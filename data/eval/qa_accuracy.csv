@@ -1,0 +1,5 @@
+model,runs,k,n_evaluated,recall@5,precision@5,f1@5,em@5,qem@5,source_hit_rate@k
+Dense (E5),runs_dense.jsonl,5,150,0.8286,0.6001,0.6298,0.62,0.6267,0.76
+Sparse (BM25),runs_sparse.jsonl,5,150,0.8629,0.6022,0.6446,0.6333,0.6333,0.7733
+Hybrid RRF,runs_hybrid.jsonl,5,150,0.8627,0.6158,0.6555,0.6667,0.6667,0.8133
+Rerank (BGE-m3),runs_bge_m3.jsonl,5,150,0.9011,0.6092,0.6574,0.6867,0.6867,0.8333

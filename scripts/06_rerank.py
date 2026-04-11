@@ -195,6 +195,7 @@ def main():
     # Shared
     parser.add_argument("--top_k",   type=int, default=20, help="Candidate pool per query")
     parser.add_argument("--final_k", type=int, default=10, help="Top-k after reranking")
+    parser.add_argument("--limit",   type=int, default=None, help="Max queries to process (batch mode)")
     args = parser.parse_args()
 
     if args.queries is None and args.query is None:
@@ -222,6 +223,8 @@ def main():
     # ── Batch evaluation mode ─────────────────────────────────────────────────
     if args.queries:
         queries     = read_jsonl(args.queries)
+        if args.limit:
+            queries = queries[:args.limit]
         all_results = []
 
         for q_item in queries:
@@ -246,10 +249,11 @@ def main():
             for rank, i in enumerate(order, start=1):
                 all_results.append(
                     {
-                        "query_id": qid,
-                        "doc_id":   candidates[i]["doc_id"],
-                        "rank":     rank,
-                        "score":    round(float(scores[i]), 6),
+                        "query_id":   qid,
+                        "doc_id":     candidates[i]["doc_id"],
+                        "source_file": candidates[i].get("source_file", ""),
+                        "rank":       rank,
+                        "score":      round(float(scores[i]), 6),
                     }
                 )
 
