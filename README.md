@@ -1,4 +1,4 @@
-# reg-retrieval — Hệ thống vector database truy xuất văn bản pháp quy học thuật
+# reg-retrieval — Hệ thống truy xuất văn bản pháp quy học thuật
 
 Pipeline end-to-end để tìm kiếm thông minh trong các văn bản quy chế, quyết định, thông tư của trường đại học và bộ ngành.
 
