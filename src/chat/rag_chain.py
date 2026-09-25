@@ -54,11 +54,25 @@ _STOPWORDS = {
 }
 
 
-def _content_tokens(text: str) -> set[str]:
+def _content_tokens(text: str, extra_stopwords: frozenset = frozenset()) -> set[str]:
     return {
         t for t in (w.lower() for w in _WORD_RE.findall(text))
-        if len(t) >= 2 and t not in _STOPWORDS
+        if len(t) >= 2 and t not in _STOPWORDS and t not in extra_stopwords
     }
+
+
+# Function words of English documents. Applied only when the quoted chunk comes
+# from a document declared English — several of these ("an", "to", "in",
+# "can", "may") are also Vietnamese syllables, so using them on Vietnamese text
+# would change which sentence gets bolded.
+_ENGLISH_STOPWORDS = frozenset(
+    "the of and to in is for that on with as by be are this or from at an it "
+    "not which shall will must all any may have has was were their its can".split()
+)
+
+
+def _stopwords_for(d: dict) -> frozenset:
+    return _ENGLISH_STOPWORDS if (d.get("language") or "") == "en" else frozenset()
 
 
 _SOFT_WRAP_RE = re.compile(r"[ \t]*\n(?!\n)[ \t]*")
@@ -76,7 +90,8 @@ def _unwrap(text: str) -> str:
     return _SOFT_WRAP_RE.sub(" ", text)
 
 
-def highlight_relevant(text: str, query: str, top_sentences: int = 1) -> str:
+def highlight_relevant(text: str, query: str, top_sentences: int = 1,
+                       extra_stopwords: frozenset = frozenset()) -> str:
     """Bold the sentence(s) of `text` that best match `query`.
 
     The clause is still quoted in full — bolding adds emphasis without removing
@@ -88,7 +103,7 @@ def highlight_relevant(text: str, query: str, top_sentences: int = 1) -> str:
     if top_sentences <= 0:
         return text
 
-    query_tokens = _content_tokens(query)
+    query_tokens = _content_tokens(query, extra_stopwords)
     if not query_tokens:
         return text
 
@@ -99,7 +114,7 @@ def highlight_relevant(text: str, query: str, top_sentences: int = 1) -> str:
 
     scored: list[tuple[float, str]] = []
     for sentence in sentences:
-        tokens = _content_tokens(sentence)
+        tokens = _content_tokens(sentence, extra_stopwords)
         if not tokens:
             continue
         overlap = len(query_tokens & tokens)
@@ -148,6 +163,99 @@ def _legal_locator(d: dict) -> str:
     if chapter:
         return f"Chương {chapter} – {chapter_title}" if chapter_title else f"Chương {chapter}"
     return ""
+
+
+# ── Structure-aware labels for documents outside the legal domain ────────────
+#
+# The chunker stores the three structure levels it detected in the same fields
+# (chapter / article / khoan) whatever the document calls them, and documents
+# uploaded through the ingestion flow also record which heading pattern filled
+# each level (`level_labels`). The labels above always read Chương/Điều/Khoản;
+# for a manual organised in Chapters and Sections that is simply wrong, so such
+# chunks are named after their own pattern. Chunks without `level_labels` — the
+# whole original corpus — and chunks of Vietnamese legal documents keep the
+# labels above unchanged.
+
+_LEGAL_VN_PATTERNS = {"CHUONG_VN", "DIEU_VN", "KHOAN_VN"}
+
+_LEVEL_NAMES = {
+    "chapter": {
+        "CHUONG_VN": ("Chương {v}", "Chương {v}"), "CHAPTER_EN": ("Chapter {v}", "Chapter {v}"),
+        "PHAN_VN": ("Phần {v}", "Phần {v}"), "PART_EN": ("Part {v}", "Part {v}"),
+        "ROMAN_TITLE": ("Phần {v}", "Part {v}"), "NAMED_VN": ("{v}", "{v}"),
+        "NAMED_EN": ("{v}", "{v}"), "HEADING_1": ("{t}", "{t}"),
+    },
+    "article": {
+        "DIEU_VN": ("Điều {v}", "Article {v}"), "ARTICLE_EN": ("Article {v}", "Article {v}"),
+        "SECTION_EN": ("Section {v}", "Section {v}"), "PARAGRAPH_SIGN": ("§{v}", "§{v}"),
+        "MUC_VN": ("Mục {v}", "Section {v}"), "HEADING_2": ("{t}", "{t}"),
+    },
+    "khoan": {
+        "KHOAN_VN": ("Khoản {v}", "Clause {v}"), "NUM_DOT": ("mục {v}", "item {v}"),
+        "NUM_DOT_NUM": ("mục {v}", "item {v}"), "PAREN_DIGIT": ("mục ({v})", "item ({v})"),
+        "LETTER_LIST": ("điểm {v}", "point {v}"), "ROMAN_LOWER": ("mục {v}", "item {v}"),
+        "THEOREM_STYLE": ("{v}", "{v}"), "CAU_BAI": ("{v}", "{v}"), "HEADING_3": ("mục {v}", "item {v}"),
+    },
+}
+
+
+def _uses_generic_labels(d: dict) -> bool:
+    labels = d.get("level_labels")
+    if not isinstance(labels, dict) or not any(labels.values()):
+        return False
+    return not (set(labels.values()) & _LEGAL_VN_PATTERNS)
+
+
+def _level_name(d: dict, level: str, value: str, title: str = "") -> str:
+    pattern = (d.get("level_labels") or {}).get(level) or ""
+    en = (d.get("language") or "") == "en"
+    names = _LEVEL_NAMES[level].get(pattern)
+    if names is None:
+        return value
+    template = names[1] if en else names[0]
+    if "{t}" in template:
+        return title or value
+    return template.format(v=value)
+
+
+def _cap(s: str) -> str:
+    return s[:1].upper() + s[1:] if s else s
+
+
+def _generic_locator(d: dict) -> str:
+    article = (d.get("article") or "").strip()
+    article_title = (d.get("article_title") or "").strip()
+    chapter = (d.get("chapter") or "").strip()
+    chapter_title = (d.get("chapter_title") or "").strip()
+    khoan = (d.get("khoan") or "").strip()
+
+    if article:
+        head, title = _level_name(d, "article", article, article_title), article_title
+    elif chapter:
+        head, title = _level_name(d, "chapter", chapter, chapter_title), chapter_title
+    else:
+        head, title = "", ""
+    if khoan:
+        leaf = _level_name(d, "khoan", khoan)
+        head = f"{head}, {leaf}" if head else _cap(leaf)
+    if title and title != head and not head.endswith(title):
+        head = f"{head} – {title}"
+    return head
+
+
+def _locator(d: dict) -> str:
+    return _generic_locator(d) if _uses_generic_labels(d) else _legal_locator(d)
+
+
+def _khoan_sort_key_generic(d: dict) -> tuple:
+    """Order "2", "2.1", "10" numerically, letters after numbers."""
+    k = (d.get("khoan") or "").strip()
+    if not k:
+        return (-1, ())
+    nums = re.findall(r"\d+", k)
+    if nums:
+        return (0, tuple(int(n) for n in nums))
+    return (1, (k,))
 
 
 def _doc_label(d: dict) -> str:
@@ -246,10 +354,10 @@ def tier1_single_clause(docs: list[dict], query: str = "", highlight: int = 0) -
     d = docs[0]
     fn_map = _source_to_footnote(docs)
     fn = fn_map[d.get("source", "unknown")]
-    locator = _legal_locator(d)
+    locator = _locator(d)
     text = (d.get("text") or "").strip()
     if highlight and query:
-        text = highlight_relevant(text, query, highlight)
+        text = highlight_relevant(text, query, highlight, _stopwords_for(d))
 
     header = f"**{locator}**" if locator else "**Trích dẫn liên quan**"
     body = f"{header} [{fn}]\n\n> {text}{_partial_note(d)}"
@@ -279,10 +387,15 @@ def tier2_same_article(docs: list[dict], query: str = "", highlight: int = 0,
     head = docs[0]
     fn_map = _source_to_footnote(docs)
     fn = fn_map[head.get("source", "unknown")]
+    generic = _uses_generic_labels(head)
 
     article = head.get("article", "")
     article_title = head.get("article_title", "") or ""
-    heading = f"**Điều {article} – {article_title}**" if article_title else f"**Điều {article}**"
+    if generic:
+        name = _cap(_level_name(head, "article", article, article_title))
+        heading = f"**{name} – {article_title}**" if article_title and article_title != name else f"**{name}**"
+    else:
+        heading = f"**Điều {article} – {article_title}**" if article_title else f"**Điều {article}**"
 
     # Group by Khoản number, preserving order; dedup only on identical text
     grouped: dict[str, list[dict]] = {}
@@ -297,7 +410,8 @@ def tier2_same_article(docs: list[dict], query: str = "", highlight: int = 0,
         seen_texts[k].add(text_key)
         grouped.setdefault(k, []).append(d)
 
-    sorted_keys = sorted(grouped.keys(), key=lambda k: _khoan_sort_key({"khoan": k}))
+    sort_key = _khoan_sort_key_generic if generic else _khoan_sort_key
+    sorted_keys = sorted(grouped.keys(), key=lambda k: sort_key({"khoan": k}))
 
     # Verbosity cap: an answer that lists every Khoản of a long Điều buries the
     # one the reader asked about. Keys stay in legal order; only the tail is cut.
@@ -309,16 +423,22 @@ def tier2_same_article(docs: list[dict], query: str = "", highlight: int = 0,
     parts = [f"{heading} [{fn}]", ""]
     for k in sorted_keys:
         if k:
-            parts.append(f"**Khoản {k}:**")
+            if generic:
+                parts.append(f"**{_cap(_level_name(head, 'khoan', k))}:**")
+            else:
+                parts.append(f"**Khoản {k}:**")
         for d in grouped[k]:
             text = (d.get("text") or "").strip()
             if highlight and query:
-                text = highlight_relevant(text, query, highlight)
+                text = highlight_relevant(text, query, highlight, _stopwords_for(d))
             parts.append(f"> {text}{_partial_note(d)}")
         parts.append("")
 
     if omitted:
-        parts.append(f"*(Còn {omitted} khoản khác trong Điều này không được trích.)*")
+        if generic:
+            parts.append(f"*(Còn {omitted} mục khác trong phần này không được trích.)*")
+        else:
+            parts.append(f"*(Còn {omitted} khoản khác trong Điều này không được trích.)*")
 
     return "\n".join(parts).rstrip() + "\n" + build_citations_footer(docs)
 
@@ -384,14 +504,22 @@ def tier3_multi_source(docs: list[dict], query: str = "", highlight: int = 0,
                     continue
                 seen_texts[k].add(tk)
                 khoan_groups.setdefault(k, []).append(c)
+            generic = _uses_generic_labels(chunks[0])
+            sort_key = _khoan_sort_key_generic if generic else _khoan_sort_key
             sorted_keys = sorted(khoan_groups.keys(),
-                                 key=lambda k: _khoan_sort_key({"khoan": k}))
+                                 key=lambda k: sort_key({"khoan": k}))
 
             title = article_titles.get((src, art), "")
             if art and art != "_no_article_":
-                heading = f"**{section_idx}. Điều {art}"
-                if title:
-                    heading += f" – {title}"
+                if generic:
+                    name = _cap(_level_name(chunks[0], "article", art, title))
+                    heading = f"**{section_idx}. {name}"
+                    if title and title != name:
+                        heading += f" – {title}"
+                else:
+                    heading = f"**{section_idx}. Điều {art}"
+                    if title:
+                        heading += f" – {title}"
                 heading += f"** [{fn}]"
             else:
                 heading = f"**{section_idx}. {_doc_label(chunks[0])}** [{fn}]"
@@ -400,11 +528,14 @@ def tier3_multi_source(docs: list[dict], query: str = "", highlight: int = 0,
 
             for k in sorted_keys:
                 if k:
-                    parts.append(f"\n*Khoản {k}:*")
+                    if generic:
+                        parts.append(f"\n*{_cap(_level_name(chunks[0], 'khoan', k))}:*")
+                    else:
+                        parts.append(f"\n*Khoản {k}:*")
                 for d in khoan_groups[k]:
                     text = (d.get("text") or "").strip()
                     if highlight and query:
-                        text = highlight_relevant(text, query, highlight)
+                        text = highlight_relevant(text, query, highlight, _stopwords_for(d))
                     parts.append(f"> {text}{_partial_note(d)}")
                 parts.append("")
 
@@ -458,7 +589,7 @@ def extractive_answer(query: str, docs: list[dict]) -> str:
         src   = d.get("source", "?")
         page  = d.get("page", "?")
         text  = (d.get("text") or "").strip()
-        loc   = _legal_locator(d)
+        loc   = _locator(d)
         loc_str = f" · {loc}" if loc else ""
         score = d.get("_score_rerank")
         score_str = f" · rerank={score:.3f}" if isinstance(score, (int, float)) else ""
@@ -510,6 +641,23 @@ class RAGChain:
                 f"(supported: hybrid, extractive)"
             )
 
+    def reload_indexes(self) -> None:
+        """Pick up index files an ingestion job rewrote, without reloading models.
+
+        BM25 and the clause index are read from disk at start-up; the dense
+        branch queries Qdrant live. Each replacement is built completely before
+        it is swapped in, so a query in flight finishes on the previous one.
+        """
+        self.retriever.reload_sparse()
+        if self.clause_index is not None:
+            from src.chat.clause_assembler import ClauseIndex
+
+            assembly = self.cfg["llm"].get("clause_assembly") or {}
+            self.clause_index = ClauseIndex(
+                self.cfg["data"]["processed_dir"],
+                max_chars=int(assembly.get("max_chars", 3000)),
+            )
+
     def retrieve(self, query: str) -> list[dict[str, Any]]:
         candidates = self.retriever.search(query)
         return self.reranker.rerank(query, candidates)
@@ -554,6 +702,11 @@ class RAGChain:
                     "text":         d.get("text", "")[:800],
                     "score_rrf":    d.get("_score_rrf"),
                     "score_rerank": d.get("_score_rerank"),
+                    # Only documents uploaded through ingestion carry these;
+                    # the UI names their structure levels from them.
+                    "level_labels": d.get("level_labels"),
+                    "file_type":    d.get("file_type"),
+                    "language":     d.get("language"),
                 }
                 for d in docs
             ],

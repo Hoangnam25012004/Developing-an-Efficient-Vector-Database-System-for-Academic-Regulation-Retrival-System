@@ -29,12 +29,22 @@ def reciprocal_rank_fusion(
 
 class HybridRetriever:
     def __init__(self, cfg: dict):
+        self._cfg = cfg
         self._dense = VectorRetriever(cfg)
         self._sparse = BM25Retriever(cfg)
         self._top_k_dense = cfg["retrieval"]["top_k_dense"]
         self._top_k_sparse = cfg["retrieval"]["top_k_sparse"]
         self._top_k_fusion = cfg["retrieval"]["top_k_fusion"]
         self._rrf_k = cfg["retrieval"]["rrf_k"]
+
+    def reload_sparse(self) -> None:
+        """Swap in the BM25 index an ingestion job just rewrote.
+
+        Loaded fully before the swap, and the swap is a single assignment, so a
+        search already in progress finishes on the old index. The dense branch
+        needs nothing: it queries Qdrant, which the job updated in place.
+        """
+        self._sparse = BM25Retriever(self._cfg)
 
     def search(self, query: str) -> list[dict[str, Any]]:
         dense_results = self._dense.search(query, top_k=self._top_k_dense)
