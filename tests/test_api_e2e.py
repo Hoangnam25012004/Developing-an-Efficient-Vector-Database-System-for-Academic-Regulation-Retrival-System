@@ -71,7 +71,7 @@ class IngestionE2ETest(unittest.TestCase):
         cls.client = TestClient(api_main.app)
         api_main._get_runner().start()
         cls.files = base / "uploads"
-        cls.files.mkdir()
+        (cls.files / "v2").mkdir(parents=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -174,7 +174,7 @@ class IngestionE2ETest(unittest.TestCase):
         self.assertIn("Quy-định-công-tác-phí.docx", [h["source"] for h in hits])
 
         # 4. replace the DOCX with a new version
-        v2 = make_docx(self.files / "v2" / "Quy định công tác phí.docx" if (self.files / "v2").mkdir() is None else None,
+        v2 = make_docx(self.files / "v2" / "Quy định công tác phí.docx",
                        lambda d: [d.add_paragraph(t) for t in LEGAL_V2])
         up = self.upload([v2], "Chinh-sach-noi-bo")
         self.assertEqual(up["files"][0]["conflict"]["type"], "same_group")

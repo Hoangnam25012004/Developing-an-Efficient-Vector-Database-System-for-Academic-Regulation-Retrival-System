@@ -2,7 +2,7 @@
 
 | Mục | Nội dung |
 |---|---|
-| Trạng thái | **Bản nháp — chờ duyệt**. Chưa có dòng code nào bị thay đổi. |
+| Trạng thái | **Đã triển khai** (commit `1bbb4a6` → `f15e2ee`, gốc là `c3c4906`). Các điểm điều chỉnh khi triển khai: Phụ lục D. |
 | Ngày | 2026-09-25 |
 | Phạm vi code | `api/main.py`, `ui/index.html`, `src/pipeline/01..03`, `src/chat/rag_chain.py`, `src/retrieval/hybrid_retriever.py`; mới: `src/ingest/`, `tests/` |
 | Không đụng tới | model embedding/reranker, RRF, logic chọn tier, `clause_assembler.py`, `eval/`, `Report/`, endpoint `/config` |
@@ -864,3 +864,44 @@ Mỗi phase có thể phát hành độc lập. Endpoint cũ vẫn chạy cho t�
 | O1 | `PUT /config` ghi file bằng encoding mặc định (`api/main.py:411`). Trên máy này, file `config.yaml` bị **làm rỗng** (đã tái hiện trên bản sao). UI không gọi endpoint này; chỉ gọi qua Swagger mới bị. | Thuộc chức năng Config, ngoài 4 vùng được phép. **Khuyến nghị sửa sớm** (ghi `encoding="utf-8"`, dạng temp + replace). |
 | O2 | 12 chunk có "Điều N" ngắn (≤ 120 ký tự) bị gộp vào chunk kế tiếp và mang nhãn điều sai (`_is_heading_only`, `01_parse_chunk.py:898-909`). Ví dụ: "Điều 2. Quyết định này có hiệu lực…" mang nhãn `article=3`. | Sửa sẽ đổi `chunk_id` của ít nhất 3 tài liệu, ảnh hưởng GT v2 và số liệu paper. |
 | O3 | Bảng PDF không có cột số thứ tự: vùng chữ của bảng vẫn bị che khỏi text trang (`01_parse_chunk.py:562`), nhưng không sinh chunk hàng nào, nên nội dung bị mất. | Đọc từ code, chưa đo trên corpus; sửa sẽ đổi đầu ra PDF hiện có. Extractor DOCX mới không có lỗi này. |
+
+Cập nhật khi triển khai:
+
+- **O1 đã được sửa** (người dùng cho phép ngày 2026-09-25): `PUT /config` giờ ghi UTF-8 qua file tạm.
+- **O2 nặng hơn mô tả ở trên.** Khi đoạn ngắn nằm ở cuối tài liệu, nó bị **bỏ hẳn** (ví dụ: Điều 2 và Điều 3 của một DOCX mẫu biến mất). Người dùng quyết định **giữ nguyên chunker như paper cho mọi tài liệu**, kể cả tài liệu mới. Hạn chế này được ghi lại, không sửa.
+
+## Phụ lục D — Điều chỉnh khi triển khai (so với bản thiết kế)
+
+| # | Điều chỉnh | Lý do |
+|---|---|---|
+| D-1 | **Không tạo payload index** trên `source` (mục 8.2 dự kiến có). Lọc theo `source` quét payload; ở quy mô này vẫn nhanh. | Giữ collection đúng cấu hình đã đo trong paper (Bảng II, III, Hình 2–3). |
+| D-2 | Point cũ của tài liệu bị thay thế chỉ bị xoá **sau khi** BM25 cập nhật xong. | Nếu hỏng giữa chừng thì chỉ thừa point, không bao giờ thiếu. Phiên bản cũ luôn khôi phục được nguyên vẹn. |
+| D-3 | Khi đồng bộ toàn bộ (`sync`), tài liệu parse lỗi **giữ nguyên** JSONL và point cũ. | Một lỗi tạm thời (ví dụ OCR không khả dụng) không được làm tài liệu biến mất khỏi chỉ mục. |
+| D-4 | `sync` bỏ qua việc embed lại các chunk đã có trong collection **khi** `index_state.json` xác nhận cùng model và cùng số point. | Lần đồng bộ sau chỉ mất vài giây thay vì khoảng 14 phút. Lần đầu (chưa có marker) vẫn embed lại toàn bộ. |
+| D-5 | `POST /uploads` nhận thêm trường `group` (tuỳ chọn) để phân loại trùng tên: `same_group` / `other_group` / `in_batch`. Trùng nội dung (sha256) là **từ chối**, không phải cảnh báo. | Người dùng thấy đúng lựa chọn (Thay thế chỉ có khi trùng trong cùng nhóm). |
+| D-6 | Mã lỗi bổ sung: `NO_TEXT` (DOCX chỉ có ảnh), `NAME_CONFLICT_IN_BATCH`, `EMPTY_CONTENT`, `FILE_MISSING`, `INDEX_FAILED`, `WORKER_CRASHED`. | Mọi nhánh lỗi đều có thông điệp tiếng Việt. |
+| D-7 | Text trang DOCX nối các đoạn bằng một dòng xuống (`\n`, như PDF), không dùng dòng trống. | Dòng trống cắt ngắn khối trích dẫn `> …` trong câu trả lời Chat. |
+| D-8 | Tên file thay thêm `'` và `` ` `` bằng `-`. | `encodeURIComponent` không mã hoá hai ký tự này, nên chúng làm hỏng `onclick` của UI. |
+| D-9 | `sources` của `/chat` chỉ thêm `level_labels`, `file_type`, `language` (không thêm `doc_group`, `chapter`). | Thêm các field kia sẽ làm tag của tài liệu cũ hiện ra, trái INV-3. |
+| D-10 | Stopword tiếng Anh chỉ áp dụng cho chunk của tài liệu tiếng Anh. | "an", "to", "in", "can", "may" cũng là âm tiết tiếng Việt ("an toàn"). |
+| D-11 | Test dùng `unittest` (có sẵn), không thêm `pytest`. Test E2E chỉ chạy khi đặt `ARRS_E2E=1`. | Không phải tải thêm gói. E2E cần Qdrant và chạy vài phút. |
+| D-12 | Cột Ngôn ngữ hiển thị `VI` cho tài liệu cũ (không có sidecar). | Đó là hồ sơ mặc định mà chúng thực sự được xử lý. |
+
+## Phụ lục E — Kết quả kiểm thử (2026-09-25)
+
+| Cổng | Kết quả |
+|---|---|
+| G1 | Parser mới sinh lại 34/34 JSONL **giống từng byte** với parser gốc. Log parse (số chunk, trang OCR) cũng giống hệt. Baseline gốc trùng với `data/processed/` hiện tại (34/34). |
+| G3 | 20/20 câu trả lời đã ghi lại (retrieve + rerank thật trên `reg_chunks`) giống hệt khi tổng hợp bằng code mới; 7.100 tổ hợp tier 1–4 tổng hợp từ 4.224 chunk thật không lệch; highlight và nhãn của 4.224/4.224 chunk giống hệt. |
+| G4 | Output của `scripts/test_chunker.py` và `scripts/test_synthesis.py` giống hệt bản gốc. |
+| Unit | 60 test (`tests/`): tên file, kiểm tra file, DOCX, parser, BM25 tăng dần = full rebuild, Qdrant tăng dần, hàng đợi job, nhãn Chat. |
+| G2 | Code mới cho 100 câu GT v2 trên `reg_chunks` thật: thứ hạng BM25 top-30, dense top-30, RRF top-20 **giống hệt** baseline gốc. |
+| E2E | `tests/test_api_e2e.py` (Qdrant + worker + model thật, collection tạm): đồng bộ, upload 5 loại file, commit, tìm kiếm, thay thế, rollback, xoá, endpoint cũ, orphan, xoá nhóm, `PUT /config`. Đạt 2 lần (197 s, 189 s); `/index/health` khớp sau mọi bước. |
+| G6 | Trình duyệt, server thử với dữ liệu riêng: đồng bộ chỉ mục, upload 2 bước (tạo nhóm mới, báo cáo từng file, trùng tên → thay thế, sai định dạng, trùng nội dung), trạng thái trực tiếp, Chat trả lời DOCX tiếng Việt (tier 1 "Điều 3", link tải DOCX) và PDF tiếng Anh (tier 1 "Chapter 3 – Violations"), xoá tài liệu, xoá nhóm. Collection `reg_chunks` không bị ghi (4.224 point trước và sau). |
+
+## Phụ lục F — Vấn đề có sẵn quan sát được khi kiểm thử (không sửa)
+
+| ID | Vấn đề | Bằng chứng |
+|---|---|---|
+| O4 | `_diversify` (reranker) lượt 2 so sánh dict gốc với bản sao đã thêm `_score_rerank`, nên **thêm lại chunk đã chọn**, gây trùng trong kết quả rerank. Paper (III-C) mô tả bước này "with redundancy removal". | Trong baseline gốc, 6/20 câu có chunk trùng. `ndcg_at_k`, precision và AP cộng mỗi vị trí, nên bị thổi phồng: ước lượng trên 19 câu có nhãn, nDCG@10 là 0,966 khi còn trùng, 0,902 khi khử trùng; một câu đạt 1,274. HR@1, HR@5, MRR không đổi. Muốn biết con số chính xác cho Bảng II thì cần chạy lại ablation có khử trùng (~50 phút CPU). |
+| O5 | Thanh trạng thái UI luôn hiện "Qdrant offline": UI đọc `d.qdrant` nhưng `/health` không trả field này. | `ui/index.html` (checkHealth), `api/main.py` (`/health`). |

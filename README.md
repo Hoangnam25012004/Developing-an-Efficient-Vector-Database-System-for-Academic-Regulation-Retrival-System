@@ -531,6 +531,24 @@ curl http://localhost:8000/health
 
 ---
 
+### Tài liệu & index (upload v2)
+
+| Endpoint | Mô tả |
+|---|---|
+| `POST /uploads` | Tải file lên vùng tạm và kiểm tra (multipart `files`, tuỳ chọn `group`) → báo cáo từng file |
+| `POST /uploads/{id}/commit` | Xác nhận: chọn nhóm, hành động khi trùng tên (`add`/`replace`/`rename`/`skip`), ngôn ngữ, metadata → tạo job index |
+| `DELETE /uploads/{id}` | Huỷ phiên tải lên |
+| `GET /documents` | Mọi tài liệu kèm trạng thái index |
+| `GET /documents/{tên}/file` | File gốc (PDF mở trên trình duyệt, DOCX tải về) |
+| `POST /documents/{tên}/retry` | Index lại một tài liệu |
+| `DELETE /documents/{tên}` · `DELETE /groups/{nhóm}` | Xoá file và xoá khỏi mọi chỉ mục |
+| `GET /jobs/{id}` · `GET /jobs?active=1` | Tiến độ job index |
+| `POST /reindex` | Đồng bộ toàn bộ (`{"mode": "sync"}` mặc định, Chat vẫn chạy; `"rebuild"` tạo lại collection) |
+| `GET /index/health` | So số chunk theo tài liệu giữa JSONL, Qdrant và BM25 |
+| `POST /upload-docs` | Endpoint cũ, giữ để tương thích (không còn ghi đè im lặng) |
+
+---
+
 ## Giao Diện Web (Static SPA)
 
 Truy cập `http://localhost:8000` để mở UI. UI là HTML/CSS/JS tĩnh, được FastAPI serve từ `ui/index.html`. Các view chính:
@@ -543,8 +561,9 @@ Truy cập `http://localhost:8000` để mở UI. UI là HTML/CSS/JS tĩnh, đư
 
 ### 2. Documents
 
-- Liệt kê các nhóm văn bản (Luật, Quy chế, Phụ lục, Thông báo…)
-- Upload PDF/DOCX mới và trigger reindex
+- Liệt kê mọi tài liệu theo nhóm, kèm ngôn ngữ và **trạng thái index** (đã index / đang xử lý / lỗi / chưa index)
+- Upload PDF/DOCX hai bước: *Kiểm tra* (báo cáo từng file) → *Tải lên & index* (index tăng dần ở chế độ nền)
+- Xoá tài liệu/nhóm (tự xoá khỏi chỉ mục), *Index lại* tài liệu lỗi, *Đồng bộ chỉ mục* toàn bộ
 
 ### 3. Dashboard / Evaluation
 
@@ -690,11 +709,35 @@ Sửa các giá trị `top_k_dense`, `top_k_sparse`, `top_k_fusion`, `reranking.
 
 ### Thêm tài liệu mới
 
-1. Đặt file PDF vào `data/raw/<category>/`
+**Cách khuyến nghị — qua giao diện** (màn hình Documents → *📥 Update Documents*):
+kéo thả file PDF/DOCX, chọn nhóm, bấm *Kiểm tra*. Hệ thống đọc thử từng file
+(loại file thật, mật khẩu, trùng tên/trùng nội dung, gợi ý ngôn ngữ Việt/Anh),
+bạn xác nhận rồi file được index ở chế độ nền — chỉ tài liệu mới được xử lý,
+Chat vẫn hoạt động, thường xong sau vài chục giây. Cột *Trạng thái* cho biết
+file nào đã tìm được trong Chat, đang xử lý hay bị lỗi (kèm lý do, nút *Index lại*).
+Xoá tài liệu/nhóm cũng tự xoá khỏi chỉ mục. Thiết kế chi tiết:
+[`docs/design/upload-documents-v2.md`](docs/design/upload-documents-v2.md).
+
+**Cách thủ công** (tái lập đúng pipeline offline của paper):
+1. Đặt file PDF/DOCX vào `data/<nhóm>/`
 2. Chạy lại indexing pipeline:
    ```bash
    ./run_pipeline.sh
    ```
+   `01_parse_chunk` có thêm cờ `--prune` để xoá các file `data/processed/*.jsonl`
+   không còn tài liệu gốc (mặc định tắt, giữ nguyên hành vi cũ).
+
+> Server phải chạy **một process** (như `start.bat`): hàng đợi index và khoá
+> commit nằm trong process API. Không chạy uvicorn với `--workers > 1`.
+
+### Chạy test
+
+```bash
+venv\Scripts\python -m unittest discover -s tests -t .
+```
+
+Test end-to-end (cần Qdrant đang chạy; dùng bản sao dữ liệu và collection tạm,
+không đụng `reg_chunks`): đặt `ARRS_E2E=1` rồi chạy `python -m unittest tests.test_api_e2e -v`.
 
 ### Tinh chỉnh ngưỡng synthesis
 

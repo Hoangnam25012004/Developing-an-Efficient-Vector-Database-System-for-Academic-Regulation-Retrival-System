@@ -1818,8 +1818,10 @@ async function commitUpload() {
     const docs = data.documents || [];
     const queued = docs.filter(d => d.status === 'queued');
     const failed = docs.filter(d => d.status === 'error');
+    // A group created by this upload is not in the label map yet: use the name typed.
+    const groupName = g.spec.new ? g.spec.new.label : (groupLabel(data.group) || data.group);
     if (queued.length) {
-      toast(`Đã lưu ${queued.length} file vào nhóm "${groupLabel(data.group) || data.group}" — đang index…`, 'success', 4500);
+      toast(`Đã lưu ${queued.length} file vào nhóm "${groupName}" — đang index…`, 'success', 4500);
     }
     failed.slice(0, 3).forEach(d => toast(`${d.original_name || d.file_key}: ${d.message || d.code}`, 'error', 7000));
     if (data.job_id) trackJob(data.job_id, 'index');

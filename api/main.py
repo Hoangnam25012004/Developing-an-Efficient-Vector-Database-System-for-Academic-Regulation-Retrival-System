@@ -826,6 +826,10 @@ async def create_upload(request: Request, files: list[UploadFile] = File(...), g
     target_group = _resolve_group_for_check(group, cfg)
     taken = ing_reg.taken_stems(cfg)
     hashes = ing_reg.content_hashes(cfg, paths)
+    labels = {k: (v or {}).get("label") or k for k, v in _load_groups().items()}
+
+    def glabel(gid: Optional[str]) -> str:
+        return labels.get(gid, gid) if gid else "—"
     detect_cfg = ing.get("language_detect") or {}
     ocr_ok: Optional[bool] = None
     batch_stems: dict[str, str] = {}
@@ -904,7 +908,7 @@ async def create_upload(request: Request, files: list[UploadFile] = File(...), g
             report["sha256"] = sha
             dup = hashes.get(sha)
             if dup is not None:
-                reject("DUPLICATE_CONTENT", source=dup.source, group=dup.group or "—")
+                reject("DUPLICATE_CONTENT", source=dup.source, group=glabel(dup.group))
             elif sha in batch_hashes:
                 reject("DUPLICATE_CONTENT", source=batch_hashes[sha], group="lần tải này")
             else:
@@ -920,11 +924,12 @@ async def create_upload(request: Request, files: list[UploadFile] = File(...), g
                                               "group": existing.group,
                                               "message": ing_val.message("NAME_CONFLICT_SAME_GROUP")}
                     else:
-                        other = existing.group if existing is not None else "—"
+                        other = existing.group if existing is not None else ""
                         report["conflict"] = {"type": "other_group",
                                               "source": existing.source if existing else None,
-                                              "group": other,
-                                              "message": ing_val.message("NAME_CONFLICT_OTHER_GROUP", group=other)}
+                                              "group": other or "—",
+                                              "message": ing_val.message("NAME_CONFLICT_OTHER_GROUP",
+                                                                         group=glabel(other))}
                 batch_stems.setdefault(sk, key)
 
         if report["status"] != "ok":
@@ -1015,7 +1020,12 @@ def _commit(upload_id: str, body: CommitRequest) -> dict:
 
     with _ingest_lock:
         group_id = _resolve_commit_group(body.group, cfg)
-        group_lang = (_load_groups().get(group_id) or {}).get("language")
+        registry_groups = _load_groups()
+        group_lang = (registry_groups.get(group_id) or {}).get("language")
+
+        def glabel(gid: Optional[str]) -> str:
+            return ((registry_groups.get(gid) or {}).get("label") or gid) if gid else "—"
+
         taken = ing_reg.taken_stems(cfg)
         hashes = ing_reg.content_hashes(cfg, paths)
         results: list[dict] = []
@@ -1055,12 +1065,13 @@ def _commit(upload_id: str, body: CommitRequest) -> dict:
                     code = ("NAME_CONFLICT_SAME_GROUP" if existing is not None and existing.group == group_id
                             else "NAME_CONFLICT_OTHER_GROUP")
                     results.append({**base, "status": "error", "code": code,
-                                    "message": ing_val.message(code, group=existing.group if existing else "—")})
+                                    "message": ing_val.message(code, group=glabel(existing.group if existing else ""))})
                     continue
             dup = hashes.get(f.get("sha256"))
             if dup is not None and (replaces is None or dup.source != replaces.source):
                 results.append({**base, "status": "error", "code": "DUPLICATE_CONTENT",
-                                "message": ing_val.message("DUPLICATE_CONTENT", source=dup.source, group=dup.group)})
+                                "message": ing_val.message("DUPLICATE_CONTENT", source=dup.source,
+                                                           group=glabel(dup.group))})
                 continue
 
             dest = paths.raw_dir / group_id / name
