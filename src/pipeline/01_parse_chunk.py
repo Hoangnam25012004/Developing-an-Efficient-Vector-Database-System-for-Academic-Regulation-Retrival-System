@@ -1,5 +1,8 @@
 """
-Step 01 — Parse PDFs, classify document type, and chunk into JSONL.
+Step 01 — Parse PDF and DOCX documents and chunk them into JSONL.
+
+PDFs go through PyMuPDF (+ OCR fallback); DOCX files through
+src/ingest/docx_extract.py. Both then share the chunking and writing below.
 
 Chunking uses a single content-driven algorithm (HPAD — Heading-Pattern
 Auto-Detect): it scans a universal catalog of heading regexes, picks the
@@ -18,17 +21,24 @@ Each chunk JSONL line carries:
   chunk_id, source, source_path, page, chunk_index, text,
   doc_group, doc_type, doc_number, issuing_body,
   section_type, chapter, chapter_title, article, article_title, khoan
+Documents uploaded through the ingestion flow (they have a <name>.meta.json
+sidecar) additionally carry: file_type, language, level_labels, ingest_version.
+Documents without a sidecar produce exactly the fields above.
 
 OCR fallback: pages with too little text or too many '?' (font-encoding
 failure) are rendered at high DPI and passed to Tesseract (lang=vie+eng).
 """
 from __future__ import annotations
 from collections import defaultdict
+from contextlib import contextmanager
 
 import argparse
 import hashlib
 import json
+import os
 import re
+import sys
+import time
 import warnings
 from pathlib import Path
 
@@ -101,6 +111,52 @@ def configure(cfg: dict) -> None:
                                     **(chunk_cfg["script_check"] or {})}
 
 
+# A corpus can mix languages, so the profile above (global, from `chunking:`)
+# is only the default. A document declared in another language borrows an
+# override for the time it is being parsed. Vietnamese — the language of the
+# whole original corpus — gets no override at all, which is what keeps the
+# output for those documents byte-identical.
+_DEFAULT_LANGUAGE_OVERRIDES = {
+    "en": {"ocr_lang": "eng", "script_check": False, "vi_normalization": False},
+}
+
+
+def profile_overrides(language: str | None, cfg: dict | None = None) -> dict:
+    """Profile overrides for a document's language ({} = use the default)."""
+    if not language:
+        return {}
+    langs = (((cfg or {}).get("ingest") or {}).get("languages") or {})
+    if language in langs:
+        return dict(langs[language] or {})
+    return dict(_DEFAULT_LANGUAGE_OVERRIDES.get(language, {}))
+
+
+@contextmanager
+def language_profile(overrides: dict | None):
+    """Apply profile overrides while one document is parsed, then restore."""
+    if not overrides:
+        yield
+        return
+    saved = {k: (dict(v) if isinstance(v, dict) else v) for k, v in _PROFILE.items()}
+    try:
+        if "ocr_lang" in overrides:
+            _PROFILE["ocr_lang"] = str(overrides["ocr_lang"])
+        if "script_check" in overrides:
+            sc = overrides["script_check"]
+            if isinstance(sc, dict):
+                _PROFILE["script_check"] = {**_PROFILE["script_check"], **sc}
+            else:
+                _PROFILE["script_check"] = {**_PROFILE["script_check"], "enabled": bool(sc)}
+        if "vi_normalization" in overrides:
+            _PROFILE["vi_normalization"] = bool(overrides["vi_normalization"])
+        if "form_markers" in overrides:
+            _PROFILE["form_markers"] = tuple(str(m).lower() for m in overrides["form_markers"] or ())
+        yield
+    finally:
+        _PROFILE.clear()
+        _PROFILE.update(saved)
+
+
 def load_config(path: str = "config.yaml") -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
@@ -140,7 +196,9 @@ def _ocr_page(page: fitz.Page) -> str:
         text = pytesseract.image_to_string(
             img, lang=_PROFILE["ocr_lang"], config=f"--psm {OCR_PSM} --oem 1"
         ).strip()
-        return _post_ocr_cleanup(text)
+        # The cleanup rewrites Vietnamese heading misreads ("Dieu 5" → "Điều 5");
+        # a document in another language turns it off via its profile.
+        return _post_ocr_cleanup(text) if _PROFILE.get("vi_normalization", True) else text
     except Exception as exc:
         warnings.warn(f"OCR failed on page {page.number + 1}: {exc}")
         return ""
@@ -199,8 +257,12 @@ def _is_corrupt(text: str) -> bool:
     return False
 
 
-def extract_pages(pdf_path: Path, exclude_bboxes: dict[int, list] | None = None) -> list[dict]:
+def extract_pages(pdf_path: Path, exclude_bboxes: dict[int, list] | None = None,
+                  ocr_log: list[int] | None = None) -> list[dict]:
     """Return list of {page, text} dicts. Falls back to OCR for scanned/corrupt pages.
+
+    `ocr_log`, when given, receives the numbers of the pages that were OCR'd,
+    so ingestion can report them; it does not change what is extracted.
 
     If `exclude_bboxes` is supplied, text blocks whose bounding box lies
     mostly (>50% area) inside any rect for that page are dropped — used to
@@ -266,6 +328,8 @@ def extract_pages(pdf_path: Path, exclude_bboxes: dict[int, list] | None = None)
     doc.close()
     if ocr_pages:
         print(f"    [OCR] {pdf_path.name}: applied OCR on pages {ocr_pages}")
+    if ocr_log is not None:
+        ocr_log.extend(ocr_pages)
     return pages
 
 
@@ -1247,49 +1311,102 @@ def _heading_title(section_text: str, regex: re.Pattern) -> str:
 # Pipeline orchestration
 # ════════════════════════════════════════════════════════════════════════════
 
-def process_pdf(pdf_path: Path, out_dir: Path,
-                group: str = "", registry: dict | None = None,
-                max_tokens: int = 256) -> tuple[int, str]:
-    """Process a single PDF. Returns (num_chunks, chunker_label).
-
-    `group` is the data/<group>/ folder the file lives in (the user's choice);
-    `registry` is the loaded data/groups.json mapping. Together they supply the
-    document-level metadata that the old content classifier used to guess.
-    """
-    registry = registry or {}
+def extract_pdf(pdf_path: Path, ocr_log: list[int] | None = None) -> tuple[list[dict], list[dict]]:
+    """Text pages and table rows of a PDF (unchanged extraction path)."""
     # Tables first → so their bboxes can redact the text region.
     table_chunks, table_bboxes = extract_tables(pdf_path)
 
     # OCR-aware page text extraction with table region redaction.
-    pages = extract_pages(pdf_path, exclude_bboxes=table_bboxes)
+    pages = extract_pages(pdf_path, exclude_bboxes=table_bboxes, ocr_log=ocr_log)
+    return pages, table_chunks
 
+
+def _replace_file(src: Path, dst: Path, attempts: int = 10) -> None:
+    """os.replace, retried: on Windows a reader holding `dst` open (the API
+    listing chunk files) makes the replace fail for as long as it reads."""
+    for attempt in range(attempts):
+        try:
+            os.replace(src, dst)
+            return
+        except PermissionError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(0.2)
+
+
+def _chunk_and_write(
+    pages: list[dict],
+    table_chunks: list[dict],
+    *,
+    source_name: str,
+    source_path: str,
+    out_path: Path,
+    group: str,
+    registry: dict,
+    max_tokens: int,
+    metadata_overrides: dict | None = None,
+    extra_fields: dict | None = None,
+    doc_number_text: str | None = None,
+    heading_blocks: list | None = None,
+    page_fallback: str = "first",
+) -> tuple[int, str, dict]:
+    """Chunk extracted pages + table rows and write one JSONL file.
+
+    Shared by every format; for a PDF with no sidecar it does exactly what
+    process_pdf always did, field for field. Returns (chunks, label, report).
+
+    extra_fields     appended to every record (documents uploaded through the
+                     ingestion flow: file_type, language, ingest_version)
+    doc_number_text  where to look for the reference number (DOCX: the whole
+                     document incl. tables, since it often sits in a letterhead table)
+    heading_blocks   DOCX paragraphs with outline levels, for documents that
+                     structure themselves with Word headings instead of numbering
+    page_fallback    "first" (PDF, unchanged) or "previous" chunk's page
+    """
+    report = {"chunker": "none", "chunks_text": 0, "chunks_table": 0, "warnings": []}
     if not pages and not table_chunks:
-        return 0, "none"
+        return 0, "none", report
 
     full_text = "\n\n".join(p["text"] for p in pages) if pages else ""
     # CRITICAL: normalize before pattern detection so OCR'd "Dieu 5" → "Điều 5".
-    full_text = _normalize_headers(full_text) if full_text else ""
+    if full_text and _PROFILE.get("vi_normalization", True):
+        full_text = _normalize_headers(full_text)
 
     # Document metadata: group/type/issuing_body come from the folder + registry
     # (no content guessing); only the reference number is read from the body.
+    # A value set by the user at upload (sidecar) takes precedence.
     gm = group_meta(group, registry)
+    overrides = metadata_overrides or {}
+    number_text = full_text if doc_number_text is None else doc_number_text
     doc_meta = {
         "doc_group":    gm["doc_group"],
-        "doc_type":     gm["doc_type"],
-        "doc_number":   extract_doc_number(full_text) if full_text else "",
-        "issuing_body": gm["issuing_body"],
+        "doc_type":     overrides.get("doc_type") or gm["doc_type"],
+        "doc_number":   overrides.get("doc_number") or (extract_doc_number(number_text) if number_text else ""),
+        "issuing_body": overrides.get("issuing_body") or gm["issuing_body"],
     }
 
     page_index = _build_page_index(pages) if pages else []
     winners = detect_pattern(full_text) if full_text else {}
+    level_labels = {"chapter": "", "article": "", "khoan": ""}
 
     # Build chunker label for reporting
-    if full_text and winners:
+    headings = [b for b in (heading_blocks or []) if b.kind == "heading" and b.level is not None and b.level <= 2]
+    if heading_blocks is not None and full_text and not (winners.get(1) or winners.get(2)) and len(headings) >= 3:
+        # A Word document without Chương/Điều/Section numbering, organised by
+        # its own heading styles: split along those instead.
+        chunks = heading_split(heading_blocks)
+        used = sorted({b.level for b in headings})
+        chunker = "heading(" + "+".join(f"H{lvl + 1}" for lvl in used) + ")"
+        level_labels = {"chapter": "HEADING_1", "article": "HEADING_2", "khoan": "HEADING_3"}
+    elif full_text and winners:
         levels_used = "+".join(
             f"L{lvl}:{lbl}" for lvl, (lbl, _) in sorted(winners.items())
         )
         chunks = hierarchical_split(full_text, winners)
         chunker = f"hpad({levels_used})"
+        for lvl, key in ((1, "chapter"), (2, "article"), (3, "khoan")):
+            if lvl in winners:
+                level_labels[key] = winners[lvl][0]
     elif full_text:
         chunks = chunk_paragraph(full_text)
         chunker = "paragraph"
@@ -1315,20 +1432,28 @@ def process_pdf(pdf_path: Path, out_dir: Path,
         else (table_chunks[0]["page"] if table_chunks else 1)
     )
 
-    out_path = out_dir / (pdf_path.stem + ".jsonl")
-    with out_path.open("w", encoding="utf-8") as f:
+    extra = dict(extra_fields or {})
+    if extra:
+        extra["level_labels"] = level_labels
+
+    # Written beside the target and swapped in, so a crash mid-write never
+    # leaves a truncated chunk file for the indexers to choke on.
+    tmp_path = out_path.with_name(out_path.name + ".tmp")
+    previous_page = fallback_page
+    with tmp_path.open("w", encoding="utf-8") as f:
         for idx, chunk in enumerate(chunks):
             probe = chunk["text"][:60]
 
             char_pos = full_text.find(probe) if full_text else -1
-            page_num = (
-                _find_page(char_pos, page_index, fallback_page)
-                if char_pos >= 0 else fallback_page
-            )
+            if char_pos >= 0:
+                page_num = _find_page(char_pos, page_index, fallback_page)
+            else:
+                page_num = previous_page if page_fallback == "previous" else fallback_page
+            previous_page = page_num
             record = {
-                "chunk_id":      make_chunk_id(pdf_path.name, idx, chunk["text"]),
-                "source":        pdf_path.name,
-                "source_path":   str(pdf_path),
+                "chunk_id":      make_chunk_id(source_name, idx, chunk["text"]),
+                "source":        source_name,
+                "source_path":   source_path,
                 "page":          page_num,
                 "chunk_index":   idx,
                 "text":          chunk["text"],
@@ -1345,15 +1470,16 @@ def process_pdf(pdf_path: Path, out_dir: Path,
                 "article_title": chunk.get("article_title", ""),
                 "khoan":         chunk.get("khoan", ""),
             }
+            record.update(extra)
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
         # Table-row chunks: indices continue after text chunks
         for offset, tc in enumerate(table_chunks):
             idx = len(chunks) + offset
             record = {
-                "chunk_id":      make_chunk_id(pdf_path.name, idx, tc["text"]),
-                "source":        pdf_path.name,
-                "source_path":   str(pdf_path),
+                "chunk_id":      make_chunk_id(source_name, idx, tc["text"]),
+                "source":        source_name,
+                "source_path":   source_path,
                 "page":          tc["page"],
                 "chunk_index":   idx,
                 "text":          tc["text"],
@@ -1368,16 +1494,210 @@ def process_pdf(pdf_path: Path, out_dir: Path,
                 "article_title": "",
                 "khoan":         "",
             }
+            record.update(extra)
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    _replace_file(tmp_path, out_path)
 
     total = len(chunks) + len(table_chunks)
     label = chunker + (f"+{len(table_chunks)}tbl" if table_chunks else "")
+    report.update({"chunker": label, "chunks_text": len(chunks), "chunks_table": len(table_chunks)})
+    return total, label, report
+
+
+def process_pdf(pdf_path: Path, out_dir: Path,
+                group: str = "", registry: dict | None = None,
+                max_tokens: int = 256) -> tuple[int, str]:
+    """Process a single PDF. Returns (num_chunks, chunker_label).
+
+    `group` is the data/<group>/ folder the file lives in (the user's choice);
+    `registry` is the loaded data/groups.json mapping. Together they supply the
+    document-level metadata that the old content classifier used to guess.
+    """
+    pages, table_chunks = extract_pdf(pdf_path)
+    total, label, _ = _chunk_and_write(
+        pages, table_chunks,
+        source_name=pdf_path.name, source_path=str(pdf_path),
+        out_path=out_dir / (pdf_path.stem + ".jsonl"),
+        group=group, registry=registry or {}, max_tokens=max_tokens,
+    )
     return total, label
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# DOCX and heading-structured documents
+# ════════════════════════════════════════════════════════════════════════════
+
+_LEADING_NUMBER = re.compile(r"^\s*((?:\d+|[IVXLCDM]+)(?:\.\d+)*)[.):]?\s+(?=\S)")
+
+
+def heading_split(blocks: list) -> list[dict]:
+    """Chunk a document along its Word heading levels (H1/H2/H3).
+
+    For documents with no numbering pattern the heading catalog recognises —
+    reports, policies, manuals — the author's own headings are the structure.
+    They map onto the same three fields HPAD fills, so citation, the tier
+    classifier and clause assembly treat both alike: H1 → chapter,
+    H2 → article, H3 → khoan (value = the heading's leading number, else its
+    ordinal; title = the heading text). Body text under a heading is chunked
+    with the paragraph chunker and the heading is prefixed to its first chunk.
+    """
+    labels: dict[int, tuple[str, str]] = {0: ("", ""), 1: ("", ""), 2: ("", "")}
+    ordinals = [0, 0, 0]
+
+    def meta() -> dict:
+        ch, art, kh = labels[0], labels[1], labels[2]
+        section_type = "khoan" if kh[0] else "article" if art[0] else "muc" if ch[0] else "text"
+        return {"section_type": section_type, "chapter": ch[0], "chapter_title": ch[1],
+                "article": art[0], "article_title": art[1], "khoan": kh[0]}
+
+    sections: list[dict] = [{"meta": meta(), "heading": "", "body": []}]
+    for b in blocks:
+        if b.kind == "heading" and b.level is not None and b.level <= 2:
+            lvl = b.level
+            ordinals[lvl] += 1
+            for deeper in range(lvl + 1, 3):
+                ordinals[deeper] = 0
+                labels[deeper] = ("", "")
+            m = _LEADING_NUMBER.match(b.text)
+            value = m.group(1) if m else str(ordinals[lvl])
+            title = (b.text[m.end():] if m else b.text).strip()
+            labels[lvl] = (value, title[:200])
+            sections.append({"meta": meta(), "heading": b.text.strip(), "body": []})
+        else:
+            sections[-1]["body"].append(b.text)
+
+    out: list[dict] = []
+    carry: list[str] = []          # headings with no body of their own
+    for sec in sections:
+        pieces = chunk_paragraph("\n\n".join(sec["body"])) if sec["body"] else []
+        if sec["heading"]:
+            carry.append(sec["heading"])
+        if not pieces:
+            continue
+        pieces[0]["text"] = "\n".join(carry + [pieces[0]["text"]])
+        carry = []
+        for piece in pieces:
+            piece.update(sec["meta"])
+            out.append(piece)
+    # A document that ends on a heading has no body to attach it to.
+    return out
+
+
+def _import_docx_extractor():
+    try:
+        from src.ingest.docx_extract import extract_docx
+    except ImportError:
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+        from src.ingest.docx_extract import extract_docx
+    return extract_docx
+
+
+def process_document(
+    path: Path,
+    out_dir: Path,
+    group: str = "",
+    registry: dict | None = None,
+    max_tokens: int = 256,
+    sidecar: dict | None = None,
+    cfg: dict | None = None,
+) -> tuple[int, str, dict]:
+    """Parse one PDF or DOCX into <stem>.jsonl. Returns (chunks, label, report).
+
+    `sidecar` is the document's upload metadata (language, metadata set by the
+    user). Without one — every document of the original corpus — a PDF goes
+    through exactly the process_pdf path and its records are unchanged.
+    """
+    registry = registry or {}
+    ext = path.suffix.lower()
+    language = (sidecar or {}).get("language") or None
+    overrides = ((sidecar or {}).get("metadata") or {}) if sidecar else {}
+    extra = None
+    if sidecar is not None:
+        extra = {"file_type": ext.lstrip("."), "language": language or "vi", "ingest_version": 2}
+    out_path = out_dir / (path.stem + ".jsonl")
+    common = dict(source_name=path.name, source_path=str(path), out_path=out_path,
+                  group=group, registry=registry, max_tokens=max_tokens,
+                  metadata_overrides=overrides, extra_fields=extra)
+
+    with language_profile(profile_overrides(language, cfg)):
+        if ext == ".pdf":
+            ocr_pages: list[int] = []
+            pages, table_chunks = extract_pdf(path, ocr_log=ocr_pages)
+            total, label, report = _chunk_and_write(pages, table_chunks, **common)
+            try:
+                doc = fitz.open(str(path))
+                report["pages"] = doc.page_count
+                doc.close()
+            except Exception:
+                report["pages"] = len(pages)
+            report["ocr_pages"] = ocr_pages
+        elif ext == ".docx":
+            extract_docx = _import_docx_extractor()
+            ex = extract_docx(
+                path,
+                caption_ok=_usable_caption,
+                header_candidate=_is_header_candidate,
+                build_labels=_build_column_labels,
+            )
+            total, label, report = _chunk_and_write(
+                ex.pages, ex.table_chunks, **common,
+                doc_number_text=ex.linear_text, heading_blocks=ex.blocks,
+                page_fallback="previous",
+            )
+            report["pages"] = ex.page_count
+            report["ocr_pages"] = []
+            report["warnings"] = report.get("warnings", []) + ex.warnings
+        else:
+            raise ValueError(f"unsupported document type: {path.name}")
+    return total, label, report
+
+
+def read_sidecar(path: Path) -> dict | None:
+    """The upload sidecar next to a document (<name>.<ext>.meta.json), if any."""
+    side = path.with_name(path.name + ".meta.json")
+    try:
+        with side.open(encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else None
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return None
+
+
+def list_documents(raw_dir: Path, skip_dirs: set[str]) -> tuple[list[Path], list[Path]]:
+    """(PDFs, DOCX files) under raw_dir that belong to a document group."""
+    def keep(p: Path) -> bool:
+        parts = p.relative_to(raw_dir).parts
+        if set(parts) & skip_dirs:
+            return False
+        # Internal folders (processed backups, ingestion state) are not groups.
+        if any(part.startswith((".", "_")) or part.lower().startswith("processed") for part in parts[:-1]):
+            return False
+        return not p.name.startswith("~$")      # Word's lock file for an open .docx
+
+    pdfs = [p for p in raw_dir.rglob("*.pdf") if keep(p)]
+    docxs = [p for p in raw_dir.rglob("*.docx") if keep(p)]
+    return pdfs, docxs
+
+
+def prune_orphans(out_dir: Path, documents: list[Path]) -> list[str]:
+    """Delete chunk files whose source document no longer exists.
+
+    Without this a deleted document stays searchable forever: nothing else
+    ever removes its <stem>.jsonl, and every indexer reads all of them.
+    """
+    stems = {p.stem.casefold() for p in documents}
+    removed = []
+    for jl in sorted(out_dir.glob("*.jsonl")):
+        if jl.stem.casefold() not in stems:
+            jl.unlink()
+            removed.append(jl.name)
+    return removed
 
 
 def run(config_path: str = "config.yaml",
         out_dir_override: str | None = None,
-        only_files: list[str] | None = None):
+        only_files: list[str] | None = None,
+        prune: bool = False):
     cfg = load_config(config_path)
     raw_dir = Path(cfg["data"]["raw_dir"])
     # Honour the config's processed_dir so the downstream stages
@@ -1386,7 +1706,9 @@ def run(config_path: str = "config.yaml",
     out_dir = Path(out_dir_override or cfg["data"]["processed_dir"])
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    registry = load_group_registry()
+    # The registry sits beside the documents it describes — data/groups.json
+    # under the default config, the same file as before.
+    registry = load_group_registry(raw_dir / "groups.json")
     configure(cfg)
 
     # Chunks longer than the encoder's window are truncated at index time, so
@@ -1397,32 +1719,54 @@ def run(config_path: str = "config.yaml",
     # Skip the processed-output dirs in case they live under raw_dir (they hold
     # JSONL, not PDFs, but guard anyway against future layout changes).
     _skip_dirs = {Path(cfg["data"]["processed_dir"]).name, "processed", "processed_v2"}
-    all_pdfs = [p for p in raw_dir.rglob("*.pdf")
-                if not (set(p.relative_to(raw_dir).parts) & _skip_dirs)]
+    all_pdfs, all_docx = list_documents(raw_dir, _skip_dirs)
+    all_docs = all_pdfs + all_docx
     if only_files:
         wanted = {Path(f).name for f in only_files}
-        pdf_files = [p for p in all_pdfs if p.name in wanted]
+        doc_files = [p for p in all_docs if p.name in wanted]
     else:
-        pdf_files = all_pdfs
+        doc_files = all_docs
+
+    # Two documents sharing a stem would write the same <stem>.jsonl, and the
+    # second would silently replace the first in every index. The first one
+    # found keeps its place; the other is reported instead of parsed.
+    owner: dict[str, Path] = {}
+    stem_conflict: dict[Path, Path] = {}
+    for p in all_docs:
+        key = p.stem.casefold()
+        if key in owner:
+            stem_conflict[p] = owner[key]
+        else:
+            owner[key] = p
 
     def _group_of(pdf: Path) -> str:
         """Group = the first folder under raw_dir; '' if the file sits at root."""
         rel = pdf.relative_to(raw_dir)
         return rel.parts[0] if len(rel.parts) > 1 else ""
 
-    print(f"HPAD chunker — processing {len(pdf_files)} PDFs → {out_dir}")
+    n_docx = sum(1 for p in doc_files if p.suffix.lower() == ".docx")
+    if n_docx:
+        print(f"HPAD chunker — processing {len(doc_files) - n_docx} PDFs + {n_docx} DOCX → {out_dir}")
+    else:
+        print(f"HPAD chunker — processing {len(doc_files)} PDFs → {out_dir}")
 
     total_chunks = 0
     hpad_count = 0
     paragraph_count = 0
     table_only_count = 0
+    heading_count = 0
     skipped: list[str] = []
     level_dist: dict[str, int] = defaultdict(int)
 
-    for pdf in pdf_files:
+    for pdf in doc_files:
+        if pdf in stem_conflict:
+            print(f"  [ERROR] {pdf.name}: STEM_CONFLICT with {stem_conflict[pdf].name}")
+            skipped.append(pdf.name)
+            continue
         try:
-            n, chunker = process_pdf(pdf, out_dir, _group_of(pdf), registry,
-                                     max_tokens=max_tokens)
+            n, chunker, _ = process_document(pdf, out_dir, _group_of(pdf), registry,
+                                             max_tokens=max_tokens,
+                                             sidecar=read_sidecar(pdf), cfg=cfg)
         except Exception as exc:
             print(f"  [ERROR] {pdf.name}: {exc}")
             skipped.append(pdf.name)
@@ -1446,6 +1790,9 @@ def run(config_path: str = "config.yaml",
         elif base == "table_only":
             tag = "TABLE"
             table_only_count += 1
+        elif base.startswith("heading"):
+            tag = "HEAD "
+            heading_count += 1
         else:
             tag = "?    "
         print(f"  [{tag}] {pdf.name}: {n} chunks ({chunker})")
@@ -1454,6 +1801,8 @@ def run(config_path: str = "config.yaml",
     print(f"\n══ Summary ══")
     print(f"  Total chunks       : {total_chunks}")
     print(f"  HPAD chunker       : {hpad_count} file(s)")
+    if heading_count:
+        print(f"  Heading chunker    : {heading_count} file(s)")
     print(f"  Paragraph chunker  : {paragraph_count} file(s)")
     print(f"  Table-only         : {table_only_count} file(s)")
     print(f"  Skipped (0 chunks) : {len(skipped)} file(s)")
@@ -1465,13 +1814,21 @@ def run(config_path: str = "config.yaml",
         print(f"\n  Skipped files:")
         for name in skipped:
             print(f"    • {name}")
+    if prune:
+        removed = prune_orphans(out_dir, all_docs)
+        print(f"\n  Pruned orphan chunk files: {len(removed)}")
+        for name in removed:
+            print(f"    • {name}")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Parse & chunk PDFs (HPAD)")
+    parser = argparse.ArgumentParser(description="Parse & chunk PDF/DOCX documents (HPAD)")
     parser.add_argument("--config", default="config.yaml")
     parser.add_argument("--out-dir", default=None,
                         help="Output dir override (default: config's processed_dir)")
     parser.add_argument("--only-files", nargs="+", default=None)
+    parser.add_argument("--prune", action="store_true",
+                        help="Delete <stem>.jsonl files whose document no longer exists "
+                             "(a deleted document otherwise stays in every index).")
     args = parser.parse_args()
-    run(args.config, args.out_dir, args.only_files)
+    run(args.config, args.out_dir, args.only_files, prune=args.prune)
