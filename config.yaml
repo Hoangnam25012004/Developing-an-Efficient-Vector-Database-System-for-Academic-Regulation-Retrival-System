@@ -1,0 +1,175 @@
+# ─── Data ──────────────────────────────────────────────────────────────────────
+data:
+  raw_dir: "data"
+  processed_dir: "data/processed"
+
+# ─── Chunking ──────────────────────────────────────────────────────────────────
+# The new dual-chunker uses internal limits (MAX_KHOAN_CHARS=512, MAX_PARAGRAPH_CHARS=400).
+# The keys below are kept for backward compatibility but are NOT used by the
+# structured/paragraph chunkers — they make decisions based on legal structure.
+chunking:
+  chunk_size: 512          # informational; structured chunker caps Khoản at 512
+  chunk_overlap: 0         # informational; paragraph chunker uses 1-sentence overlap
+
+  # Hard ceiling per indexed chunk, in encoder tokens. Text beyond the
+  # embedding model's position limit is dropped silently at index time, so a
+  # longer chunk is only partly searchable. Set this to the encoder's window:
+  #   bkai vietnamese-bi-encoder  → 258 (use 250 for headroom)
+  #   multilingual-e5-*           → 512
+  # Splitting here is safe for answers: the synthesis layer reassembles a
+  # clause from its consecutive pieces before quoting it.
+  max_tokens: 250
+
+  # ── Language profile ───────────────────────────────────────────────────────
+  # Structural detection (Chương/Điều/Khoản, Chapter/Article/Section, numbered
+  # and lettered lists) is language-agnostic already — the chunker picks
+  # whichever heading pattern the document actually uses. Only the heuristics
+  # below assume Vietnamese, so a corpus in another language needs just this
+  # block changed, not code.
+  language: vi
+
+  # Tesseract language packs for the OCR fallback.
+  ocr_lang: "vie+eng"
+
+  # Scans in this corpus ship a text layer produced by a non-Vietnamese OCR
+  # engine: plenty of characters, zero diacritics. Treating such a page as
+  # text indexes gibberish, so it is sent to OCR instead. Set enabled: false
+  # for languages without diacritics (English, Chinese, Japanese), where the
+  # signal is meaningless.
+  script_check:
+    enabled: true
+    min_ratio: 0.05        # broken pages measured 0.000; healthy ones ≥ 0.239
+    min_chars: 200         # shorter text proves nothing either way
+
+  # Openings that mark form scaffolding rather than regulation. Chunks matching
+  # two or more lose any inherited Điều/Khoản label, because appendices in
+  # these documents inherit whatever heading preceded them.
+  form_markers:
+    - "kính gửi"
+    - "đơn đề nghị"
+    - "cộng hòa xã hội"
+    - "độc lập - tự do"
+    - "độc lập – tự do"
+    - "người làm đơn"
+    - "họ tên cha"
+    - "họ tên mẹ"
+    - "hộ khẩu thường trú"
+    - "xác nhận của"
+    - "mẫu số"
+    - "biểu mẫu"
+
+# ─── Embedding ─────────────────────────────────────────────────────────────────
+embedding:
+  provider: "local"
+  local_model: "bkai-foundation-models/vietnamese-bi-encoder"
+  batch_size: 32
+
+# ─── Vector Store ──────────────────────────────────────────────────────────────
+vector_store:
+  provider: "qdrant"
+  qdrant_url: "${QDRANT_URL}"
+  qdrant_api_key: "${QDRANT_API_KEY}"
+  collection_name: "reg_chunks"
+  vector_size: 768
+
+  # ── HNSW index construction ──────────────────────────────────────────────
+  # NOTE: Qdrant only builds the HNSW graph once a segment exceeds
+  # `indexing_threshold` points. The default (10000) is ABOVE this corpus
+  # (~4.1k chunks), so the deployed collection silently served every query by
+  # brute-force full scan and `indexed_vectors_count` stayed 0. Lower the
+  # threshold to actually exercise ANN; keep it high to force exact search.
+  hnsw:
+    m: 16                   # graph out-degree; 0 disables HNSW entirely
+    ef_construct: 100       # build-time beam width
+    full_scan_threshold: 10000   # segments smaller than this use full scan (Qdrant default)
+    on_disk: false
+  indexing_threshold: 10000      # points per segment before HNSW is built
+
+  # ── Search-time parameters ───────────────────────────────────────────────
+  search:
+    hnsw_ef: null           # query-time beam width; null → Qdrant default (=ef_construct)
+    exact: false            # true → brute-force ground truth (used to measure ANN recall)
+
+  # ── Vector compression ───────────────────────────────────────────────────
+  # type: none | scalar | binary
+  quantization:
+    type: "none"
+    always_ram: true        # keep quantized vectors in RAM, originals on disk
+    quantile: 0.99          # scalar (int8) clipping quantile
+    rescore: true           # re-score survivors with full-precision vectors
+    oversampling: 2.0       # fetch oversampling×limit candidates before rescoring
+
+# ─── BM25 ──────────────────────────────────────────────────────────────────────
+bm25:
+  index_path: "data/processed/bm25.pkl"
+  k1: 1.5
+  b: 0.75
+
+# ─── Hybrid Search ─────────────────────────────────────────────────────────────
+retrieval:
+  top_k_dense: 30
+  top_k_sparse: 30
+  top_k_fusion: 20          # widened from 10 — multi-source queries need more candidates
+  rrf_k: 60
+
+# ─── Reranking ─────────────────────────────────────────────────────────────────
+reranking:
+  enabled: true
+  provider: "cross-encoder"
+  cross_encoder_model: "AITeamVN/Vietnamese_Reranker"
+  top_k: 10
+  max_per_source: 5         # raised from 3 — Khoản-level chunks need more headroom
+                            # for multi-Khoản answers from the same Điều
+  min_score: 0.0            # disabled here; quality gating happens in the LLM-free tier
+
+# ─── LLM (LLM-free hybrid synthesis) ───────────────────────────────────────────
+llm:
+  provider: "hybrid"        # LLM-free 4-tier synthesis (no external API)
+
+  # min_score: minimum rerank score for top doc to be considered a hit.
+  #   Below this → "not found" (Tier 4).
+  #   Cross-encoder + 512-char input typically scores relevant docs in 0.1-0.9 range.
+  min_score: 0.05
+
+  # single_dominance_gap: gap between top doc and 2nd-place doc to trigger Tier 1.
+  #   Large gap → one Khoản clearly dominates → show single-clause answer.
+  #   Small gap → multiple Khoản competitive → grouped answer (Tier 2/3).
+  single_dominance_gap: 0.30
+
+  not_found_message: "Tôi không tìm thấy thông tin này trong tài liệu hiện có."
+
+  # ── Answer quality ─────────────────────────────────────────────────────────
+  # clause_assembly: 14.4% of Khoản units in this corpus are stored as several
+  #   sub-chunks (the chunker caps a Khoản at 512 chars). Retrieval benefits
+  #   from the finer units, but quoting one of them hands the reader the middle
+  #   of a provision — its opening condition and closing exception missing,
+  #   which in legal text can invert the meaning. So expand back to the whole
+  #   clause before quoting. max_chars bounds pathological units (amending laws
+  #   nest every revision under "Điều 1, Khoản n"; one appendix reaches 44k
+  #   chars); past the cap a window around the retrieved chunk is quoted and
+  #   flagged as partial.
+  clause_assembly:
+    enabled: true
+    max_chars: 3000
+
+  # highlight_sentences: bold the N sentences that best match the query. The
+  #   clause is still quoted in full — emphasis adds nothing and removes
+  #   nothing, so the citation stays verbatim. 0 disables.
+  highlight_sentences: 1
+
+  # Verbosity caps. Tier 3 is where answers sprawl: each extra retrieved chunk
+  # adds another quoted block. Capping here rather than shrinking chunks keeps
+  # every quoted clause legally complete. 0 = no cap.
+  tier2_max_clauses: 6
+  tier3_max_clauses: 4
+
+# ─── API ───────────────────────────────────────────────────────────────────────
+api:
+  host: "0.0.0.0"
+  port: 8000
+
+# ─── Evaluation ────────────────────────────────────────────────────────────────
+evaluation:
+  test_queries_path: "eval/test_queries_gt_100_v1.jsonl"
+  k_values: [1, 3, 5, 10]
+  output_dir: "eval/results"

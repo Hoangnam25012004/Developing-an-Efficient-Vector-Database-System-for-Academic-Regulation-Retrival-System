@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>ARRS — IU Academic Regulation Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked-footnote/dist/index.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A6B;--navy-deep:#122650;--navy-mid:#243f78;
+  --blue:#2563EB;--blue-light:#3B82F6;--sky:#0EA5E9;
+  --teal:#0D9488;--green:#16A34A;--amber:#D97706;--red:#DC2626;
+  --bg:#F1F5F9;--surface:#FFFFFF;
+  --sidebar-w:240px;--sidebar-c:68px;--top-h:58px;
+  --text:#0F172A;--text-2:#475569;--text-3:#94A3B8;
+  --border:#E2E8F0;--border-2:#CBD5E1;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.06);
+  --shadow-sm:0 1px 4px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 12px 24px rgba(0,0,0,.1),0 4px 8px rgba(0,0,0,.06);
+  --r:10px;--r-sm:6px;--r-lg:16px;
+  --ease:.22s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;overflow:hidden;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;display:flex;margin:0;padding:0}
+kbd{font-family:'JetBrains Mono',monospace;background:var(--border);padding:1px 5px;border-radius:4px;font-size:11px;color:var(--text-2)}
+code{font-family:'JetBrains Mono',monospace;background:var(--bg);padding:1px 5px;border-radius:4px;font-size:12px;color:var(--blue)}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-3)}
+
+/* SIDEBAR */
+#sidebar{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--navy);
+  display:flex;flex-direction:column;height:100vh;
+  transition:width var(--ease),min-width var(--ease);
+  overflow:hidden;position:relative;z-index:100;
+  box-shadow:2px 0 12px rgba(0,0,0,.18);
+}
+#sidebar.collapsed{width:var(--sidebar-c);min-width:var(--sidebar-c)}
+.sb-logo{padding:20px 18px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;overflow:hidden}
+.sb-logo-icon{width:40px;height:40px;min-width:40px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25);padding:3px}
+.sb-logo-icon img{width:100%;height:100%;object-fit:contain;display:block}
+.sb-logo-text .brand{font-size:17px;font-weight:700;color:#fff;letter-spacing:.3px}
+.sb-logo-text .sub{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.5px;text-transform:uppercase;margin-top:1px}
+.sb-section{padding:12px 10px 4px;font-size:9.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.35);white-space:nowrap;overflow:hidden}
+.sb-item{display:flex;align-items:center;gap:14px;padding:10px 14px;margin:2px 8px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap;overflow:hidden;color:rgba(255,255,255,.65);font-size:13.5px;font-weight:500;transition:background var(--ease),color var(--ease);position:relative}
+.sb-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9)}
+.sb-item.active{background:rgba(255,255,255,.14);color:#fff}
+.sb-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--sky);border-radius:0 3px 3px 0}
+.sb-icon{font-size:16px;min-width:20px;text-align:center}
+.sb-label{line-height:1}
+.sb-badge{margin-left:auto;background:var(--sky);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center}
+.sb-footer{margin-top:auto;padding:14px 10px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden}
+.sb-toggle{width:28px;height:28px;min-width:28px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background var(--ease);margin-left:auto}
+.sb-toggle:hover{background:rgba(255,255,255,.2)}
+.sb-status{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.5);font-size:11px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;flex-shrink:0;box-shadow:0 0 0 2px rgba(34,197,94,.25)}
+.status-dot.warn{background:var(--amber)}
+.status-dot.err{background:var(--red);box-shadow:0 0 0 2px rgba(220,38,38,.25)}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:var(--top-h);min-height:var(--top-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;box-shadow:var(--shadow-xs)}
+.topbar-title{font-size:16px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.topbar-title .icon{font-size:18px}
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:13px;font-weight:500;font-family:inherit;transition:all var(--ease);white-space:nowrap}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#1d4ed8}
+.btn-primary:disabled{background:var(--border-2);cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg);border-color:var(--border-2)}
+.btn-icon{padding:7px;border-radius:var(--r-sm);background:transparent;border:1px solid var(--border);color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--ease);font-size:15px}
+.btn-icon:hover{background:var(--bg);border-color:var(--border-2)}
+
+.screen{display:none;flex:1;overflow:hidden;flex-direction:column}
+.screen.active{display:flex}
+
+/* CHAT */
+#screen-chat{flex-direction:row}
+#screen-chat > .topbar{display:none!important}
+.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative;width:100%}
+.chat-history{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px}
+.chat-welcome{margin:auto;text-align:center;max-width:520px;padding:40px 20px}
+.chat-welcome .logo-big{font-size:56px;margin-bottom:16px}
+.chat-welcome h2{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
+.chat-welcome p{color:var(--text-2);font-size:14px;line-height:1.7;margin-bottom:28px}
+.sq-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left}
+.sq-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;cursor:pointer;transition:all var(--ease)}
+.sq-card:hover{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(59,130,246,.1);transform:translateY(-1px)}
+.sq-card .sq-icon{font-size:18px;margin-bottom:6px}
+.sq-card .sq-text{font-size:12.5px;color:var(--text-2);line-height:1.5}
+
+.msg{display:flex;gap:12px;align-items:flex-start}
+.msg.user{flex-direction:row-reverse}
+.avatar{width:36px;height:36px;min-width:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.avatar.ai{background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff}
+.avatar.user{background:linear-gradient(135deg,var(--teal),#22D3EE);color:#fff}
+.bubble{max-width:72%;padding:12px 16px;border-radius:var(--r-lg);font-size:13.5px;line-height:1.7;position:relative;word-wrap:break-word;overflow-wrap:anywhere}
+.msg.ai .bubble{background:var(--surface);border:1px solid var(--border);border-top-left-radius:4px;color:var(--text)}
+.msg.user .bubble{background:var(--blue);color:#fff;border-top-right-radius:4px}
+.msg.ai .bubble p{margin:0 0 8px 0}
+.msg.ai .bubble p:last-child{margin-bottom:0}
+.msg.ai .bubble a.pdf-link{color:var(--blue);text-decoration:underline;text-underline-offset:2px;cursor:pointer;word-break:break-all}
+.msg.ai .bubble a.pdf-link:hover{color:var(--blue-light);text-decoration-thickness:2px}
+.msg.ai .bubble ul,.msg.ai .bubble ol{margin:8px 0 8px 20px}
+.msg.ai .bubble li{margin:4px 0}
+.msg.ai .bubble strong{color:var(--navy);font-weight:700}
+.msg.ai .bubble code{background:var(--bg);color:var(--blue);padding:1px 6px;border-radius:4px;font-size:12px}
+.bubble.error{background:#FEF2F2;border-color:#FECACA;color:var(--red)}
+.bubble-meta{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+.bubble-time{font-size:11px;color:var(--text-3)}
+.bubble-elapsed{font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:3px}
+.copy-btn{font-size:11px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;transition:all var(--ease);display:flex;align-items:center;gap:4px;font-family:inherit}
+.copy-btn:hover{background:var(--bg);color:var(--text-2)}
+
+.source-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.src-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:500;background:rgba(37,99,235,.08);color:var(--blue);border:1px solid rgba(37,99,235,.18);cursor:pointer;transition:all var(--ease)}
+.src-chip:hover{background:rgba(37,99,235,.15)}
+.src-chip .page{color:var(--text-3);font-weight:400}
+
+.typing-bubble{display:flex;gap:5px;align-items:center;padding:14px 16px}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text-3);animation:bounce .9s infinite}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+.source-panel{width:320px;min-width:320px;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;transition:width var(--ease),min-width var(--ease),opacity var(--ease)}
+.source-panel.hidden{width:0;min-width:0;opacity:0;pointer-events:none}
+.sp-header{padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.sp-body{overflow-y:auto;flex:1;padding:12px}
+.sp-empty{padding:32px 16px;text-align:center;color:var(--text-3);font-size:13px}
+.sp-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:all var(--ease)}
+.sp-card:hover{border-color:var(--blue-light);box-shadow:var(--shadow-xs)}
+.sp-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.sp-card-file{font-size:12px;font-weight:600;color:var(--text);word-break:break-all;flex:1}
+.sp-score{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap;background:rgba(22,163,74,.12);color:var(--green)}
+.sp-card-text{font-size:12px;color:var(--text-2);line-height:1.6;max-height:120px;overflow-y:auto}
+.sp-card-footer{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.sp-tag{font-size:11px;color:var(--text-3);background:var(--border);padding:2px 8px;border-radius:99px}
+
+.chat-input-bar{padding:0!important;margin:0!important;background:var(--surface);border-top:1px solid var(--border);width:100%!important;box-sizing:border-box!important;display:block!important}
+.chat-input-bar > .chat-input-row{display:flex!important;gap:10px;align-items:center;background:var(--surface)!important;border:none!important;border-radius:0!important;padding:14px 0 14px 20px!important;transition:none;width:100%!important;box-sizing:border-box!important;margin:0!important}
+.chat-input-row:focus-within{background:var(--surface)!important;box-shadow:none}
+#chat-input{flex:1;border:none;background:transparent;resize:none;font-family:inherit;font-size:14px;color:var(--text);outline:none;min-height:22px;max-height:120px;line-height:1.6}
+#chat-input::placeholder{color:var(--text-3)}
+.send-btn{width:36px;height:36px;min-width:36px;border-radius:var(--r-sm);background:var(--blue);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background var(--ease),transform var(--ease)}
+.send-btn:hover:not(:disabled){background:#1d4ed8;transform:scale(1.05)}
+.send-btn:disabled{background:var(--border-2);cursor:not-allowed}
+.chat-hint{font-size:11.5px;color:var(--text-3);padding:8px 16px 10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--surface)}
+
+/* SEARCH */
+#screen-search{flex-direction:column}
+.search-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;gap:20px}
+.search-left{flex:1;min-width:0}
+.search-right{width:280px;min-width:280px}
+.search-bar-wrap{margin-bottom:16px}
+.search-bar-outer{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:10px 16px;box-shadow:var(--shadow-sm);transition:border-color var(--ease)}
+.search-bar-outer:focus-within{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.search-bar-outer input{flex:1;border:none;background:transparent;font-family:inherit;font-size:14.5px;color:var(--text);outline:none}
+.search-bar-outer input::placeholder{color:var(--text-3)}
+.search-bar-outer .search-icon{font-size:17px;color:var(--text-3)}
+.mode-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.mode-tab{padding:6px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);font-size:12.5px;font-weight:500;color:var(--text-2);cursor:pointer;transition:all var(--ease);display:flex;align-items:center;gap:5px}
+.mode-tab:hover{border-color:var(--blue-light);color:var(--blue)}
+.mode-tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.results-meta{font-size:12.5px;color:var(--text-3);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.results-meta strong{color:var(--text);font-weight:600}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;transition:border-color var(--ease),box-shadow var(--ease);cursor:pointer}
+.result-card:hover{border-color:var(--blue-light);box-shadow:var(--shadow-sm)}
+.rc-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.rc-filename{font-size:12.5px;font-weight:600;color:var(--blue);word-break:break-all}
+.rc-scores{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+.rc-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
+.rc-badge.rrf{background:rgba(13,148,136,.1);color:var(--teal)}
+.rc-badge.rerank{background:rgba(22,163,74,.1);color:var(--green)}
+.rc-badge.dense{background:rgba(37,99,235,.1);color:var(--blue)}
+.rc-badge.sparse{background:rgba(217,119,6,.1);color:var(--amber)}
+.rc-text{font-size:13px;color:var(--text-2);line-height:1.65;margin-bottom:10px;white-space:pre-wrap}
+.rc-text mark{background:rgba(37,99,235,.12);color:var(--blue);border-radius:3px;padding:0 2px}
+.rc-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rc-tag{font-size:11px;color:var(--text-3);background:var(--bg);padding:2px 8px;border-radius:99px;border:1px solid var(--border)}
+.empty-state{padding:60px 20px;text-align:center;color:var(--text-3);font-size:14px}
+.empty-state .ic{font-size:40px;margin-bottom:12px;opacity:.5}
+
+.filter-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.filter-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2);margin-bottom:12px}
+.filter-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.filter-label{font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:6px}
+.filter-value{font-size:12.5px;color:var(--text);font-weight:500}
+.range-input{width:100%;margin-top:8px;accent-color:var(--blue)}
+.checkbox-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto}
+.cb-item{display:flex;align-items:center;gap:8px;cursor:pointer}
+.cb-item input[type=checkbox]{accent-color:var(--blue);width:14px;height:14px;cursor:pointer}
+.cb-item label{font-size:13px;color:var(--text-2);cursor:pointer;flex:1}
+.cb-count{font-size:11px;color:var(--text-3);background:var(--bg);padding:1px 7px;border-radius:99px}
+
+/* DOCUMENTS */
+#screen-documents{flex-direction:column}
+.doc-body{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:20px 24px 0}
+.stat-row{display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;flex:1;min-width:140px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-xs)}
+.stat-icon{width:44px;height:44px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.stat-icon.blue{background:rgba(37,99,235,.1)}
+.stat-icon.teal{background:rgba(13,148,136,.1)}
+.stat-icon.amber{background:rgba(217,119,6,.1)}
+.stat-icon.green{background:rgba(22,163,74,.1)}
+.stat-info .val{font-size:24px;font-weight:700;color:var(--text);line-height:1}
+.stat-info .lbl{font-size:12px;color:var(--text-3);margin-top:4px}
+.doc-tabs{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+.doc-tab{padding:6px 14px;border-radius:99px;font-size:12.5px;font-weight:500;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);cursor:pointer;transition:all var(--ease);display:flex;align-items:center;gap:5px}
+.doc-tab:hover{border-color:var(--blue-light);color:var(--blue)}
+.doc-tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.doc-tab .cnt{font-size:10.5px;padding:1px 6px;border-radius:99px;font-weight:700;background:rgba(255,255,255,.25)}
+.doc-tab:not(.active) .cnt{background:var(--bg);color:var(--text-3)}
+.doc-tab .grp-del{font-size:11px;font-weight:700;opacity:.45;padding:0 2px;border-radius:4px;margin-left:2px}
+.doc-tab .grp-del:hover{opacity:1;color:#fff;background:var(--red,#e5484d)}
+.doc-del-btn{background:none;border:none;cursor:pointer;font-size:15px;opacity:.55;padding:2px 6px;border-radius:6px;transition:all var(--ease)}
+.doc-del-btn:hover{opacity:1;background:rgba(229,72,77,.14)}
+.doc-table-wrap{flex:1;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);margin-bottom:20px}
+table.doc-table{width:100%;border-collapse:collapse}
+.doc-table thead th{padding:10px 14px;text-align:left;font-size:11.5px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;cursor:pointer;white-space:nowrap;user-select:none}
+.doc-table thead th:hover{color:var(--blue)}
+.doc-table thead th .sort-icon{font-size:10px;opacity:.5;margin-left:4px}
+.doc-table tbody tr{border-bottom:1px solid var(--border-2);transition:background var(--ease);cursor:pointer}
+.doc-table tbody tr:last-child{border-bottom:none}
+.doc-table tbody tr:hover{background:#F8FAFF}
+.doc-table td{padding:11px 14px;font-size:13px;color:var(--text)}
+.doc-table td.muted{color:var(--text-3);font-size:12.5px}
+.doc-type-badge{display:inline-flex;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600}
+.doc-type-badge.qd{background:rgba(37,99,235,.1);color:var(--blue)}
+.doc-type-badge.tt{background:rgba(13,148,136,.1);color:var(--teal)}
+.doc-type-badge.hd{background:rgba(217,119,6,.1);color:var(--amber)}
+.doc-type-badge.qc{background:rgba(22,163,74,.1);color:var(--green)}
+.doc-type-badge.cv{background:rgba(139,92,246,.1);color:#7C3AED}
+.doc-type-badge.lq{background:rgba(220,38,38,.1);color:var(--red)}
+.doc-type-badge.tb{background:rgba(100,116,139,.1);color:#64748B}
+
+/* ANALYTICS */
+#screen-analytics{flex-direction:column}
+.analytics-body{flex:1;overflow-y:auto;padding:20px 24px}
+.section-title{font-size:13px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;box-shadow:var(--shadow-xs);transition:box-shadow var(--ease)}
+.metric-card:hover{box-shadow:var(--shadow-sm)}
+.metric-label{font-size:11.5px;color:var(--text-3);margin-bottom:8px;font-weight:500}
+.metric-val{font-size:28px;font-weight:700;line-height:1}
+.metric-val.good{color:var(--green)}
+.metric-val.ok{color:var(--amber)}
+.metric-val.low{color:var(--red)}
+.metric-val.muted{color:var(--text-2)}
+.metric-sub{font-size:11px;color:var(--text-3);margin-top:4px}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow-xs)}
+.chart-card h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.chart-card p{font-size:12px;color:var(--text-3);margin-bottom:14px}
+.chart-wrap{position:relative;height:240px}
+.gen-metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.gen-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow-xs);display:flex;flex-direction:column;align-items:center}
+.gen-card h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;align-self:flex-start}
+.gen-card p{font-size:12px;color:var(--text-3);margin-bottom:16px;align-self:flex-start}
+.gauge-wrap{position:relative;width:120px;height:70px;margin-bottom:12px}
+canvas.gauge{display:block}
+.gauge-val{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:20px;font-weight:700;white-space:nowrap}
+.gauge-val.good{color:var(--green)}
+.gauge-val.ok{color:var(--amber)}
+.gauge-val.low{color:var(--red)}
+.gen-detail{display:flex;flex-direction:column;gap:4px;width:100%}
+.gen-row{display:flex;justify-content:space-between;font-size:12px}
+.gen-row span:first-child{color:var(--text-2)}
+.gen-row span:last-child{font-weight:600;color:var(--text)}
+.eval-info{background:linear-gradient(135deg,rgba(37,99,235,.06),rgba(14,165,233,.06));border:1px solid rgba(37,99,235,.18);border-radius:var(--r);padding:16px 20px;display:flex;align-items:center;gap:14px}
+.eval-info-icon{font-size:28px}
+.eval-info-text h4{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:4px}
+.eval-info-text p{font-size:12.5px;color:var(--text-2);line-height:1.6}
+.eval-info .btn-primary{margin-left:auto;flex-shrink:0}
+
+/* SETTINGS */
+#screen-settings{flex-direction:column}
+.settings-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;gap:20px}
+.settings-left{flex:1;min-width:0}
+.settings-right{width:260px;min-width:260px}
+.settings-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+.settings-section-header{padding:14px 18px;font-size:13.5px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);background:var(--bg)}
+.settings-section-body{padding:16px 18px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-2);gap:12px}
+.setting-row:last-child{border-bottom:none;padding-bottom:0}
+.setting-info label{font-size:13px;font-weight:500;color:var(--text);display:block;margin-bottom:2px}
+.setting-info .hint{font-size:11.5px;color:var(--text-3)}
+.setting-control input[type=text],.setting-control input[type=number],.setting-control select{border:1.5px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;font-family:inherit;font-size:13px;color:var(--text);outline:none;transition:border-color var(--ease);min-width:120px;background:var(--surface)}
+.setting-control input:focus,.setting-control select:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.toggle-switch{position:relative;width:40px;height:22px;display:inline-block}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;border-radius:99px;background:var(--border-2);cursor:pointer;transition:background var(--ease)}
+.toggle-switch input:checked+.toggle-track{background:var(--blue)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform var(--ease);box-shadow:var(--shadow-xs);pointer-events:none}
+.toggle-switch input:checked~.toggle-thumb{transform:translateX(18px)}
+.sysinfo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.sysinfo-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2);margin-bottom:12px}
+.sysinfo-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-2);font-size:12.5px;gap:8px}
+.sysinfo-row:last-child{border-bottom:none;padding-bottom:0}
+.sysinfo-row .k{color:var(--text-2)}
+.sysinfo-row .v{font-weight:500;color:var(--text);text-align:right;word-break:break-all}
+.sysinfo-row .v.ok{color:var(--green)}
+.sysinfo-row .v.warn{color:var(--amber)}
+.sysinfo-row .v.err{color:var(--red)}
+
+.yaml-editor{width:100%;min-height:400px;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--text);background:#0F172A;color:#E2E8F0;outline:none;resize:vertical;line-height:1.6}
+.yaml-editor:focus{border-color:var(--blue-light)}
+
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
+.pill.blue{background:rgba(37,99,235,.1);color:var(--blue)}
+.pill.green{background:rgba(22,163,74,.1);color:var(--green)}
+.pill.amber{background:rgba(217,119,6,.1);color:var(--amber)}
+.pill.teal{background:rgba(13,148,136,.1);color:var(--teal)}
+.pill.red{background:rgba(220,38,38,.1);color:var(--red)}
+
+/* UPLOAD CONFIRM MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);z-index:9998;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease-out}
+.modal{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);max-width:560px;width:92%;max-height:80vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.modal-head h3{font-size:16px;font-weight:600;color:var(--text)}
+.modal-head .icon{font-size:20px}
+.modal-body{padding:16px 24px;overflow-y:auto;flex:1}
+.modal-body .hint{font-size:12.5px;color:var(--text-2);background:rgba(13,148,136,.08);border-left:3px solid var(--teal);padding:10px 12px;border-radius:var(--r-sm);margin-bottom:14px;line-height:1.5}
+
+/* Drag & drop zone */
+.dropzone{
+  border:2px dashed var(--border-2);
+  border-radius:var(--r);
+  padding:28px 20px;
+  text-align:center;
+  background:var(--bg);
+  cursor:pointer;
+  transition:all var(--ease);
+  margin-bottom:14px;
+}
+.dropzone:hover{border-color:var(--blue-light);background:rgba(59,130,246,.04)}
+.dropzone.dragover{border-color:var(--blue);background:rgba(59,130,246,.08);border-style:solid}
+.dropzone-icon{font-size:32px;margin-bottom:6px;opacity:.7}
+.dropzone-text{font-size:13.5px;color:var(--text);font-weight:500;margin-bottom:3px}
+.dropzone-sub{font-size:11.5px;color:var(--text-3)}
+.dropzone-list-title{font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 6px;padding:0 2px}
+
+.modal-file{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;transition:background var(--ease)}
+.modal-file:hover{background:var(--bg)}
+.modal-file input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:var(--blue);flex-shrink:0}
+.modal-file .fname{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.modal-file .fsize{font-size:11px;color:var(--text-3);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.modal-file .fremove{background:none;border:none;cursor:pointer;color:var(--text-3);font-size:16px;padding:2px 6px;border-radius:4px;transition:all var(--ease)}
+.modal-file .fremove:hover{color:var(--red);background:rgba(220,38,38,.08)}
+
+.modal-foot{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:var(--bg)}
+.modal-foot button{padding:8px 16px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:13px;font-weight:500;font-family:inherit;transition:all var(--ease)}
+.modal-foot button:disabled{opacity:.5;cursor:not-allowed}
+.modal-foot .btn-cancel{background:var(--surface);color:var(--text-2);border:1px solid var(--border-2)}
+.modal-foot .btn-cancel:hover{background:var(--bg)}
+.modal-foot .btn-primary{background:var(--blue);color:#fff}
+.modal-foot .btn-primary:hover:not(:disabled){background:var(--blue-light)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--r-sm);font-size:13px;box-shadow:var(--shadow-lg);animation:slideIn .25s ease-out;max-width:360px}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+.toast.info{background:var(--blue)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.text-muted{color:var(--text-3)}
+.text-sm{font-size:12px}
+.hidden{display:none!important}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+.spinner.dark{border-color:rgba(0,0,0,.15);border-top-color:var(--blue)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESPONSIVE — fix layout jam on resize */
+/* Source panel auto-collapse below 1100px (chat needs breathing room) */
+@media (max-width:1100px){
+  .source-panel{width:0;min-width:0;opacity:0;pointer-events:none}
+  .source-panel.force-show{width:300px;min-width:300px;opacity:1;pointer-events:auto;position:absolute;right:0;top:var(--top-h);bottom:0;z-index:50;box-shadow:-4px 0 16px rgba(0,0,0,.12)}
+}
+/* Below 900px: sidebar compact-only, search filters stack */
+@media (max-width:900px){
+  #sidebar:not(.collapsed){width:var(--sidebar-c);min-width:var(--sidebar-c)}
+  #sidebar:not(.collapsed) .sb-logo-text,
+  #sidebar:not(.collapsed) .sb-section,
+  #sidebar:not(.collapsed) .sb-label,
+  #sidebar:not(.collapsed) .sb-badge,
+  #sidebar:not(.collapsed) .sb-status{display:none}
+  .search-body{flex-direction:column}
+  .search-right{width:100%;min-width:0;order:-1}
+  .topbar{padding:0 14px;gap:8px}
+  .topbar-title{font-size:14px}
+  .topbar-actions .btn span:not(.icon){display:none}
+}
+/* Below 640px: stack stat cards, scrollable doc-tabs, smaller bubble */
+@media (max-width:640px){
+  .stat-row{gap:8px}
+  .stat-card{min-width:0;padding:12px 14px}
+  .stat-info .val{font-size:18px}
+  .doc-tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .doc-tab{flex-shrink:0}
+  .doc-table-wrap{overflow:auto}
+  .doc-table thead th{font-size:10.5px;padding:8px 10px}
+  .doc-table tbody td{font-size:12px;padding:8px 10px!important}
+  .bubble{max-width:88%}
+  .chat-history,.search-body,.doc-body{padding:14px 12px}
+  .chat-input-bar{padding:10px 12px}
+}
+/* Always: prevent table from forcing horizontal page scroll */
+.doc-table-wrap{overflow-x:auto}
+</style>
+</head>
+<body>
+
+<!-- API base URL -->
+<script>window.API_BASE = window.API_BASE || 'http://127.0.0.1:8000';</script>
+
+<aside id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon"><img src="/img/Logo-HCMIU.svg" alt="HCMIU" onerror="this.onerror=null;this.src='/img/Logo-HCMIU.svg.png'"></div>
+    <div class="sb-logo-text">
+      <div class="brand">ARRS</div>
+      <div class="sub">IU Academic Assistant</div>
+    </div>
+  </div>
+
+  <div class="sb-section">Main</div>
+  <div class="sb-item active" data-screen="chat">
+    <span class="sb-icon">💬</span><span class="sb-label">Chat</span>
+  </div>
+
+  <div class="sb-section">Data</div>
+  <div class="sb-item" data-screen="documents">
+    <span class="sb-icon">📁</span><span class="sb-label">Documents</span>
+    <span class="sb-badge" id="sb-doc-count">–</span>
+  </div>
+
+
+  <div class="sb-footer">
+    <div class="sb-status">
+      <div class="status-dot" id="sb-status-dot"></div>
+      <span class="sb-label" id="sb-status-text">Checking…</span>
+    </div>
+  </div>
+</aside>
+
+<div id="main">
+
+  <!-- CHAT -->
+  <div class="screen active" id="screen-chat">
+    <div class="topbar">
+      <div class="topbar-title"><span class="icon">💬</span> Chat</div>
+      <div class="topbar-actions">
+        <span class="pill blue" id="chat-model-pill">Hybrid RRF + Rerank</span>
+        <button class="btn-icon" id="toggle-sources" title="Show/hide sources">📋</button>
+        <button class="btn-icon" id="clear-chat" title="Clear conversation">🗑️</button>
+      </div>
+    </div>
+
+    <div class="chat-main">
+      <div class="chat-history" id="chat-history">
+        <div class="chat-welcome" id="chat-welcome">
+          <div class="logo-big">🎓</div>
+          <h2>Welcome to ARRS</h2>
+          <p>Academic Regulation Retrieval System for International University&nbsp;–&nbsp;VNU-HCMC students. Ask any question about admissions, scholarships, credits, discipline, examinations…</p>
+          <div class="sq-grid">
+            <div class="sq-card" onclick="sendSuggest(this)">
+              <div class="sq-icon">🎓</div>
+              <div class="sq-text">Điều kiện xét học bổng khuyến khích học tập là gì?</div>
+            </div>
+            <div class="sq-card" onclick="sendSuggest(this)">
+              <div class="sq-icon">📋</div>
+              <div class="sq-text">Sinh viên vi phạm thi hộ lần đầu bị xử lý như thế nào?</div>
+            </div>
+            <div class="sq-card" onclick="sendSuggest(this)">
+              <div class="sq-icon">⏱️</div>
+              <div class="sq-text">Thời gian tối đa hoàn thành chương trình đại học là bao lâu?</div>
+            </div>
+            <div class="sq-card" onclick="sendSuggest(this)">
+              <div class="sq-icon">📝</div>
+              <div class="sq-text">Điều kiện để được xét tốt nghiệp sớm?</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="chat-messages"></div>
+      </div>
+
+      <div class="chat-input-bar">
+        <div class="chat-input-row">
+          <textarea id="chat-input" rows="1" placeholder="Ask a question about IU academic regulations…"></textarea>
+          <button class="send-btn" id="chat-send" title="Send">➤</button>
+        </div>
+        <div class="chat-hint">
+          <span><kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="source-panel hidden" id="source-panel">
+      <div class="sp-header">
+        <span id="sp-title">📋 References</span>
+        <button class="btn-icon" style="border:none;font-size:13px" onclick="document.getElementById('source-panel').classList.add('hidden')">✕</button>
+      </div>
+      <div class="sp-body" id="sp-body">
+        <div class="sp-empty">Send a question to see source documents.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCUMENTS -->
+  <div class="screen" id="screen-documents">
+    <div class="topbar">
+      <div class="topbar-title"><span class="icon">📁</span> Documents</div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" id="reindex-docs" title="Upload PDF/DOCX files from your computer">📥 Update Documents</button>
+        <button class="btn btn-ghost" id="refresh-docs" title="Reload list">↻ Refresh</button>
+        <input type="text" id="doc-search" placeholder="🔍  Search file name…"
+          style="border:1.5px solid var(--border);border-radius:var(--r-sm);padding:6px 12px;font-family:inherit;font-size:13px;outline:none;width:210px" />
+      </div>
+    </div>
+
+    <div class="doc-body">
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-icon blue">📄</div>
+          <div class="stat-info"><div class="val" id="stat-docs">–</div><div class="lbl">Total documents</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon teal">🧩</div>
+          <div class="stat-info"><div class="val" id="stat-chunks">–</div><div class="lbl">Chunks</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber">📂</div>
+          <div class="stat-info"><div class="val" id="stat-groups">–</div><div class="lbl">Document groups</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">✅</div>
+          <div class="stat-info"><div class="val" id="stat-indexed">–</div><div class="lbl">Indexed</div></div>
+        </div>
+      </div>
+
+      <div class="doc-tabs" id="doc-tabs">
+        <div class="doc-tab active" data-group="all">All <span class="cnt">–</span></div>
+      </div>
+
+      <div class="doc-table-wrap">
+        <table class="doc-table" id="doc-table">
+          <thead>
+            <tr>
+              <th data-col="source">File name <span class="sort-icon">↕</span></th>
+              <th data-col="doc_type">Type <span class="sort-icon">↕</span></th>
+              <th data-col="doc_number">Doc. number <span class="sort-icon">↕</span></th>
+              <th data-col="issuing_body">Issuing body <span class="sort-icon">↕</span></th>
+              <th data-col="doc_group">Group <span class="sort-icon">↕</span></th>
+              <th data-col="chunk_count" style="text-align:right">Chunks <span class="sort-icon">↕</span></th>
+              <th data-col="max_page" style="text-align:right">Pages <span class="sort-icon">↕</span></th>
+              <th style="text-align:center">Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="doc-tbody">
+            <tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3)">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+</div><!-- /main -->
+
+<!-- Upload modal: drag & drop files from local computer (no OS file picker) -->
+<div id="upload-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="icon">📄</span>
+      <h3>Tải tài liệu lên hệ thống</h3>
+    </div>
+    <div class="modal-body">
+      <!-- Drag & drop zone: drops files into the list without opening OS file picker -->
+      <div class="dropzone" id="upload-dropzone">
+        <div class="dropzone-icon">📁</div>
+        <div class="dropzone-text">Kéo thả file PDF/DOCX vào đây</div>
+        <div class="dropzone-sub">Chỉ chấp nhận file từ máy tính của bạn</div>
+      </div>
+
+      <div class="upload-group-row" style="margin-top:14px">
+        <label for="upload-group-select" style="display:block;font-weight:600;margin-bottom:6px">
+          Nhóm (group) cho các file này
+        </label>
+        <select id="upload-group-select" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#ccc)"></select>
+        <div id="upload-newgroup-wrap" style="display:none;margin-top:8px">
+          <input id="upload-newgroup-name" type="text" placeholder="Tên nhóm mới (vd: Học bổng ngoài trường)"
+                 style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#ccc)" />
+        </div>
+      </div>
+
+      <div class="hint">
+        Chọn <strong>nhóm có sẵn</strong> hoặc <strong>tạo nhóm mới</strong> để phân loại tài liệu.
+        Hệ thống dùng nhóm này làm <em>doc_group / loại văn bản / cơ quan ban hành</em> —
+        không đoán từ nội dung. Số hiệu văn bản được tự trích từ nội dung nếu có.
+      </div>
+
+      <div class="dropzone-list-title" id="upload-list-title" style="display:none">File đã chọn</div>
+      <div id="upload-file-list"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" id="upload-cancel">Hủy</button>
+      <button class="btn-primary" id="upload-confirm" disabled>Tải lên</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  CONFIG + UTILITIES
+// ═══════════════════════════════════════════════════
+const API_BASE = window.API_BASE || 'http://127.0.0.1:8000';
+const api = (path, opts = {}) => fetch(API_BASE + path, opts);
+
+function toast(msg, type = 'info', timeout = 3500) {
+  const w = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(100%)'; t.style.transition = '.25s'; }, timeout);
+  setTimeout(() => t.remove(), timeout + 300);
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
+}
+
+const DOC_TYPE_LABELS = {
+  law: 'Luật',
+  circular: 'Thông tư',
+  decree: 'Nghị định',
+  school_decision: 'Quyết định',
+  school_decision_full: 'Quyết định',
+  school_decision_brief: 'Quyết định (tóm tắt)',
+  regulation: 'Quy chế',
+  guideline: 'Hướng dẫn',
+  notice: 'Thông báo',
+  dispatch: 'Công văn',
+};
+
+// Legacy numeric labels — kept only as a fallback for any stale numeric
+// doc_group values. Group labels are now driven by the /groups registry.
+const DOC_GROUP_LABELS = {
+  1: 'Luật quốc gia',
+  2: 'Thông tư Bộ GD&ĐT',
+  3: 'Quyết định ĐHQG-HCM',
+  4: 'Quy chế trường ĐHQT',
+  5: 'Nội quy trường ĐHQT',
+  6: 'Thông báo',
+  7: 'Phụ lục',
+};
+
+// Group registry, loaded from GET /groups. id (folder) → metadata.
+let GROUPS = [];
+let groupLabelMap = {};
+async function loadGroups() {
+  try {
+    const r = await api('/groups');
+    if (r.ok) {
+      const d = await r.json();
+      GROUPS = d.groups || [];
+      groupLabelMap = {};
+      GROUPS.forEach(g => { groupLabelMap[g.id] = g.label; });
+    }
+  } catch {}
+  return GROUPS;
+}
+
+function typeLabel(t) {
+  if (t === null || t === undefined || t === '') return '';
+  const key = String(t).toLowerCase();
+  return DOC_TYPE_LABELS[key] || String(t);
+}
+
+function groupLabel(g) {
+  if (g === null || g === undefined || g === '') return '';
+  return groupLabelMap[g] || DOC_GROUP_LABELS[g] || String(g);
+}
+
+function highlightQuery(text, query) {
+  if (!query) return escapeHtml(text);
+  const terms = query.split(/\s+/).filter(t => t.length > 2);
+  let out = escapeHtml(text);
+  for (const term of terms) {
+    const re = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+    out = out.replace(re, '<mark>$1</mark>');
+  }
+  return out;
+}
+
+function fmtScore(s) {
+  if (s === null || s === undefined) return '—';
+  return (typeof s === 'number' ? s.toFixed(3) : String(s));
+}
+
+function fmtTime(n) {
+  if (n === null || n === undefined) return '—';
+  return n < 1 ? `${Math.round(n * 1000)}ms` : `${n.toFixed(2)}s`;
+}
+
+function typeSlug(t) {
+  if (!t) return 'tb';
+  const k = String(t).toLowerCase();
+  if (k === 'law' || k.includes('luật') || k.includes('luat')) return 'lq';
+  if (k === 'circular' || k.includes('thông tư') || k.includes('thong tu')) return 'tt';
+  if (k.startsWith('school_decision') || k === 'decision' || k.includes('quyết định') || k.includes('quyet dinh')) return 'qd';
+  if (k === 'decree' || k.includes('nghị định') || k.includes('nghi dinh')) return 'qd';
+  if (k === 'guideline' || k.includes('hướng dẫn') || k.includes('huong dan')) return 'hd';
+  if (k === 'regulation' || k.includes('quy chế') || k.includes('quy che')) return 'qc';
+  if (k === 'dispatch' || k.includes('công văn') || k.includes('cong van')) return 'cv';
+  if (k === 'notice' || k.includes('thông báo') || k.includes('thong bao')) return 'tb';
+  return 'tb';
+}
+
+function classForScore(v, good, ok) {
+  if (v === null || v === undefined || isNaN(v)) return 'muted';
+  if (v >= good) return 'good';
+  if (v >= ok) return 'ok';
+  return 'low';
+}
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════
+const screenInit = { chat: false, documents: false };
+
+function showScreen(id) {
+  document.querySelectorAll('.sb-item').forEach(x => x.classList.toggle('active', x.dataset.screen === id));
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + id));
+
+  if (id === 'documents' && !screenInit.documents) { loadDocuments(); screenInit.documents = true; }
+}
+
+document.querySelectorAll('.sb-item[data-screen]').forEach(item => {
+  item.addEventListener('click', () => showScreen(item.dataset.screen));
+});
+
+const sidebar = document.getElementById('sidebar');
+
+// ═══════════════════════════════════════════════════
+//  HEALTH CHECK (runs every 30s)
+// ═══════════════════════════════════════════════════
+async function checkHealth() {
+  const dot = document.getElementById('sb-status-dot');
+  const text = document.getElementById('sb-status-text');
+  const sysApi = document.getElementById('sys-api');
+  const sysStatus = document.getElementById('sys-status');
+  try {
+    const r = await api('/health', { signal: AbortSignal.timeout(3500) });
+    if (r.ok) {
+      const d = await r.json();
+      dot.className = 'status-dot' + (d.qdrant ? '' : ' warn');
+      text.textContent = d.qdrant ? 'System online' : 'Qdrant offline';
+      if (sysApi) sysApi.textContent = 'Online';
+      if (sysApi) sysApi.className = 'v ok';
+      if (sysStatus) { sysStatus.textContent = '● Online'; sysStatus.className = 'v ok'; }
+      return true;
+    }
+  } catch {}
+  dot.className = 'status-dot err';
+  text.textContent = 'API offline';
+  if (sysApi) { sysApi.textContent = 'Offline'; sysApi.className = 'v err'; }
+  if (sysStatus) { sysStatus.textContent = '● Offline'; sysStatus.className = 'v err'; }
+  return false;
+}
+
+// ═══════════════════════════════════════════════════
+//  CHAT
+// ═══════════════════════════════════════════════════
+const chatInput = document.getElementById('chat-input');
+const chatWelcome = document.getElementById('chat-welcome');
+const chatMessages = document.getElementById('chat-messages');
+const chatSend = document.getElementById('chat-send');
+const spPanel = document.getElementById('source-panel');
+const spBody = document.getElementById('sp-body');
+const spTitle = document.getElementById('sp-title');
+let lastChatSources = [];
+
+chatInput.addEventListener('input', () => {
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+});
+chatInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+chatSend.addEventListener('click', sendChat);
+
+document.getElementById('clear-chat').addEventListener('click', () => {
+  chatMessages.innerHTML = '';
+  chatWelcome.classList.remove('hidden');
+  lastChatSources = [];
+  spBody.innerHTML = '<div class="sp-empty">Send a question to see source documents.</div>';
+  spTitle.textContent = '📋 References';
+});
+
+document.getElementById('toggle-sources').addEventListener('click', () => {
+  spPanel.classList.toggle('hidden');
+});
+
+window.sendSuggest = function (card) {
+  const t = card.querySelector('.sq-text').textContent.trim();
+  chatInput.value = t;
+  sendChat();
+};
+
+let __markedFootnoteRegistered = false;
+function renderMarkdown(md) {
+  try {
+    if (window.marked) {
+      if (!__markedFootnoteRegistered && window.markedFootnote) {
+        marked.use(window.markedFootnote());
+        __markedFootnoteRegistered = true;
+      }
+      return marked.parse(md, { breaks: true, gfm: true });
+    }
+  } catch {}
+  return escapeHtml(md).replace(/\n/g, '<br>');
+}
+
+// Quét toàn bộ bubble, biến mọi "filename.pdf — trang N" thành link mở PDF.
+// Hỗ trợ tiền tố "[^N]:", các loại dash (— – -), và "trang"/"tr.".
+function linkifyFootnotePdfs(rootEl) {
+  if (!rootEl) return;
+  const PDF_RE = /(\[\^?\d+\]:\s*)?(\S+\.pdf)\s*[—–\-]\s*(?:trang|tr\.?)\s*(\d+)/gi;
+  const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => {
+      if (n.parentNode && n.parentNode.closest('a')) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const targets = [];
+  let n;
+  while ((n = walker.nextNode())) {
+    PDF_RE.lastIndex = 0;
+    if (PDF_RE.test(n.nodeValue)) targets.push(n);
+  }
+  targets.forEach(tn => {
+    PDF_RE.lastIndex = 0;
+    const text = tn.nodeValue;
+    const frag = document.createDocumentFragment();
+    let lastIdx = 0;
+    let m;
+    while ((m = PDF_RE.exec(text)) !== null) {
+      if (m.index > lastIdx) frag.appendChild(document.createTextNode(text.slice(lastIdx, m.index)));
+      const prefix = m[1] || '';
+      const filename = m[2];
+      const page = m[3];
+      const a = document.createElement('a');
+      a.href = `${API_BASE}/pdf/${encodeURIComponent(filename)}#page=${page}`;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'pdf-link';
+      a.title = `Mở ${filename} (trang ${page})`;
+      a.textContent = `${prefix}${filename} — trang ${page}`;
+      frag.appendChild(a);
+      lastIdx = m.index + m[0].length;
+    }
+    if (lastIdx < text.length) frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+    tn.parentNode.replaceChild(frag, tn);
+  });
+}
+
+function appendMessage(role, content, meta) {
+  const msg = document.createElement('div');
+  msg.className = 'msg ' + role;
+  const av = document.createElement('div');
+  av.className = 'avatar ' + role;
+  av.textContent = role === 'user' ? 'SV' : 'AI';
+
+  const wrap = document.createElement('div');
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble' + (meta && meta.error ? ' error' : '');
+  if (role === 'ai' && !meta?.error) {
+    bubble.innerHTML = renderMarkdown(content);
+    linkifyFootnotePdfs(bubble);
+  } else {
+    bubble.textContent = content;
+  }
+  wrap.appendChild(bubble);
+
+  if (role === 'ai' && !meta?.error) {
+    const mbar = document.createElement('div');
+    mbar.className = 'bubble-meta';
+    const time = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    mbar.innerHTML = `<span class="bubble-time">${time}</span>` +
+      (meta?.elapsed ? `<span class="bubble-elapsed">⏱ ${fmtTime(meta.elapsed)}</span>` : '') +
+      `<button class="copy-btn">📋 Copy</button>`;
+    mbar.querySelector('.copy-btn').onclick = (e) => {
+      navigator.clipboard.writeText(bubble.innerText).catch(() => {});
+      e.target.textContent = '✓ Copied';
+      setTimeout(() => e.target.textContent = '📋 Copy', 1800);
+    };
+    wrap.appendChild(mbar);
+  }
+
+  msg.appendChild(av);
+  msg.appendChild(wrap);
+  chatMessages.appendChild(msg);
+  chatMessages.scrollIntoView({ block: 'end' });
+  document.getElementById('chat-history').scrollTop = document.getElementById('chat-history').scrollHeight;
+  return msg;
+}
+
+function showTyping() {
+  const m = document.createElement('div');
+  m.className = 'msg ai';
+  m.id = '__typing';
+  m.innerHTML = '<div class="avatar ai">AI</div><div class="bubble typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  chatMessages.appendChild(m);
+  document.getElementById('chat-history').scrollTop = document.getElementById('chat-history').scrollHeight;
+}
+function removeTyping() { document.getElementById('__typing')?.remove(); }
+
+function renderSourcesPanel(sources) {
+  if (!sources || !sources.length) {
+    spBody.innerHTML = '<div class="sp-empty">No source documents.</div>';
+    spTitle.textContent = '📋 References';
+    return;
+  }
+  spTitle.textContent = `📋 References (${sources.length})`;
+  spBody.innerHTML = sources.map((s, i) => {
+    const score = s.score_rerank ?? s.score_rrf ?? s.score_dense ?? s.score_sparse;
+    const scoreCls = score >= 0.7 ? '' : (score >= 0.4 ? 'ok' : 'low');
+    const tags = [];
+    if (s.doc_group !== null && s.doc_group !== undefined && s.doc_group !== '') tags.push(escapeHtml(groupLabel(s.doc_group)));
+    if (s.doc_type) tags.push(escapeHtml(typeLabel(s.doc_type)));
+    if (s.article) tags.push(`Điều ${escapeHtml(s.article)}`);
+    else if (s.chapter) tags.push(`Chương ${escapeHtml(s.chapter)}`);
+    return `
+      <div class="sp-card" onclick="window.open('${API_BASE}/pdf/${encodeURIComponent(s.source || '')}', '_blank')">
+        <div class="sp-card-header">
+          <div class="sp-card-file">${i+1}. ${escapeHtml(s.source || 'N/A')} · tr.${s.page || '?'}</div>
+          <div class="sp-score">${fmtScore(score)}</div>
+        </div>
+        <div class="sp-card-text">${escapeHtml((s.text || '').slice(0, 260))}…</div>
+        <div class="sp-card-footer">
+          ${tags.map(t => `<span class="sp-tag">${t}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function sendChat() {
+  const q = chatInput.value.trim();
+  if (!q) return;
+  chatWelcome.classList.add('hidden');
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  chatSend.disabled = true;
+
+  appendMessage('user', q);
+  showTyping();
+
+  try {
+    const t0 = Date.now();
+    const r = await api('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: q }),
+      signal: AbortSignal.timeout(180000),
+    });
+    removeTyping();
+    if (!r.ok) {
+      const errTxt = await r.text();
+      appendMessage('ai', `API error (${r.status}): ${errTxt}`, { error: true });
+      return;
+    }
+    const data = await r.json();
+    const elapsed = data.elapsed ?? ((Date.now() - t0) / 1000);
+    lastChatSources = data.sources || [];
+    appendMessage('ai', data.answer || '(không có câu trả lời)', { elapsed, sources: lastChatSources });
+    renderSourcesPanel(lastChatSources);
+  } catch (e) {
+    removeTyping();
+    appendMessage('ai', `Connection error: ${e.message || e}`, { error: true });
+  } finally {
+    chatSend.disabled = false;
+    chatInput.focus();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  DOCUMENTS
+// ═══════════════════════════════════════════════════
+let allDocs = [];
+let currentGroup = 'all';
+let docFilter = '';
+let sortCol = null, sortAsc = true;
+
+async function loadDocuments() {
+  const tbody = document.getElementById('doc-tbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3)"><span class="spinner dark"></span> Loading documents…</td></tr>';
+  try {
+    await loadGroups();   // populate group label map before rendering pills/tabs
+    const [sRes, stRes] = await Promise.all([api('/sources'), api('/stats')]);
+    if (!sRes.ok || !stRes.ok) throw new Error('HTTP error');
+    const sData = await sRes.json();
+    const stData = await stRes.json();
+
+    allDocs = sData.documents || [];
+    document.getElementById('stat-docs').textContent = stData.total_documents ?? allDocs.length;
+    document.getElementById('stat-chunks').textContent = (stData.total_chunks ?? 0).toLocaleString('vi-VN');
+    document.getElementById('stat-groups').textContent = Object.keys(stData.groups || {}).length;
+    document.getElementById('stat-indexed').textContent = '100%';
+    document.getElementById('sb-doc-count').textContent = allDocs.length;
+
+    const tabs = document.getElementById('doc-tabs');
+    const groupCounts = {};
+    allDocs.forEach(d => {
+      const key = (d.doc_group === null || d.doc_group === undefined || d.doc_group === '') ? 'Khác' : d.doc_group;
+      groupCounts[key] = (groupCounts[key] || 0) + 1;
+    });
+    tabs.innerHTML = `<div class="doc-tab active" data-group="all">Tất cả <span class="cnt">${allDocs.length}</span></div>` +
+      Object.entries(groupCounts).sort((a,b) => b[1]-a[1]).map(([g, c]) => {
+        // 'Khác' (ungrouped/empty) is not a real folder → not deletable.
+        const delBtn = (g !== 'Khác')
+          ? `<span class="grp-del" title="Xóa nhóm" data-del-group="${escapeHtml(g)}">✕</span>` : '';
+        return `<div class="doc-tab" data-group="${escapeHtml(g)}">${escapeHtml(groupLabel(g) || g)} <span class="cnt">${c}</span>${delBtn}</div>`;
+      }).join('');
+    tabs.querySelectorAll('.doc-tab').forEach(t => {
+      t.onclick = (e) => {
+        // Click on the ✕ → delete the group instead of selecting it.
+        const del = e.target.closest('.grp-del');
+        if (del) {
+          e.stopPropagation();
+          const gid = del.dataset.delGroup;
+          window.deleteGroup(gid, groupLabel(gid) || gid);
+          return;
+        }
+        tabs.querySelectorAll('.doc-tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        currentGroup = t.dataset.group;
+        renderDocs();
+      };
+    });
+
+    renderDocs();
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--red)">Error: ${escapeHtml(e.message || String(e))}</td></tr>`;
+  }
+}
+
+function renderDocs() {
+  let rows = allDocs.filter(d => {
+    const gKey = (d.doc_group === null || d.doc_group === undefined || d.doc_group === '') ? 'Khác' : d.doc_group;
+    const matchGroup = currentGroup === 'all' || String(gKey) === String(currentGroup);
+    const q = docFilter.toLowerCase();
+    const matchFilter = !q ||
+      (d.source || '').toLowerCase().includes(q) ||
+      (d.doc_number || '').toLowerCase().includes(q) ||
+      (d.issuing_body || '').toLowerCase().includes(q);
+    return matchGroup && matchFilter;
+  });
+  if (sortCol) {
+    rows.sort((a, b) => {
+      const av = a[sortCol] ?? '', bv = b[sortCol] ?? '';
+      if (typeof av === 'number') return sortAsc ? av - bv : bv - av;
+      return sortAsc ? String(av).localeCompare(String(bv), 'vi') : String(bv).localeCompare(String(av), 'vi');
+    });
+  }
+  const tbody = document.getElementById('doc-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3)">No matching documents</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(d => {
+    const cls = typeSlug(d.doc_type);
+    return `
+      <tr onclick="window.open('${API_BASE}/pdf/${encodeURIComponent(d.source || '')}', '_blank')">
+        <td style="font-weight:500">📄 ${escapeHtml(d.source || '')}</td>
+        <td>${d.doc_type ? `<span class="doc-type-badge ${cls}">${escapeHtml(typeLabel(d.doc_type))}</span>` : '<span class="text-muted">—</span>'}</td>
+        <td class="muted">${escapeHtml(d.doc_number || '—')}</td>
+        <td class="muted">${escapeHtml(d.issuing_body || '—')}</td>
+        <td>${(d.doc_group !== null && d.doc_group !== undefined && d.doc_group !== '') ? `<span class="pill teal">${escapeHtml(groupLabel(d.doc_group))}</span>` : '—'}</td>
+        <td style="text-align:right;font-weight:600">${d.chunk_count || 0}</td>
+        <td style="text-align:right" class="muted">${d.max_page || 0}</td>
+        <td style="text-align:center">
+          <button class="doc-del-btn" title="Xóa tài liệu"
+                  onclick="event.stopPropagation(); window.deleteDoc('${escapeHtml((d.source||'').replace(/'/g,"\\'"))}')">🗑</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+document.getElementById('doc-search').addEventListener('input', e => { docFilter = e.target.value; renderDocs(); });
+document.getElementById('refresh-docs').addEventListener('click', () => { loadDocuments(); toast('Refreshing…', 'info'); });
+
+// ─── Delete document / group (filesystem change → offer reindex) ───────────
+async function offerReindex(actionMsg) {
+  const doIt = confirm(`${actionMsg}\n\nChạy reindex ngay để cập nhật hệ thống tìm kiếm? (5–15 phút)`);
+  if (!doIt) {
+    toast('Đã thay đổi file. Bấm "Update Documents" để reindex khi sẵn sàng.', 'info', 5000);
+    return;
+  }
+  const btn = document.getElementById('reindex-docs');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> starting reindex…';
+  try {
+    const r = await api('/reindex', { method: 'POST' });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      throw new Error(d.detail || ('HTTP ' + r.status));
+    }
+    toast('Reindex running in background.', 'info', 4500);
+    _reindexPoll = setInterval(() => pollReindexStatus(btn), 2500);
+  } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = '📥 Update Documents';
+    toast('Reindex failed: ' + (e.message || e), 'error', 6000);
+  }
+}
+
+window.deleteDoc = async function (name) {
+  if (!name) return;
+  if (!confirm(`Xóa tài liệu "${name}"?\nFile PDF sẽ bị xóa khỏi hệ thống.`)) return;
+  try {
+    const r = await api('/documents/' + encodeURIComponent(name), { method: 'DELETE' });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      throw new Error(d.detail || ('HTTP ' + r.status));
+    }
+    toast(`Đã xóa "${name}"`, 'success', 3500);
+    await loadDocuments();
+    offerReindex(`Đã xóa tài liệu "${name}".`);
+  } catch (e) {
+    toast('Xóa thất bại: ' + (e.message || e), 'error', 5000);
+  }
+};
+
+window.deleteGroup = async function (id, label) {
+  if (!id) return;
+  if (!confirm(`Xóa nhóm "${label}" và TẤT CẢ file PDF bên trong?\nHành động này không thể hoàn tác.`)) return;
+  try {
+    const r = await api('/groups/' + encodeURIComponent(id), { method: 'DELETE' });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      throw new Error(d.detail || ('HTTP ' + r.status));
+    }
+    const d = await r.json();
+    toast(`Đã xóa nhóm "${label}" (${d.removed_files} file)`, 'success', 4000);
+    currentGroup = 'all';
+    await loadDocuments();
+    offerReindex(`Đã xóa nhóm "${label}".`);
+  } catch (e) {
+    toast('Xóa nhóm thất bại: ' + (e.message || e), 'error', 5000);
+  }
+};
+
+// ─── Update Documents — file picker → upload → optional reindex ───────────
+let _reindexPoll = null;
+function pollReindexStatus(btn) {
+  api('/reindex/status').then(r => r.json()).then(s => {
+    btn.innerHTML = `<span class="spinner"></span> ${s.stage || 'running'}…`;
+    if (!s.running) {
+      clearInterval(_reindexPoll); _reindexPoll = null;
+      btn.disabled = false;
+      btn.innerHTML = '📥 Update Documents';
+      if (s.error) {
+        toast('Reindex failed: ' + s.error, 'error', 6000);
+      } else {
+        toast('Reindex complete. Documents reloaded.', 'success', 4500);
+        loadDocuments();
+      }
+    }
+  }).catch(e => {
+    clearInterval(_reindexPoll); _reindexPoll = null;
+    btn.disabled = false;
+    btn.innerHTML = '📥 Update Documents';
+    toast('Status check failed: ' + (e.message || e), 'error');
+  });
+}
+
+// ─── Upload via Drag & Drop (no OS file picker → no "Upload from mobile" button) ───
+
+// Local state: files queued in the modal before sending
+let _pendingUploadFiles = [];
+
+const ALLOWED_EXT = ['.pdf', '.docx'];
+function _hasAllowedExt(name) {
+  const lower = name.toLowerCase();
+  return ALLOWED_EXT.some(ext => lower.endsWith(ext));
+}
+
+function _humanSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+// Re-render the file list inside the modal from _pendingUploadFiles
+function renderUploadList() {
+  const list  = document.getElementById('upload-file-list');
+  const title = document.getElementById('upload-list-title');
+  const confirmBtn = document.getElementById('upload-confirm');
+  list.innerHTML = '';
+
+  if (!_pendingUploadFiles.length) {
+    title.style.display = 'none';
+    confirmBtn.disabled = true;
+    return;
+  }
+  title.style.display = '';
+  confirmBtn.disabled = false;
+
+  _pendingUploadFiles.forEach((f, idx) => {
+    const row = document.createElement('div');
+    row.className = 'modal-file';
+    row.innerHTML = `
+      <span class="fname" title="${escapeHtml(f.name)}">📄 ${escapeHtml(f.name)}</span>
+      <span class="fsize">${_humanSize(f.size)}</span>
+      <button class="fremove" data-idx="${idx}" title="Bỏ file này">✕</button>
+    `;
+    list.appendChild(row);
+  });
+
+  // Wire remove buttons
+  list.querySelectorAll('.fremove').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(e.currentTarget.dataset.idx, 10);
+      _pendingUploadFiles.splice(idx, 1);
+      renderUploadList();
+    });
+  });
+}
+
+// Add files to queue, filtering by extension + deduping by name
+function addFilesToQueue(fileList) {
+  const incoming = Array.from(fileList || []);
+  const accepted = [];
+  const rejected = [];
+  for (const f of incoming) {
+    if (!_hasAllowedExt(f.name)) {
+      rejected.push(f.name);
+      continue;
+    }
+    // Dedup: skip if same name+size already in queue
+    const dup = _pendingUploadFiles.some(p => p.name === f.name && p.size === f.size);
+    if (dup) continue;
+    accepted.push(f);
+  }
+  _pendingUploadFiles = _pendingUploadFiles.concat(accepted);
+  if (rejected.length) {
+    toast(`Bỏ qua ${rejected.length} file không phải PDF/DOCX`, 'error', 4000);
+  }
+  renderUploadList();
+}
+
+// Populate the upload group <select> from the registry (+ "create new" option).
+const NEW_GROUP_SENTINEL = '__new__';
+async function populateUploadGroupSelect() {
+  const sel = document.getElementById('upload-group-select');
+  await loadGroups();
+  const opts = GROUPS
+    .slice()
+    .sort((a, b) => String(a.label).localeCompare(String(b.label), 'vi'))
+    .map(g => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.label)} (${g.file_count})</option>`)
+    .join('');
+  sel.innerHTML = opts + `<option value="${NEW_GROUP_SENTINEL}">➕ Tạo nhóm mới…</option>`;
+  _toggleNewGroupInput();
+}
+function _toggleNewGroupInput() {
+  const sel = document.getElementById('upload-group-select');
+  const wrap = document.getElementById('upload-newgroup-wrap');
+  wrap.style.display = (sel.value === NEW_GROUP_SENTINEL) ? '' : 'none';
+}
+document.getElementById('upload-group-select').addEventListener('change', _toggleNewGroupInput);
+
+// Click "Update Documents" → open empty modal (no OS file picker)
+document.getElementById('reindex-docs').addEventListener('click', () => {
+  _pendingUploadFiles = [];
+  renderUploadList();
+  populateUploadGroupSelect();
+  document.getElementById('upload-modal').classList.remove('hidden');
+});
+
+// Cancel → close modal + clear queue
+document.getElementById('upload-cancel').addEventListener('click', () => {
+  document.getElementById('upload-modal').classList.add('hidden');
+  _pendingUploadFiles = [];
+});
+
+// ─── Drag & Drop on the modal dropzone ───
+const _dropzone = document.getElementById('upload-dropzone');
+
+['dragenter', 'dragover'].forEach(evt => {
+  _dropzone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    _dropzone.classList.add('dragover');
+  });
+});
+['dragleave', 'drop'].forEach(evt => {
+  _dropzone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    _dropzone.classList.remove('dragover');
+  });
+});
+_dropzone.addEventListener('drop', (e) => {
+  const files = e.dataTransfer?.files;
+  if (files && files.length) addFilesToQueue(files);
+});
+
+// Prevent the whole modal from accepting native drop (avoid full-page replace)
+document.getElementById('upload-modal').addEventListener('dragover', (e) => e.preventDefault());
+document.getElementById('upload-modal').addEventListener('drop', (e) => e.preventDefault());
+
+// Confirm "Tải lên" → send to backend
+document.getElementById('upload-confirm').addEventListener('click', async () => {
+  if (!_pendingUploadFiles.length) return;
+
+  // Resolve the chosen group (existing id, or a new group name).
+  const sel = document.getElementById('upload-group-select');
+  let groupValue = sel.value;
+  if (groupValue === NEW_GROUP_SENTINEL) {
+    groupValue = document.getElementById('upload-newgroup-name').value.trim();
+    if (!groupValue) {
+      toast('Vui lòng nhập tên nhóm mới', 'error', 3500);
+      return;   // keep modal open
+    }
+  }
+  if (!groupValue) {
+    toast('Vui lòng chọn nhóm cho tài liệu', 'error', 3500);
+    return;
+  }
+
+  const files = _pendingUploadFiles.slice();   // copy
+  document.getElementById('upload-modal').classList.add('hidden');
+  _pendingUploadFiles = [];
+
+  const btn = document.getElementById('reindex-docs');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> uploading…';
+
+  // Build multipart form: many "files" + a single "group" field
+  const fd = new FormData();
+  files.forEach(f => fd.append('files', f));
+  fd.append('group', groupValue);
+
+  try {
+    const r = await api('/upload-docs', { method: 'POST', body: fd });
+    if (!r.ok) {
+      const txt = await r.text();
+      throw new Error(`HTTP ${r.status}: ${txt}`);
+    }
+    const data = await r.json();
+    const sn = data.saved_count, sk = data.skipped_count;
+    let msg = `Đã tải lên ${sn} file vào nhóm "${data.group || groupValue}"`;
+    if (sk) msg += ` — ${sk} bị bỏ qua`;
+    toast(msg, 'success', 4500);
+
+    if (sn === 0) {
+      btn.disabled = false;
+      btn.innerHTML = '📥 Update Documents';
+      return;
+    }
+
+    // Ask whether to reindex now
+    const doReindex = confirm(
+      `${sn} file(s) đã lưu vào nhóm "${data.group || groupValue}".\n\n` +
+      `Reindex now? This will:\n` +
+      `  1. Re-parse and chunk every PDF (including the new ones)\n` +
+      `  2. Re-embed chunks and upsert into Qdrant\n` +
+      `  3. Rebuild the BM25 index\n\n` +
+      `Usually takes 5–15 minutes.`
+    );
+    if (!doReindex) {
+      btn.disabled = false;
+      btn.innerHTML = '📥 Update Documents';
+      toast('Files saved. Click Update Documents again to reindex when ready.', 'info', 5000);
+      return;
+    }
+
+    // Trigger reindex
+    btn.innerHTML = '<span class="spinner"></span> starting reindex…';
+    const r2 = await api('/reindex', { method: 'POST' });
+    if (!r2.ok) {
+      const detail = await r2.json().catch(() => ({})).then(d => d.detail || ('HTTP ' + r2.status));
+      throw new Error(detail);
+    }
+    toast('Reindex running in background. You can keep using the chat.', 'info', 4500);
+    _reindexPoll = setInterval(() => pollReindexStatus(btn), 2500);
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '📥 Update Documents';
+    toast('Upload failed: ' + (err.message || err), 'error', 6000);
+  }
+});
+document.querySelectorAll('.doc-table thead th').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (!col) return;
+    if (sortCol === col) sortAsc = !sortAsc;
+    else { sortCol = col; sortAsc = true; }
+    renderDocs();
+  });
+});
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+(async () => {
+  await checkHealth();
+  setInterval(checkHealth, 30000);
+
+  // Preload corpus stats (sidebar badge only)
+  try {
+    const r = await api('/stats');
+    if (r.ok) {
+      const s = await r.json();
+      document.getElementById('sb-doc-count').textContent = s.total_documents || '–';
+    }
+  } catch {}
+})();
+</script>
+</body>
+</html>

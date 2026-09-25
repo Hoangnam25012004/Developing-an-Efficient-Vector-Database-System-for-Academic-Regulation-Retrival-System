@@ -1,0 +1,37 @@
+{
+  "Luat-quoc-gia": {
+    "label": "Luật quốc gia",
+    "doc_type": "law",
+    "issuing_body": "Quốc hội"
+  },
+  "Thong-tu-quy-che-cap-bo-gddt": {
+    "label": "Thông tư Bộ GD&ĐT",
+    "doc_type": "circular",
+    "issuing_body": "Bộ Giáo dục và Đào tạo"
+  },
+  "Quyet-dinh-quy-che-cap-dhqg-hcm": {
+    "label": "Quyết định ĐHQG-HCM",
+    "doc_type": "university_decision",
+    "issuing_body": "ĐHQG-HCM"
+  },
+  "Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt": {
+    "label": "Quy chế trường ĐHQT",
+    "doc_type": "school_decision_full",
+    "issuing_body": "Trường Đại học Quốc tế"
+  },
+  "Quyet-dinh-ngan-noi-quy-cua-truong-dhqt": {
+    "label": "Nội quy / quyết định ngắn ĐHQT",
+    "doc_type": "school_decision_brief",
+    "issuing_body": "Trường Đại học Quốc tế"
+  },
+  "Phu-luc": {
+    "label": "Phụ lục",
+    "doc_type": "appendix",
+    "issuing_body": ""
+  },
+  "Thong-bao": {
+    "label": "Thông báo",
+    "doc_type": "announcement",
+    "issuing_body": "Phòng Công tác sinh viên"
+  }
+}

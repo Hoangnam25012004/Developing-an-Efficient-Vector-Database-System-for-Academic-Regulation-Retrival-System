@@ -1,0 +1,8 @@
+{
+  "model": "bkai-foundation-models/vietnamese-bi-encoder",
+  "device": "cpu",
+  "dim": 768,
+  "n_chunks": 4224,
+  "n_queries": 100,
+  "corpus_encode_seconds": 715.91
+}

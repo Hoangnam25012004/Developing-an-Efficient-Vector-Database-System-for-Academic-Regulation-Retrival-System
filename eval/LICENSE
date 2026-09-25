@@ -1,0 +1,16 @@
+The graded test collection in this directory is licensed under the Creative
+Commons Attribution 4.0 International License (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+
+It covers the query sets and relevance judgments (test_queries_gt_v2.jsonl,
+judgments.jsonl, pool.jsonl, and the older *_v1, *_strict and *_stale_v1 files
+kept for reference), the annotation protocol (ANNOTATION.md) and the cached
+query embeddings in cache/.
+
+If you use them, please cite:
+  Dang Hoang Nam, "Developing an Efficient Vector Database System for
+  Academic Regulation Retrieval System", KSE 2026.
+
+The Python scripts in this directory are part of the software and are licensed
+under the MIT License (../LICENSE). The regulation text quoted in these files
+comes from the documents in ../data/, which belong to their issuing bodies.
