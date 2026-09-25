@@ -373,6 +373,41 @@ canvas.gauge{display:block}
 .modal-foot .btn-primary:hover:not(:disabled){background:var(--blue-light)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
+/* UPLOAD v2 — steps, per-file report, statuses */
+.modal.wide{max-width:900px;max-height:88vh}
+.up-steps{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:12px;color:var(--text-3)}
+.up-step{padding:2px 8px;border-radius:99px}
+.up-step.active{background:rgba(37,99,235,.1);color:var(--blue);font-weight:600}
+.up-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:150px}
+.up-field label{font-size:11.5px;font-weight:600;color:var(--text-2)}
+.up-field input,.up-field select,.up-row select,.up-meta input{width:100%;padding:7px 9px;border-radius:var(--r-sm);border:1px solid var(--border-2);font-family:inherit;font-size:12.5px;background:var(--surface);color:var(--text)}
+.up-newgroup{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.up-progress{height:8px;background:var(--bg);border-radius:99px;overflow:hidden;margin:4px 0 6px}
+.up-progress .bar{height:100%;width:0;background:var(--blue);transition:width .2s}
+.up-progress-lbl{font-size:12px;color:var(--text-2);margin-bottom:10px}
+.up-row{border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px}
+.up-row.rejected{background:#FEF2F2;border-color:#FECACA}
+.up-row.warn{background:#FFFBEB;border-color:#FDE68A}
+.up-row-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.up-row-head .ic{font-size:15px;width:18px;text-align:center}
+.up-row-head .nm{font-weight:600;font-size:13px;flex:1;min-width:180px;word-break:break-all}
+.up-row-head .meta{font-size:11.5px;color:var(--text-3);font-family:'JetBrains Mono',monospace}
+.up-row-head select{width:auto;min-width:120px}
+.up-msg{font-size:12px;margin-top:6px;color:var(--text-2);line-height:1.5}
+.up-msg.err{color:var(--red)}
+.up-msg.warn{color:#92400E}
+.up-meta-toggle{font-size:12px;color:var(--blue);cursor:pointer;margin-top:6px;display:inline-block;user-select:none}
+.up-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.st-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
+.st-badge.indexed{background:rgba(22,163,74,.1);color:var(--green)}
+.st-badge.queued,.st-badge.processing,.st-badge.removing{background:rgba(37,99,235,.1);color:var(--blue)}
+.st-badge.failed{background:rgba(220,38,38,.1);color:var(--red)}
+.st-badge.empty{background:rgba(217,119,6,.12);color:var(--amber)}
+.st-badge.not_indexed,.st-badge.orphan{background:rgba(100,116,139,.12);color:#475569}
+.doc-act-btn{background:none;border:none;cursor:pointer;font-size:14px;opacity:.6;padding:2px 5px;border-radius:6px;transition:all var(--ease)}
+.doc-act-btn:hover{opacity:1;background:rgba(37,99,235,.1)}
+@media (max-width:640px){.up-meta{grid-template-columns:1fr}}
+
 /* TOAST */
 .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--r-sm);font-size:13px;box-shadow:var(--shadow-lg);animation:slideIn .25s ease-out;max-width:360px}
@@ -529,7 +564,8 @@ canvas.gauge{display:block}
     <div class="topbar">
       <div class="topbar-title"><span class="icon">📁</span> Documents</div>
       <div class="topbar-actions">
-        <button class="btn btn-primary" id="reindex-docs" title="Upload PDF/DOCX files from your computer">📥 Update Documents</button>
+        <button class="btn btn-primary" id="reindex-docs" title="Tải tài liệu PDF/DOCX lên và index">📥 Update Documents</button>
+        <button class="btn btn-ghost" id="sync-index" title="Parse lại toàn bộ tài liệu và đồng bộ chỉ mục (Chat vẫn hoạt động)">⟳ Đồng bộ chỉ mục</button>
         <button class="btn btn-ghost" id="refresh-docs" title="Reload list">↻ Refresh</button>
         <input type="text" id="doc-search" placeholder="🔍  Search file name…"
           style="border:1.5px solid var(--border);border-radius:var(--r-sm);padding:6px 12px;font-family:inherit;font-size:13px;outline:none;width:210px" />
@@ -569,13 +605,15 @@ canvas.gauge{display:block}
               <th data-col="doc_number">Doc. number <span class="sort-icon">↕</span></th>
               <th data-col="issuing_body">Issuing body <span class="sort-icon">↕</span></th>
               <th data-col="doc_group">Group <span class="sort-icon">↕</span></th>
+              <th data-col="language">Ngôn ngữ <span class="sort-icon">↕</span></th>
+              <th data-col="status">Trạng thái <span class="sort-icon">↕</span></th>
               <th data-col="chunk_count" style="text-align:right">Chunks <span class="sort-icon">↕</span></th>
               <th data-col="max_page" style="text-align:right">Pages <span class="sort-icon">↕</span></th>
               <th style="text-align:center">Hành động</th>
             </tr>
           </thead>
           <tbody id="doc-tbody">
-            <tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3)">Loading…</td></tr>
+            <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3)">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -585,44 +623,75 @@ canvas.gauge{display:block}
 
 </div><!-- /main -->
 
-<!-- Upload modal: drag & drop files from local computer (no OS file picker) -->
+<!-- Upload modal: drag & drop files from local computer (no OS file picker).
+     Step 1 picks files + group, step 2 shows the server's check of every file
+     and lets the user decide conflicts/language before anything is stored. -->
 <div id="upload-modal" class="modal-overlay hidden">
-  <div class="modal">
+  <div class="modal wide">
     <div class="modal-head">
       <span class="icon">📄</span>
       <h3>Tải tài liệu lên hệ thống</h3>
+      <div class="up-steps">
+        <span class="up-step active" data-step="1">① Chọn file</span>›
+        <span class="up-step" data-step="2">② Kiểm tra</span>›
+        <span class="up-step" data-step="3">③ Xử lý</span>
+      </div>
     </div>
     <div class="modal-body">
-      <!-- Drag & drop zone: drops files into the list without opening OS file picker -->
-      <div class="dropzone" id="upload-dropzone">
-        <div class="dropzone-icon">📁</div>
-        <div class="dropzone-text">Kéo thả file PDF/DOCX vào đây</div>
-        <div class="dropzone-sub">Chỉ chấp nhận file từ máy tính của bạn</div>
-      </div>
-
-      <div class="upload-group-row" style="margin-top:14px">
-        <label for="upload-group-select" style="display:block;font-weight:600;margin-bottom:6px">
-          Nhóm (group) cho các file này
-        </label>
-        <select id="upload-group-select" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#ccc)"></select>
-        <div id="upload-newgroup-wrap" style="display:none;margin-top:8px">
-          <input id="upload-newgroup-name" type="text" placeholder="Tên nhóm mới (vd: Học bổng ngoài trường)"
-                 style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#ccc)" />
+      <div id="up-step1">
+        <!-- Drag & drop zone: drops files into the list without opening OS file picker -->
+        <div class="dropzone" id="upload-dropzone">
+          <div class="dropzone-icon">📁</div>
+          <div class="dropzone-text">Kéo thả file PDF/DOCX vào đây</div>
+          <div class="dropzone-sub">Chỉ chấp nhận file từ máy tính của bạn · tối đa <span id="up-limit-files">20</span> file, mỗi file ≤ <span id="up-limit-mb">50</span> MB</div>
         </div>
+
+        <div class="upload-group-row" style="margin-top:14px">
+          <label for="upload-group-select" style="display:block;font-weight:600;margin-bottom:6px">
+            Nhóm (group) cho các file này
+          </label>
+          <select id="upload-group-select" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#ccc)"></select>
+          <div id="upload-newgroup-wrap" style="display:none">
+            <div class="up-newgroup">
+              <div class="up-field"><label for="upload-newgroup-name">Tên nhóm mới *</label>
+                <input id="upload-newgroup-name" type="text" placeholder="vd: Chính sách nhân sự" /></div>
+              <div class="up-field"><label for="upload-newgroup-type">Loại tài liệu</label>
+                <input id="upload-newgroup-type" type="text" list="up-doctype-list" placeholder="vd: Chính sách" /></div>
+              <div class="up-field"><label for="upload-newgroup-body">Đơn vị ban hành / tác giả</label>
+                <input id="upload-newgroup-body" type="text" placeholder="vd: Phòng Nhân sự" /></div>
+              <div class="up-field" style="max-width:150px"><label for="upload-newgroup-lang">Ngôn ngữ mặc định</label>
+                <select id="upload-newgroup-lang"><option value="vi">Tiếng Việt</option><option value="en">English</option></select></div>
+            </div>
+          </div>
+          <datalist id="up-doctype-list">
+            <option value="Luật"></option><option value="Thông tư"></option><option value="Quyết định"></option>
+            <option value="Quy chế"></option><option value="Thông báo"></option><option value="Hướng dẫn"></option>
+            <option value="Chính sách"></option><option value="Hợp đồng"></option><option value="Báo cáo"></option>
+            <option value="Tài liệu kỹ thuật"></option><option value="Khác"></option>
+          </datalist>
+        </div>
+
+        <div class="hint" style="margin-top:14px">
+          Chọn <strong>nhóm có sẵn</strong> hoặc <strong>tạo nhóm mới</strong> để phân loại tài liệu.
+          Hệ thống dùng nhóm này làm <em>doc_group / loại văn bản / cơ quan ban hành</em> —
+          không đoán từ nội dung. Bấm <strong>Kiểm tra</strong> để hệ thống đọc thử từng file
+          trước khi đưa vào kho.
+        </div>
+
+        <div class="dropzone-list-title" id="upload-list-title" style="display:none">File đã chọn</div>
+        <div id="upload-file-list"></div>
       </div>
 
-      <div class="hint">
-        Chọn <strong>nhóm có sẵn</strong> hoặc <strong>tạo nhóm mới</strong> để phân loại tài liệu.
-        Hệ thống dùng nhóm này làm <em>doc_group / loại văn bản / cơ quan ban hành</em> —
-        không đoán từ nội dung. Số hiệu văn bản được tự trích từ nội dung nếu có.
+      <div id="up-step2" class="hidden">
+        <div class="up-progress"><div class="bar" id="up-progress-bar"></div></div>
+        <div class="up-progress-lbl" id="up-progress-lbl"></div>
+        <div id="up-report"></div>
       </div>
-
-      <div class="dropzone-list-title" id="upload-list-title" style="display:none">File đã chọn</div>
-      <div id="upload-file-list"></div>
     </div>
     <div class="modal-foot">
       <button class="btn-cancel" id="upload-cancel">Hủy</button>
-      <button class="btn-primary" id="upload-confirm" disabled>Tải lên</button>
+      <button class="btn-cancel hidden" id="upload-back">← Quay lại</button>
+      <button class="btn-primary" id="upload-confirm" disabled>Kiểm tra</button>
     </div>
   </div>
 </div>
@@ -700,6 +769,43 @@ function typeLabel(t) {
 function groupLabel(g) {
   if (g === null || g === undefined || g === '') return '';
   return groupLabelMap[g] || DOC_GROUP_LABELS[g] || String(g);
+}
+
+// Structure labels for documents uploaded through ingestion (they carry
+// level_labels). Mirrors _LEVEL_NAMES in src/chat/rag_chain.py; documents
+// without level_labels, or with Vietnamese legal structure, keep "Điều N".
+const LEGAL_VN_PATTERNS = new Set(['CHUONG_VN', 'DIEU_VN', 'KHOAN_VN']);
+const LEVEL_NAMES = {
+  chapter: { CHUONG_VN: ['Chương {v}', 'Chương {v}'], CHAPTER_EN: ['Chapter {v}', 'Chapter {v}'],
+             PHAN_VN: ['Phần {v}', 'Phần {v}'], PART_EN: ['Part {v}', 'Part {v}'],
+             ROMAN_TITLE: ['Phần {v}', 'Part {v}'], NAMED_VN: ['{v}', '{v}'], NAMED_EN: ['{v}', '{v}'],
+             HEADING_1: ['Phần {v}', 'Part {v}'] },
+  article: { DIEU_VN: ['Điều {v}', 'Article {v}'], ARTICLE_EN: ['Article {v}', 'Article {v}'],
+             SECTION_EN: ['Section {v}', 'Section {v}'], PARAGRAPH_SIGN: ['§{v}', '§{v}'],
+             MUC_VN: ['Mục {v}', 'Section {v}'], HEADING_2: ['Mục {v}', 'Section {v}'] },
+  khoan:   { KHOAN_VN: ['Khoản {v}', 'Clause {v}'], NUM_DOT: ['mục {v}', 'item {v}'],
+             NUM_DOT_NUM: ['mục {v}', 'item {v}'], PAREN_DIGIT: ['mục ({v})', 'item ({v})'],
+             LETTER_LIST: ['điểm {v}', 'point {v}'], ROMAN_LOWER: ['mục {v}', 'item {v}'],
+             THEOREM_STYLE: ['{v}', '{v}'], CAU_BAI: ['{v}', '{v}'], HEADING_3: ['mục {v}', 'item {v}'] },
+};
+function usesGenericLabels(s) {
+  const ll = s && s.level_labels;
+  if (!ll || typeof ll !== 'object') return false;
+  const vals = Object.values(ll).filter(Boolean);
+  return vals.length > 0 && !vals.some(v => LEGAL_VN_PATTERNS.has(v));
+}
+function levelName(s, level, value) {
+  const pattern = (s.level_labels || {})[level] || '';
+  const names = LEVEL_NAMES[level][pattern];
+  if (!names) return String(value);
+  const t = (s.language === 'en') ? names[1] : names[0];
+  return t.replace('{v}', value);
+}
+// PDFs open in the browser at the cited page; other formats download.
+function docUrl(name, page) {
+  const n = String(name || '');
+  if (/\.pdf$/i.test(n)) return `${API_BASE}/pdf/${encodeURIComponent(n)}` + (page ? `#page=${page}` : '');
+  return `${API_BASE}/documents/${encodeURIComponent(n)}/file`;
 }
 
 function highlightQuery(text, query) {
@@ -842,11 +948,12 @@ function renderMarkdown(md) {
   return escapeHtml(md).replace(/\n/g, '<br>');
 }
 
-// Quét toàn bộ bubble, biến mọi "filename.pdf — trang N" thành link mở PDF.
+// Quét toàn bộ bubble, biến mọi "filename.pdf — trang N" thành link mở PDF
+// (và "filename.docx — trang N" thành link tải file gốc).
 // Hỗ trợ tiền tố "[^N]:", các loại dash (— – -), và "trang"/"tr.".
 function linkifyFootnotePdfs(rootEl) {
   if (!rootEl) return;
-  const PDF_RE = /(\[\^?\d+\]:\s*)?(\S+\.pdf)\s*[—–\-]\s*(?:trang|tr\.?)\s*(\d+)/gi;
+  const PDF_RE = /(\[\^?\d+\]:\s*)?(\S+\.(?:pdf|docx))\s*[—–\-]\s*(?:trang|tr\.?)\s*(\d+)/gi;
   const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
     acceptNode: (n) => {
       if (n.parentNode && n.parentNode.closest('a')) return NodeFilter.FILTER_REJECT;
@@ -871,11 +978,11 @@ function linkifyFootnotePdfs(rootEl) {
       const filename = m[2];
       const page = m[3];
       const a = document.createElement('a');
-      a.href = `${API_BASE}/pdf/${encodeURIComponent(filename)}#page=${page}`;
+      a.href = docUrl(filename, page);
       a.target = '_blank';
       a.rel = 'noopener';
       a.className = 'pdf-link';
-      a.title = `Mở ${filename} (trang ${page})`;
+      a.title = /\.pdf$/i.test(filename) ? `Mở ${filename} (trang ${page})` : `Tải ${filename} (trang ${page})`;
       a.textContent = `${prefix}${filename} — trang ${page}`;
       frag.appendChild(a);
       lastIdx = m.index + m[0].length;
@@ -949,10 +1056,13 @@ function renderSourcesPanel(sources) {
     const tags = [];
     if (s.doc_group !== null && s.doc_group !== undefined && s.doc_group !== '') tags.push(escapeHtml(groupLabel(s.doc_group)));
     if (s.doc_type) tags.push(escapeHtml(typeLabel(s.doc_type)));
-    if (s.article) tags.push(`Điều ${escapeHtml(s.article)}`);
+    if (usesGenericLabels(s)) {
+      if (s.article) tags.push(escapeHtml(levelName(s, 'article', s.article)));
+      else if (s.chapter) tags.push(escapeHtml(levelName(s, 'chapter', s.chapter)));
+    } else if (s.article) tags.push(`Điều ${escapeHtml(s.article)}`);
     else if (s.chapter) tags.push(`Chương ${escapeHtml(s.chapter)}`);
     return `
-      <div class="sp-card" onclick="window.open('${API_BASE}/pdf/${encodeURIComponent(s.source || '')}', '_blank')">
+      <div class="sp-card" onclick="window.open('${/\.pdf$/i.test(s.source || '') || !s.source ? `${API_BASE}/pdf/${encodeURIComponent(s.source || '')}` : docUrl(s.source)}', '_blank')">
         <div class="sp-card-header">
           <div class="sp-card-file">${i+1}. ${escapeHtml(s.source || 'N/A')} · tr.${s.page || '?'}</div>
           <div class="sp-score">${fmtScore(score)}</div>
@@ -1009,26 +1119,61 @@ async function sendChat() {
 //  DOCUMENTS
 // ═══════════════════════════════════════════════════
 let allDocs = [];
+let docSummary = null;
 let currentGroup = 'all';
 let docFilter = '';
 let sortCol = null, sortAsc = true;
+let _docsPoll = null;
+const UPLOAD_BTN_LABEL = '📥 Update Documents';
+const SYNC_BTN_LABEL = '⟳ Đồng bộ chỉ mục';
 
-async function loadDocuments() {
+// Document status, as reconciled by GET /documents (file ↔ sidecar ↔ index ↔ jobs).
+const STATUS_LABELS = {
+  indexed: '✅ Đã index', queued: '⏳ Đang chờ', processing: '⚙ Đang xử lý', removing: '🗑 Đang xoá',
+  failed: '❌ Lỗi', empty: '⚠ Rỗng', not_indexed: '○ Chưa index', orphan: '◌ Còn trong chỉ mục',
+};
+const STEP_LABELS = { parse: 'Parse', embed: 'Embed', bm25: 'Index', cleanup: 'Hoàn tất',
+                      qdrant: 'Xoá vector', chunks: 'Xoá chunk', queued: 'Chờ' };
+function statusBadge(d) {
+  const s = d.status || 'not_indexed';
+  const det = d.status_detail || {};
+  let label = STATUS_LABELS[s] || s;
+  if (s === 'processing' && det.step) label += ` · ${STEP_LABELS[det.step] || det.step}`;
+  let tip = det.message || '';
+  if (!tip && s === 'orphan') tip = 'File không còn nhưng dữ liệu vẫn nằm trong chỉ mục — bấm 🗑 để dọn.';
+  if (!tip && s === 'empty') tip = 'Không trích được nội dung từ tài liệu.';
+  return `<span class="st-badge ${escapeHtml(s)}" title="${escapeHtml(tip)}">${escapeHtml(label)}</span>`;
+}
+function langLabel(l) { return l === 'en' ? 'EN' : (l === 'vi' ? 'VI' : '—'); }
+function isBusy(d) { return ['queued', 'processing', 'removing'].includes(d.status); }
+function errDetail(d) {
+  if (!d) return '';
+  if (typeof d.detail === 'string') return d.detail;
+  return (d.detail && (d.detail.message || d.detail.code)) || '';
+}
+
+async function loadDocuments(silent = false) {
   const tbody = document.getElementById('doc-tbody');
-  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3)"><span class="spinner dark"></span> Loading documents…</td></tr>';
+  if (!silent) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3)"><span class="spinner dark"></span> Loading documents…</td></tr>';
+  }
   try {
     await loadGroups();   // populate group label map before rendering pills/tabs
-    const [sRes, stRes] = await Promise.all([api('/sources'), api('/stats')]);
-    if (!sRes.ok || !stRes.ok) throw new Error('HTTP error');
-    const sData = await sRes.json();
+    const [dRes, stRes] = await Promise.all([api('/documents'), api('/stats')]);
+    if (!dRes.ok || !stRes.ok) throw new Error('HTTP error');
+    const dData = await dRes.json();
     const stData = await stRes.json();
 
-    allDocs = sData.documents || [];
-    document.getElementById('stat-docs').textContent = stData.total_documents ?? allDocs.length;
+    // doc_group keeps the name the table and tabs always used.
+    allDocs = (dData.documents || []).map(d => ({ ...d, doc_group: d.group }));
+    docSummary = dData.summary || {};
+    const s = docSummary;
+    document.getElementById('stat-docs').textContent = s.total ?? allDocs.length;
     document.getElementById('stat-chunks').textContent = (stData.total_chunks ?? 0).toLocaleString('vi-VN');
-    document.getElementById('stat-groups').textContent = Object.keys(stData.groups || {}).length;
-    document.getElementById('stat-indexed').textContent = '100%';
-    document.getElementById('sb-doc-count').textContent = allDocs.length;
+    document.getElementById('stat-groups').textContent =
+      new Set(allDocs.filter(d => d.status !== 'orphan').map(d => d.doc_group || 'Khác')).size;
+    document.getElementById('stat-indexed').textContent = s.total ? `${s.indexed}/${s.total}` : '0';
+    document.getElementById('sb-doc-count').textContent = s.total ?? allDocs.length;
 
     const tabs = document.getElementById('doc-tabs');
     const groupCounts = {};
@@ -1036,12 +1181,13 @@ async function loadDocuments() {
       const key = (d.doc_group === null || d.doc_group === undefined || d.doc_group === '') ? 'Khác' : d.doc_group;
       groupCounts[key] = (groupCounts[key] || 0) + 1;
     });
-    tabs.innerHTML = `<div class="doc-tab active" data-group="all">Tất cả <span class="cnt">${allDocs.length}</span></div>` +
+    if (currentGroup !== 'all' && !groupCounts[currentGroup]) currentGroup = 'all';
+    tabs.innerHTML = `<div class="doc-tab${currentGroup === 'all' ? ' active' : ''}" data-group="all">Tất cả <span class="cnt">${allDocs.length}</span></div>` +
       Object.entries(groupCounts).sort((a,b) => b[1]-a[1]).map(([g, c]) => {
         // 'Khác' (ungrouped/empty) is not a real folder → not deletable.
         const delBtn = (g !== 'Khác')
           ? `<span class="grp-del" title="Xóa nhóm" data-del-group="${escapeHtml(g)}">✕</span>` : '';
-        return `<div class="doc-tab" data-group="${escapeHtml(g)}">${escapeHtml(groupLabel(g) || g)} <span class="cnt">${c}</span>${delBtn}</div>`;
+        return `<div class="doc-tab${String(currentGroup) === String(g) ? ' active' : ''}" data-group="${escapeHtml(g)}">${escapeHtml(groupLabel(g) || g)} <span class="cnt">${c}</span>${delBtn}</div>`;
       }).join('');
     tabs.querySelectorAll('.doc-tab').forEach(t => {
       t.onclick = (e) => {
@@ -1061,8 +1207,15 @@ async function loadDocuments() {
     });
 
     renderDocs();
+
+    // Keep the list live while documents are queued, indexing or being removed.
+    const busy = allDocs.some(isBusy);
+    if (busy && !_docsPoll) _docsPoll = setInterval(() => loadDocuments(true), 3000);
+    if (!busy && _docsPoll) { clearInterval(_docsPoll); _docsPoll = null; }
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--red)">Error: ${escapeHtml(e.message || String(e))}</td></tr>`;
+    if (!silent) {
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--red)">Error: ${escapeHtml(e.message || String(e))}</td></tr>`;
+    }
   }
 }
 
@@ -1074,7 +1227,9 @@ function renderDocs() {
     const matchFilter = !q ||
       (d.source || '').toLowerCase().includes(q) ||
       (d.doc_number || '').toLowerCase().includes(q) ||
-      (d.issuing_body || '').toLowerCase().includes(q);
+      (d.issuing_body || '').toLowerCase().includes(q) ||
+      (d.title || '').toLowerCase().includes(q) ||
+      (d.original_filename || '').toLowerCase().includes(q);
     return matchGroup && matchFilter;
   });
   if (sortCol) {
@@ -1086,24 +1241,36 @@ function renderDocs() {
   }
   const tbody = document.getElementById('doc-tbody');
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3)">No matching documents</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3)">No matching documents</td></tr>';
     return;
   }
   tbody.innerHTML = rows.map(d => {
     const cls = typeSlug(d.doc_type);
+    const icon = d.file_type === 'docx' ? '📝' : '📄';
+    const jsName = escapeHtml((d.source || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+    const openable = d.status !== 'orphan';
+    const rowClick = openable ? `onclick="window.open('${docUrl(d.source)}', '_blank')"` : '';
+    const sub = d.title || (d.original_filename && d.original_filename !== d.source ? d.original_filename : '');
+    const retry = ['failed', 'empty', 'not_indexed'].includes(d.status)
+      ? `<button class="doc-act-btn" title="Index lại tài liệu này"
+                 onclick="event.stopPropagation(); window.retryDoc('${jsName}')">↻</button>` : '';
+    const delTitle = d.status === 'orphan' ? 'Dọn khỏi chỉ mục' : 'Xóa tài liệu';
+    const del = d.status === 'removing' ? '' :
+      `<button class="doc-del-btn" title="${delTitle}"
+               onclick="event.stopPropagation(); window.deleteDoc('${jsName}')">🗑</button>`;
+    const lang = d.language || (d.status === 'orphan' ? '' : 'vi');
     return `
-      <tr onclick="window.open('${API_BASE}/pdf/${encodeURIComponent(d.source || '')}', '_blank')">
-        <td style="font-weight:500">📄 ${escapeHtml(d.source || '')}</td>
+      <tr ${rowClick}>
+        <td style="font-weight:500">${icon} ${escapeHtml(d.source || '')}${sub ? `<div class="text-muted text-sm" style="font-weight:400">${escapeHtml(sub)}</div>` : ''}</td>
         <td>${d.doc_type ? `<span class="doc-type-badge ${cls}">${escapeHtml(typeLabel(d.doc_type))}</span>` : '<span class="text-muted">—</span>'}</td>
         <td class="muted">${escapeHtml(d.doc_number || '—')}</td>
         <td class="muted">${escapeHtml(d.issuing_body || '—')}</td>
         <td>${(d.doc_group !== null && d.doc_group !== undefined && d.doc_group !== '') ? `<span class="pill teal">${escapeHtml(groupLabel(d.doc_group))}</span>` : '—'}</td>
+        <td class="muted">${langLabel(lang)}</td>
+        <td>${statusBadge(d)}</td>
         <td style="text-align:right;font-weight:600">${d.chunk_count || 0}</td>
         <td style="text-align:right" class="muted">${d.max_page || 0}</td>
-        <td style="text-align:center">
-          <button class="doc-del-btn" title="Xóa tài liệu"
-                  onclick="event.stopPropagation(); window.deleteDoc('${escapeHtml((d.source||'').replace(/'/g,"\\'"))}')">🗑</button>
-        </td>
+        <td style="text-align:center;white-space:nowrap">${retry}${del}</td>
       </tr>
     `;
   }).join('');
@@ -1112,43 +1279,67 @@ function renderDocs() {
 document.getElementById('doc-search').addEventListener('input', e => { docFilter = e.target.value; renderDocs(); });
 document.getElementById('refresh-docs').addEventListener('click', () => { loadDocuments(); toast('Refreshing…', 'info'); });
 
-// ─── Delete document / group (filesystem change → offer reindex) ───────────
-async function offerReindex(actionMsg) {
-  const doIt = confirm(`${actionMsg}\n\nChạy reindex ngay để cập nhật hệ thống tìm kiếm? (5–15 phút)`);
-  if (!doIt) {
-    toast('Đã thay đổi file. Bấm "Update Documents" để reindex khi sẵn sàng.', 'info', 5000);
-    return;
-  }
+// ─── Indexing jobs: follow one job to its end ─────────────────────────────
+const _trackedJobs = new Set();
+function trackJob(jobId, what = 'index') {
+  if (!jobId || _trackedJobs.has(jobId)) return;
+  _trackedJobs.add(jobId);
   const btn = document.getElementById('reindex-docs');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> starting reindex…';
-  try {
-    const r = await api('/reindex', { method: 'POST' });
-    if (!r.ok) {
-      const d = await r.json().catch(() => ({}));
-      throw new Error(d.detail || ('HTTP ' + r.status));
+  const timer = setInterval(async () => {
+    try {
+      const r = await api('/jobs/' + encodeURIComponent(jobId));
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const job = await r.json();
+      const p = job.progress || {};
+      if (job.status === 'queued' || job.status === 'running') {
+        if (what === 'index' && job.status === 'running' && p.total) {
+          btn.innerHTML = `<span class="spinner"></span> ${STEP_LABELS[p.step] || p.step || 'index'} ${Math.min((p.done || 0) + 1, p.total)}/${p.total}…`;
+        } else if (what === 'index') {
+          btn.innerHTML = `<span class="spinner"></span> đang chờ index…`;
+        }
+        return;
+      }
+      clearInterval(timer);
+      _trackedJobs.delete(jobId);
+      if (what === 'index' && ![..._trackedJobs].length) btn.innerHTML = UPLOAD_BTN_LABEL;
+      const results = Object.values(job.results || {});
+      const ok = results.filter(x => x.status === 'indexed' || x.status === 'removed').length;
+      const bad = results.filter(x => x.status === 'failed' || x.status === 'empty');
+      if (job.status === 'succeeded') {
+        toast(what === 'remove' ? 'Đã cập nhật chỉ mục sau khi xoá.' : `Đã index xong ${ok} tài liệu — có thể hỏi ngay trong Chat.`, 'success', 5000);
+      } else {
+        const first = bad[0] || {};
+        const msg = (job.error && job.error.message) || first.message || 'Không rõ lỗi';
+        toast(`Index xong ${ok}/${results.length} tài liệu. Lỗi: ${msg}`, 'error', 8000);
+      }
+      loadDocuments(true);
+    } catch (e) {
+      clearInterval(timer);
+      _trackedJobs.delete(jobId);
+      if (what === 'index' && ![..._trackedJobs].length) btn.innerHTML = UPLOAD_BTN_LABEL;
     }
-    toast('Reindex running in background.', 'info', 4500);
-    _reindexPoll = setInterval(() => pollReindexStatus(btn), 2500);
-  } catch (e) {
-    btn.disabled = false;
-    btn.innerHTML = '📥 Update Documents';
-    toast('Reindex failed: ' + (e.message || e), 'error', 6000);
-  }
+  }, 2000);
 }
 
+// ─── Delete / retry (index follows automatically) ─────────────────────────
 window.deleteDoc = async function (name) {
   if (!name) return;
-  if (!confirm(`Xóa tài liệu "${name}"?\nFile PDF sẽ bị xóa khỏi hệ thống.`)) return;
+  const d = allDocs.find(x => x.source === name);
+  const orphan = d && d.status === 'orphan';
+  const msg = orphan
+    ? `Dọn dữ liệu chỉ mục còn sót của "${name}"?`
+    : `Xóa tài liệu "${name}"?\nFile và toàn bộ dữ liệu chỉ mục của tài liệu này sẽ bị xoá.`;
+  if (!confirm(msg)) return;
   try {
     const r = await api('/documents/' + encodeURIComponent(name), { method: 'DELETE' });
     if (!r.ok) {
-      const d = await r.json().catch(() => ({}));
-      throw new Error(d.detail || ('HTTP ' + r.status));
+      const body = await r.json().catch(() => ({}));
+      throw new Error(errDetail(body) || ('HTTP ' + r.status));
     }
-    toast(`Đã xóa "${name}"`, 'success', 3500);
-    await loadDocuments();
-    offerReindex(`Đã xóa tài liệu "${name}".`);
+    const data = await r.json();
+    toast(orphan ? `Đang dọn "${name}" khỏi chỉ mục…` : `Đã xóa "${name}" — đang cập nhật chỉ mục…`, 'success', 3500);
+    trackJob(data.job_id, 'remove');
+    await loadDocuments(true);
   } catch (e) {
     toast('Xóa thất bại: ' + (e.message || e), 'error', 5000);
   }
@@ -1156,51 +1347,101 @@ window.deleteDoc = async function (name) {
 
 window.deleteGroup = async function (id, label) {
   if (!id) return;
-  if (!confirm(`Xóa nhóm "${label}" và TẤT CẢ file PDF bên trong?\nHành động này không thể hoàn tác.`)) return;
+  if (!confirm(`Xóa nhóm "${label}" và TẤT CẢ tài liệu bên trong?\nFile và dữ liệu chỉ mục sẽ bị xoá. Hành động này không thể hoàn tác.`)) return;
   try {
     const r = await api('/groups/' + encodeURIComponent(id), { method: 'DELETE' });
     if (!r.ok) {
-      const d = await r.json().catch(() => ({}));
-      throw new Error(d.detail || ('HTTP ' + r.status));
+      const body = await r.json().catch(() => ({}));
+      throw new Error(errDetail(body) || ('HTTP ' + r.status));
     }
     const d = await r.json();
-    toast(`Đã xóa nhóm "${label}" (${d.removed_files} file)`, 'success', 4000);
+    toast(`Đã xóa nhóm "${label}" (${d.removed_files} file) — đang cập nhật chỉ mục…`, 'success', 4000);
     currentGroup = 'all';
-    await loadDocuments();
-    offerReindex(`Đã xóa nhóm "${label}".`);
+    trackJob(d.job_id, 'remove');
+    await loadDocuments(true);
   } catch (e) {
     toast('Xóa nhóm thất bại: ' + (e.message || e), 'error', 5000);
   }
 };
 
-// ─── Update Documents — file picker → upload → optional reindex ───────────
+window.retryDoc = async function (name) {
+  try {
+    const r = await api('/documents/' + encodeURIComponent(name) + '/retry', { method: 'POST' });
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      throw new Error(errDetail(body) || ('HTTP ' + r.status));
+    }
+    const data = await r.json();
+    toast(`Đã xếp "${name}" vào hàng đợi index.`, 'info', 3500);
+    trackJob(data.job_id, 'index');
+    await loadDocuments(true);
+  } catch (e) {
+    toast('Không thể index lại: ' + (e.message || e), 'error', 5000);
+  }
+};
+
+// ─── Full re-sync of the index (maintenance) ──────────────────────────────
 let _reindexPoll = null;
-function pollReindexStatus(btn) {
+function pollReindexStatus(btn, label = SYNC_BTN_LABEL) {
   api('/reindex/status').then(r => r.json()).then(s => {
-    btn.innerHTML = `<span class="spinner"></span> ${s.stage || 'running'}…`;
+    const p = s.progress || {};
+    const step = STEP_LABELS[s.stage] || s.stage || 'running';
+    btn.innerHTML = `<span class="spinner dark"></span> ${step}${p.total ? ` ${p.done || 0}/${p.total}` : ''}…`;
     if (!s.running) {
       clearInterval(_reindexPoll); _reindexPoll = null;
       btn.disabled = false;
-      btn.innerHTML = '📥 Update Documents';
+      btn.innerHTML = label;
       if (s.error) {
-        toast('Reindex failed: ' + s.error, 'error', 6000);
+        toast('Đồng bộ thất bại: ' + s.error, 'error', 6000);
       } else {
-        toast('Reindex complete. Documents reloaded.', 'success', 4500);
-        loadDocuments();
+        toast('Đồng bộ chỉ mục hoàn tất.', 'success', 4500);
       }
+      loadDocuments(true);
     }
   }).catch(e => {
     clearInterval(_reindexPoll); _reindexPoll = null;
     btn.disabled = false;
-    btn.innerHTML = '📥 Update Documents';
+    btn.innerHTML = label;
     toast('Status check failed: ' + (e.message || e), 'error');
   });
 }
 
-// ─── Upload via Drag & Drop (no OS file picker → no "Upload from mobile" button) ───
+document.getElementById('sync-index').addEventListener('click', async () => {
+  const ok = confirm(
+    'Đồng bộ lại toàn bộ chỉ mục?\n\n' +
+    'Hệ thống parse lại mọi tài liệu và cập nhật chỉ mục tại chỗ — Chat vẫn hoạt động trong lúc chạy.\n' +
+    'Lần đầu có thể mất 10–15 phút vì phải tạo lại vector cho toàn bộ tài liệu.'
+  );
+  if (!ok) return;
+  const btn = document.getElementById('sync-index');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner dark"></span> đang đồng bộ…';
+  try {
+    const r = await api('/reindex', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'sync' }),
+    });
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      throw new Error(errDetail(body) || ('HTTP ' + r.status));
+    }
+    toast('Đang đồng bộ chỉ mục ở chế độ nền. Chat vẫn dùng được.', 'info', 4500);
+    _reindexPoll = setInterval(() => pollReindexStatus(btn), 2500);
+  } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = SYNC_BTN_LABEL;
+    toast('Không thể đồng bộ: ' + (e.message || e), 'error', 6000);
+  }
+});
 
-// Local state: files queued in the modal before sending
+// ─── Upload v2: drag & drop → server check → confirm → background indexing ───
+// (no OS file picker → no "Upload from mobile" button)
+
+// Local state: files queued in the modal before sending, and the server's
+// report for the current check (staging session).
 let _pendingUploadFiles = [];
+let _uploadSession = null;
+let _uploadStep = 1;
+const UPLOAD_LIMITS = { maxFiles: 20, maxFileMb: 50 };
 
 const ALLOWED_EXT = ['.pdf', '.docx'];
 function _hasAllowedExt(name) {
@@ -1223,17 +1464,17 @@ function renderUploadList() {
 
   if (!_pendingUploadFiles.length) {
     title.style.display = 'none';
-    confirmBtn.disabled = true;
+    if (_uploadStep === 1) confirmBtn.disabled = true;
     return;
   }
   title.style.display = '';
-  confirmBtn.disabled = false;
+  if (_uploadStep === 1) confirmBtn.disabled = false;
 
   _pendingUploadFiles.forEach((f, idx) => {
     const row = document.createElement('div');
     row.className = 'modal-file';
     row.innerHTML = `
-      <span class="fname" title="${escapeHtml(f.name)}">📄 ${escapeHtml(f.name)}</span>
+      <span class="fname" title="${escapeHtml(f.name)}">${/\.docx$/i.test(f.name) ? '📝' : '📄'} ${escapeHtml(f.name)}</span>
       <span class="fsize">${_humanSize(f.size)}</span>
       <button class="fremove" data-idx="${idx}" title="Bỏ file này">✕</button>
     `;
@@ -1255,9 +1496,14 @@ function addFilesToQueue(fileList) {
   const incoming = Array.from(fileList || []);
   const accepted = [];
   const rejected = [];
+  const tooBig = [];
   for (const f of incoming) {
     if (!_hasAllowedExt(f.name)) {
       rejected.push(f.name);
+      continue;
+    }
+    if (f.size > UPLOAD_LIMITS.maxFileMb * 1024 * 1024) {
+      tooBig.push(f.name);
       continue;
     }
     // Dedup: skip if same name+size already in queue
@@ -1265,9 +1511,17 @@ function addFilesToQueue(fileList) {
     if (dup) continue;
     accepted.push(f);
   }
+  const room = UPLOAD_LIMITS.maxFiles - _pendingUploadFiles.length;
+  if (accepted.length > room) {
+    toast(`Mỗi lần tối đa ${UPLOAD_LIMITS.maxFiles} file — ${accepted.length - Math.max(room, 0)} file bị bỏ qua`, 'error', 4000);
+    accepted.splice(Math.max(room, 0));
+  }
   _pendingUploadFiles = _pendingUploadFiles.concat(accepted);
   if (rejected.length) {
     toast(`Bỏ qua ${rejected.length} file không phải PDF/DOCX`, 'error', 4000);
+  }
+  if (tooBig.length) {
+    toast(`Bỏ qua ${tooBig.length} file lớn hơn ${UPLOAD_LIMITS.maxFileMb} MB`, 'error', 4000);
   }
   renderUploadList();
 }
@@ -1292,18 +1546,80 @@ function _toggleNewGroupInput() {
 }
 document.getElementById('upload-group-select').addEventListener('change', _toggleNewGroupInput);
 
+// The chosen group: an existing id, or a new group with its metadata.
+function _selectedGroup() {
+  const sel = document.getElementById('upload-group-select');
+  if (sel.value === NEW_GROUP_SENTINEL) {
+    const label = document.getElementById('upload-newgroup-name').value.trim();
+    if (!label) return { error: 'Vui lòng nhập tên nhóm mới' };
+    return {
+      hint: label,
+      spec: { new: {
+        label,
+        doc_type: document.getElementById('upload-newgroup-type').value.trim(),
+        issuing_body: document.getElementById('upload-newgroup-body').value.trim(),
+        language: document.getElementById('upload-newgroup-lang').value,
+      } },
+    };
+  }
+  if (!sel.value) return { error: 'Vui lòng chọn nhóm cho tài liệu' };
+  return { hint: sel.value, spec: { id: sel.value } };
+}
+
+function setUploadStep(n) {
+  _uploadStep = n;
+  document.querySelectorAll('#upload-modal .up-step').forEach(s => {
+    s.classList.toggle('active', Number(s.dataset.step) === n);
+  });
+  document.getElementById('up-step1').classList.toggle('hidden', n !== 1);
+  document.getElementById('up-step2').classList.toggle('hidden', n !== 2);
+  document.getElementById('upload-back').classList.toggle('hidden', n !== 2);
+  const confirmBtn = document.getElementById('upload-confirm');
+  if (n === 1) {
+    confirmBtn.textContent = 'Kiểm tra';
+    confirmBtn.disabled = !_pendingUploadFiles.length;
+  }
+}
+
+function discardUploadSession() {
+  if (_uploadSession && _uploadSession.upload_id) {
+    api('/uploads/' + encodeURIComponent(_uploadSession.upload_id), { method: 'DELETE' }).catch(() => {});
+  }
+  _uploadSession = null;
+}
+
+function closeUploadModal() {
+  document.getElementById('upload-modal').classList.add('hidden');
+}
+
 // Click "Update Documents" → open empty modal (no OS file picker)
 document.getElementById('reindex-docs').addEventListener('click', () => {
+  discardUploadSession();
   _pendingUploadFiles = [];
+  document.getElementById('up-report').innerHTML = '';
+  document.getElementById('upload-newgroup-name').value = '';
+  document.getElementById('upload-newgroup-type').value = '';
+  document.getElementById('upload-newgroup-body').value = '';
+  document.getElementById('up-limit-files').textContent = UPLOAD_LIMITS.maxFiles;
+  document.getElementById('up-limit-mb').textContent = UPLOAD_LIMITS.maxFileMb;
+  setUploadStep(1);
   renderUploadList();
   populateUploadGroupSelect();
   document.getElementById('upload-modal').classList.remove('hidden');
 });
 
-// Cancel → close modal + clear queue
+// Cancel → close modal + clear queue (and drop the server-side staging)
 document.getElementById('upload-cancel').addEventListener('click', () => {
-  document.getElementById('upload-modal').classList.add('hidden');
+  discardUploadSession();
+  closeUploadModal();
   _pendingUploadFiles = [];
+});
+
+// Back → return to the file list; the check will be redone
+document.getElementById('upload-back').addEventListener('click', () => {
+  discardUploadSession();
+  setUploadStep(1);
+  renderUploadList();
 });
 
 // ─── Drag & Drop on the modal dropzone ───
@@ -1332,85 +1648,197 @@ _dropzone.addEventListener('drop', (e) => {
 document.getElementById('upload-modal').addEventListener('dragover', (e) => e.preventDefault());
 document.getElementById('upload-modal').addEventListener('drop', (e) => e.preventDefault());
 
-// Confirm "Tải lên" → send to backend
-document.getElementById('upload-confirm').addEventListener('click', async () => {
-  if (!_pendingUploadFiles.length) return;
+// XHR rather than fetch: only XHR reports upload progress.
+function _postWithProgress(path, formData, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', API_BASE + path);
+    xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress(e.loaded / e.total); };
+    xhr.onload = () => {
+      let body = null;
+      try { body = JSON.parse(xhr.responseText); } catch {}
+      resolve({ status: xhr.status, body });
+    };
+    xhr.onerror = () => reject(new Error('Không kết nối được máy chủ'));
+    xhr.send(formData);
+  });
+}
 
-  // Resolve the chosen group (existing id, or a new group name).
-  const sel = document.getElementById('upload-group-select');
-  let groupValue = sel.value;
-  if (groupValue === NEW_GROUP_SENTINEL) {
-    groupValue = document.getElementById('upload-newgroup-name').value.trim();
-    if (!groupValue) {
-      toast('Vui lòng nhập tên nhóm mới', 'error', 3500);
-      return;   // keep modal open
-    }
-  }
-  if (!groupValue) {
-    toast('Vui lòng chọn nhóm cho tài liệu', 'error', 3500);
-    return;
-  }
+const WARNING_TEXT = {
+  needs_ocr: f => `Tài liệu có trang scan — cần OCR khoảng ${f.scanned_pages_estimate} trang (~${f.ocr_seconds_estimate} giây).`,
+  ocr_unavailable: () => 'Có trang scan nhưng Tesseract (OCR) không khả dụng — các trang này có thể không có nội dung.',
+  broken_text_layer: () => 'Lớp chữ có vẻ bị hỏng (không có dấu tiếng Việt) — hệ thống sẽ OCR lại các trang đó.',
+};
 
-  const files = _pendingUploadFiles.slice();   // copy
-  document.getElementById('upload-modal').classList.add('hidden');
-  _pendingUploadFiles = [];
+async function runUploadCheck() {
+  const g = _selectedGroup();
+  if (g.error) { toast(g.error, 'error', 3500); return; }
+  setUploadStep(2);
+  const confirmBtn = document.getElementById('upload-confirm');
+  const bar = document.getElementById('up-progress-bar');
+  const lbl = document.getElementById('up-progress-lbl');
+  const report = document.getElementById('up-report');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Đang kiểm tra…';
+  report.innerHTML = '';
+  bar.style.width = '0%';
+  lbl.textContent = `Đang tải ${_pendingUploadFiles.length} file lên để kiểm tra…`;
 
-  const btn = document.getElementById('reindex-docs');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> uploading…';
-
-  // Build multipart form: many "files" + a single "group" field
   const fd = new FormData();
-  files.forEach(f => fd.append('files', f));
-  fd.append('group', groupValue);
-
+  _pendingUploadFiles.forEach(f => fd.append('files', f));
+  fd.append('group', g.hint);
   try {
-    const r = await api('/upload-docs', { method: 'POST', body: fd });
-    if (!r.ok) {
-      const txt = await r.text();
-      throw new Error(`HTTP ${r.status}: ${txt}`);
+    const res = await _postWithProgress('/uploads', fd, frac => {
+      bar.style.width = Math.round(frac * 100) + '%';
+      if (frac >= 1) lbl.textContent = 'Đang đọc và kiểm tra nội dung từng file…';
+    });
+    if (res.status !== 201 || !res.body) {
+      throw new Error(errDetail(res.body) || ('HTTP ' + res.status));
     }
-    const data = await r.json();
-    const sn = data.saved_count, sk = data.skipped_count;
-    let msg = `Đã tải lên ${sn} file vào nhóm "${data.group || groupValue}"`;
-    if (sk) msg += ` — ${sk} bị bỏ qua`;
-    toast(msg, 'success', 4500);
+    _uploadSession = res.body;
+    bar.style.width = '100%';
+    const n = _uploadSession.files.length;
+    const okCount = _uploadSession.files.filter(f => f.status === 'ok').length;
+    lbl.textContent = `Đã kiểm tra ${n} file: ${okCount} hợp lệ, ${n - okCount} bị từ chối. Xem lại rồi bấm xác nhận.`;
+    renderUploadReport();
+  } catch (e) {
+    lbl.textContent = 'Kiểm tra thất bại: ' + (e.message || e);
+    confirmBtn.textContent = 'Kiểm tra';
+    confirmBtn.disabled = true;
+  }
+}
 
-    if (sn === 0) {
-      btn.disabled = false;
-      btn.innerHTML = '📥 Update Documents';
-      return;
+function renderUploadReport() {
+  const report = document.getElementById('up-report');
+  const files = (_uploadSession && _uploadSession.files) || [];
+  report.innerHTML = files.map(f => {
+    const key = escapeHtml(f.file_key);
+    const shownName = escapeHtml(f.safe_name || f.original_name || '');
+    if (f.status !== 'ok') {
+      return `<div class="up-row rejected">
+        <div class="up-row-head"><span class="ic">✗</span><span class="nm">${escapeHtml(f.original_name || '(không tên)')}</span>
+          <span class="meta">${_humanSize(f.size || 0)}</span></div>
+        <div class="up-msg err">${escapeHtml(f.message || f.reason_code || 'Bị từ chối')}</div>
+      </div>`;
     }
+    const warn = (f.warnings && f.warnings.length) || f.conflict;
+    const renamed = f.original_name && f.safe_name && f.original_name !== f.safe_name
+      ? `<div class="up-msg">Tên được chuẩn hoá: <code>${escapeHtml(f.original_name)}</code> → <code>${shownName}</code></div>` : '';
+    const pages = f.pages ? `${f.pages} tr · ` : '';
+    const langSel = `<select data-lang="${key}" title="Ngôn ngữ tài liệu">
+        <option value="vi"${f.language_suggestion !== 'en' ? ' selected' : ''}>Tiếng Việt</option>
+        <option value="en"${f.language_suggestion === 'en' ? ' selected' : ''}>English</option></select>`;
+    let conflictSel = '';
+    let conflictMsg = '';
+    if (f.conflict) {
+      const same = f.conflict.type === 'same_group';
+      conflictSel = `<select data-action="${key}" title="Xử lý khi trùng tên">
+          ${same ? '<option value="replace" selected>Thay thế bản cũ</option>' : ''}
+          <option value="rename"${same ? '' : ' selected'}>Đổi tên (thêm -2)</option>
+          <option value="skip">Bỏ qua</option></select>`;
+      conflictMsg = `<div class="up-msg warn">⚠ ${escapeHtml(f.conflict.message || 'Trùng tên')}${f.conflict.source ? ` (${escapeHtml(f.conflict.source)})` : ''}</div>`;
+    }
+    const warnings = (f.warnings || []).map(w => WARNING_TEXT[w] ? `<div class="up-msg warn">⚠ ${escapeHtml(WARNING_TEXT[w](f))}</div>` : '').join('');
+    const langHint = f.language_suggestion === 'en'
+      ? '<div class="up-msg">Gợi ý ngôn ngữ: tiếng Anh (có thể đổi).</div>' : '';
+    return `<div class="up-row${warn ? ' warn' : ''}">
+      <div class="up-row-head">
+        <span class="ic">${warn ? '⚠' : '✓'}</span>
+        <span class="nm">${/\.docx$/i.test(f.safe_name || '') ? '📝' : '📄'} ${shownName}</span>
+        <span class="meta">${escapeHtml((f.file_type || '').toUpperCase())} · ${pages}${_humanSize(f.size || 0)}</span>
+        ${langSel}${conflictSel}
+      </div>
+      ${renamed}${conflictMsg}${warnings}${langHint}
+      <span class="up-meta-toggle" data-meta-toggle="${key}">▸ Tuỳ chỉnh thông tin (tiêu đề · số hiệu · loại · đơn vị)</span>
+      <div class="up-meta hidden" data-meta="${key}">
+        <input data-meta-field="title" placeholder="Tiêu đề hiển thị" />
+        <input data-meta-field="doc_number" placeholder="Số hiệu (để trống = tự trích)" />
+        <input data-meta-field="doc_type" list="up-doctype-list" placeholder="Loại (để trống = theo nhóm)" />
+        <input data-meta-field="issuing_body" placeholder="Đơn vị ban hành (để trống = theo nhóm)" />
+      </div>
+    </div>`;
+  }).join('');
 
-    // Ask whether to reindex now
-    const doReindex = confirm(
-      `${sn} file(s) đã lưu vào nhóm "${data.group || groupValue}".\n\n` +
-      `Reindex now? This will:\n` +
-      `  1. Re-parse and chunk every PDF (including the new ones)\n` +
-      `  2. Re-embed chunks and upsert into Qdrant\n` +
-      `  3. Rebuild the BM25 index\n\n` +
-      `Usually takes 5–15 minutes.`
-    );
-    if (!doReindex) {
-      btn.disabled = false;
-      btn.innerHTML = '📥 Update Documents';
-      toast('Files saved. Click Update Documents again to reindex when ready.', 'info', 5000);
-      return;
-    }
+  report.querySelectorAll('[data-meta-toggle]').forEach(t => {
+    t.addEventListener('click', () => {
+      const box = report.querySelector(`[data-meta="${t.dataset.metaToggle}"]`);
+      box.classList.toggle('hidden');
+      t.textContent = (box.classList.contains('hidden') ? '▸' : '▾') + t.textContent.slice(1);
+    });
+  });
+  report.querySelectorAll('select[data-action]').forEach(s => s.addEventListener('change', _updateCommitButton));
+  _updateCommitButton();
+}
 
-    // Trigger reindex
-    btn.innerHTML = '<span class="spinner"></span> starting reindex…';
-    const r2 = await api('/reindex', { method: 'POST' });
-    if (!r2.ok) {
-      const detail = await r2.json().catch(() => ({})).then(d => d.detail || ('HTTP ' + r2.status));
-      throw new Error(detail);
+function _commitSelections() {
+  const report = document.getElementById('up-report');
+  const out = [];
+  for (const f of (_uploadSession && _uploadSession.files) || []) {
+    if (f.status !== 'ok') continue;
+    const key = f.file_key;
+    const actSel = report.querySelector(`select[data-action="${key}"]`);
+    const action = actSel ? actSel.value : 'add';
+    const langSel = report.querySelector(`select[data-lang="${key}"]`);
+    const meta = {};
+    report.querySelectorAll(`[data-meta="${key}"] [data-meta-field]`).forEach(inp => {
+      meta[inp.dataset.metaField] = inp.value.trim();
+    });
+    out.push({ file_key: key, action, language: langSel ? langSel.value : null, metadata: meta });
+  }
+  return out;
+}
+
+function _updateCommitButton() {
+  const confirmBtn = document.getElementById('upload-confirm');
+  const n = _commitSelections().filter(x => x.action !== 'skip').length;
+  confirmBtn.textContent = n ? `Tải lên & index ${n} file` : 'Không có file để tải lên';
+  confirmBtn.disabled = !n;
+}
+
+async function commitUpload() {
+  if (!_uploadSession) return;
+  const g = _selectedGroup();
+  if (g.error) { toast(g.error, 'error', 3500); return; }
+  const confirmBtn = document.getElementById('upload-confirm');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Đang lưu…';
+  const files = _commitSelections();
+  try {
+    const r = await api('/uploads/' + encodeURIComponent(_uploadSession.upload_id) + '/commit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ group: g.spec, files, index_now: true }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(errDetail(data) || ('HTTP ' + r.status));
+    _uploadSession = null;           // staging is consumed server-side
+    _pendingUploadFiles = [];
+    setUploadStep(1);
+    closeUploadModal();
+    const docs = data.documents || [];
+    const queued = docs.filter(d => d.status === 'queued');
+    const failed = docs.filter(d => d.status === 'error');
+    if (queued.length) {
+      toast(`Đã lưu ${queued.length} file vào nhóm "${groupLabel(data.group) || data.group}" — đang index…`, 'success', 4500);
     }
-    toast('Reindex running in background. You can keep using the chat.', 'info', 4500);
-    _reindexPoll = setInterval(() => pollReindexStatus(btn), 2500);
-  } catch (err) {
-    btn.disabled = false;
-    btn.innerHTML = '📥 Update Documents';
-    toast('Upload failed: ' + (err.message || err), 'error', 6000);
+    failed.slice(0, 3).forEach(d => toast(`${d.original_name || d.file_key}: ${d.message || d.code}`, 'error', 7000));
+    if (data.job_id) trackJob(data.job_id, 'index');
+    if (!screenInit.documents) { screenInit.documents = true; }
+    await loadDocuments(true);
+  } catch (e) {
+    confirmBtn.disabled = false;
+    _updateCommitButton();
+    toast('Tải lên thất bại: ' + (e.message || e), 'error', 6000);
+  }
+}
+
+// Confirm button: step 1 → check on the server; step 2 → commit + index
+document.getElementById('upload-confirm').addEventListener('click', async () => {
+  if (_uploadStep === 1) {
+    if (!_pendingUploadFiles.length) return;
+    await runUploadCheck();
+  } else {
+    await commitUpload();
   }
 });
 document.querySelectorAll('.doc-table thead th').forEach(th => {

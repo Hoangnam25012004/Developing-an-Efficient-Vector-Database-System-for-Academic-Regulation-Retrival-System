@@ -173,3 +173,38 @@ evaluation:
   test_queries_path: "eval/test_queries_gt_100_v1.jsonl"
   k_values: [1, 3, 5, 10]
   output_dir: "eval/results"
+
+# ─── Document ingestion (upload → validate → index) ────────────────────────────
+# Used by the upload API and its background indexing worker only; the offline
+# pipeline (01/02/03 run from the command line) does not read this block.
+# Design: docs/design/upload-documents-v2.md
+ingest:
+  allowed_types: [pdf, docx]
+  max_file_mb: 50               # largest document in the original corpus: 27.4 MB
+  max_files_per_upload: 20
+  max_batch_mb: 200
+  max_pages: 1000               # largest in the original corpus: 45 pages
+  max_docx_uncompressed_mb: 300 # zip-bomb guard for .docx
+  min_free_disk_mb: 1024
+  staging_ttl_hours: 24         # unconfirmed uploads are discarded after this
+  job_timeout_s: 3600
+  keep_jobs: 200                # job history kept under data/processed/_ingest/jobs
+  worker_threads: 0             # CPU threads for embedding; 0 = half the cores (leaves room for Chat)
+  default_language: vi
+
+  # Per-language parsing profile. Empty = use the `chunking:` profile above
+  # unchanged — which is what every document of the original corpus gets.
+  languages:
+    vi: {}
+    en:
+      ocr_lang: "eng"
+      script_check: false       # the Vietnamese-diacritic check means nothing for English
+      vi_normalization: false   # no "Dieu 5" → "Điều 5" rewriting
+
+  # Language suggestion shown at upload (the user can override it per file).
+  # Measured on this corpus: scans with a broken text layer 0.000 diacritics /
+  # ≤0.009 English stopwords; healthy Vietnamese 0.293 / 0.020; English 0.000 / 0.288.
+  language_detect:
+    min_chars: 200
+    vi_min_diacritic_ratio: 0.05
+    en_min_stopword_ratio: 0.12
