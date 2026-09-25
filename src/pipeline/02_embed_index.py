@@ -8,12 +8,22 @@ Writes: Qdrant collection (local or Cloud)
 import argparse
 import json
 import os
+import time
 from pathlib import Path
-from typing import Generator
+from typing import Callable, Generator, Iterable
 
 import yaml
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    FilterSelector,
+    MatchAny,
+    PointIdsList,
+    PointStruct,
+    VectorParams,
+)
 
 from src.retrieval.qdrant_params import (
     describe,
@@ -146,6 +156,124 @@ def chunk_id_to_point_id(chunk_id: str) -> int:
     always lands at same point, no zombie vectors, no duplicates.
     """
     return int(chunk_id, 16)
+
+
+# ─── Incremental operations (used by the ingestion worker) ────────────────────
+#
+# run() below rebuilds the collection from scratch. These functions keep the
+# collection live and touch only the points of the documents being added,
+# replaced or removed, so search keeps working while a document is indexed.
+# Point ids derive from chunk_id (a content hash), so every operation here is
+# idempotent and safe to re-run after a failure. No payload index is created:
+# at this corpus size a filtered scan is cheap, and the collection keeps
+# exactly the configuration the benchmarks were measured on.
+
+def with_retry(fn: Callable, attempts: int = 3, delays: tuple = (2, 5, 10)):
+    """Run a Qdrant call, retrying transient failures (Qdrant restarting, timeouts)."""
+    for attempt in range(attempts):
+        try:
+            return fn()
+        except Exception:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(delays[min(attempt, len(delays) - 1)])
+
+
+def source_filter(sources: Iterable[str]) -> Filter:
+    return Filter(must=[FieldCondition(key="source", match=MatchAny(any=list(sources)))])
+
+
+def upsert_records(client: QdrantClient, collection: str, records: list[dict], embed,
+                   embed_batch: int = 32, upsert_batch: int = 64,
+                   progress: Callable[[int, int], None] | None = None) -> set[int]:
+    """Embed and upsert chunk records; returns their point ids.
+
+    Same vectors as run(): the same embedder, the same text, the same
+    normalisation, and the same chunk_id → point id mapping.
+    """
+    ids: set[int] = set()
+    buffer: list[PointStruct] = []
+    done = 0
+    for batch in batched(records, embed_batch):
+        vectors = embed([r["text"] for r in batch])
+        for rec, vec in zip(batch, vectors):
+            pid = chunk_id_to_point_id(rec["chunk_id"])
+            ids.add(pid)
+            buffer.append(PointStruct(id=pid, vector=vec, payload=dict(rec)))
+        while len(buffer) >= upsert_batch:
+            send, buffer = buffer[:upsert_batch], buffer[upsert_batch:]
+            with_retry(lambda: client.upsert(collection_name=collection, points=send, wait=True))
+        done += len(batch)
+        if progress:
+            progress(done, len(records))
+    if buffer:
+        with_retry(lambda: client.upsert(collection_name=collection, points=buffer, wait=True))
+    return ids
+
+
+def _scroll_ids(client: QdrantClient, collection: str, flt: Filter | None) -> set[int]:
+    ids: set[int] = set()
+    offset = None
+    while True:
+        points, offset = with_retry(lambda: client.scroll(
+            collection_name=collection, scroll_filter=flt, limit=1000, offset=offset,
+            with_payload=False, with_vectors=False,
+        ))
+        ids.update(int(p.id) for p in points)
+        if offset is None:
+            return ids
+
+
+def point_ids_for_sources(client: QdrantClient, collection: str, sources: Iterable[str]) -> set[int]:
+    sources = list(sources)
+    return _scroll_ids(client, collection, source_filter(sources)) if sources else set()
+
+
+def all_point_ids(client: QdrantClient, collection: str) -> set[int]:
+    return _scroll_ids(client, collection, None)
+
+
+def delete_point_ids(client: QdrantClient, collection: str, ids: Iterable[int]) -> int:
+    ids = sorted(ids)
+    for start in range(0, len(ids), 1000):
+        part = ids[start:start + 1000]
+        with_retry(lambda: client.delete(
+            collection_name=collection, points_selector=PointIdsList(points=part), wait=True,
+        ))
+    return len(ids)
+
+
+def delete_sources(client: QdrantClient, collection: str, sources: Iterable[str]) -> None:
+    sources = list(sources)
+    if sources:
+        with_retry(lambda: client.delete(
+            collection_name=collection,
+            points_selector=FilterSelector(filter=source_filter(sources)), wait=True,
+        ))
+
+
+def count_by_source(client: QdrantClient, collection: str) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    offset = None
+    while True:
+        points, offset = with_retry(lambda: client.scroll(
+            collection_name=collection, limit=1000, offset=offset,
+            with_payload=["source"], with_vectors=False,
+        ))
+        for p in points:
+            src = (p.payload or {}).get("source") or "unknown"
+            counts[src] = counts.get(src, 0) + 1
+        if offset is None:
+            return counts
+
+
+def collection_vector_size(client: QdrantClient, collection: str) -> int | None:
+    """Vector size of an existing collection, or None if it does not exist."""
+    existing = {c.name for c in with_retry(lambda: client.get_collections()).collections}
+    if collection not in existing:
+        return None
+    info = with_retry(lambda: client.get_collection(collection))
+    return info.config.params.vectors.size
 
 
 # ─── Main ──────────────────────────────────────────────────────────────────────

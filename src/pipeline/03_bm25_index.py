@@ -6,8 +6,10 @@ Writes: data/processed/bm25.pkl  (corpus list + BM25Okapi object)
 
 import argparse
 import json
+import os
 import pickle
 import re
+import time
 from pathlib import Path
 
 import yaml
@@ -54,9 +56,117 @@ def load_chunks(processed_dir: Path, only_files: list[str] | None = None) -> lis
     return records
 
 
-def _jsonl_to_source_name(jsonl_name: str) -> str:
-    """Map 'Foo.jsonl' → 'Foo.pdf' (the source field used in chunk records)."""
-    return Path(jsonl_name).stem + ".pdf"
+def _sources_of_jsonl(path: Path) -> set[str]:
+    """The `source` values recorded inside a chunk file.
+
+    Read from the records rather than derived from the file name, which used
+    to assume every document was a PDF ('Foo.jsonl' → 'Foo.pdf') and so could
+    never replace the chunks of a DOCX.
+    """
+    sources: set[str] = set()
+    if not path.exists():
+        return sources
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                sources.add(json.loads(line).get("source"))
+    sources.discard(None)
+    return sources
+
+
+def _save_index(index_path: Path, records: list[dict], tokenized: list[list[str]], cfg: dict) -> None:
+    """Build BM25 and write it next to the target, then swap it in.
+
+    A reader (the API loading the index) never sees a half-written pickle;
+    on Windows the swap is retried while a reader still has the file open.
+    """
+    bm25 = BM25Okapi(tokenized, k1=cfg["bm25"]["k1"], b=cfg["bm25"]["b"])
+    payload = {"records": records, "tokenized": tokenized, "bm25": bm25}
+    tmp = index_path.with_name(index_path.name + ".tmp")
+    with tmp.open("wb") as f:
+        pickle.dump(payload, f)
+    for attempt in range(10):
+        try:
+            os.replace(tmp, index_path)
+            return
+        except PermissionError:
+            if attempt == 9:
+                raise
+            time.sleep(0.2)
+
+
+def rebuild_index(cfg: dict, log=print) -> int:
+    """Full rebuild from every chunk file (same as the CLI without --only-files)."""
+    processed_dir = Path(cfg["data"]["processed_dir"])
+    index_path = Path(cfg["bm25"]["index_path"])
+    index_path.parent.mkdir(parents=True, exist_ok=True)
+    records = load_chunks(processed_dir)
+    tokenized = [simple_tokenize(r["text"]) for r in records]
+    _save_index(index_path, records, tokenized, cfg)
+    log(f"BM25 index rebuilt: {len(records)} chunks")
+    return len(records)
+
+
+def update_index(cfg: dict, replace_sources=(), remove_sources=(), log=print) -> int:
+    """Incrementally replace/remove documents in the BM25 index.
+
+    Only the replaced documents are re-tokenized. The result is ordered exactly
+    as a full rebuild would order it — chunk files sorted by path, records in
+    file order — so the index, its scores and even the order of tied scores
+    are identical to rebuilding from scratch. Returns the corpus size.
+    """
+    processed_dir = Path(cfg["data"]["processed_dir"])
+    index_path = Path(cfg["bm25"]["index_path"])
+    index_path.parent.mkdir(parents=True, exist_ok=True)
+    if not index_path.exists():
+        log(f"No BM25 index at {index_path} — building from scratch.")
+        records = load_chunks(processed_dir)
+        tokenized = [simple_tokenize(r["text"]) for r in records]
+        _save_index(index_path, records, tokenized, cfg)
+        return len(records)
+
+    replace_sources, remove_sources = set(replace_sources), set(remove_sources)
+    with index_path.open("rb") as f:
+        old = pickle.load(f)
+    drop = replace_sources | remove_sources
+    by_source: dict[str, list[tuple[dict, list[str]]]] = {}
+    for rec, tok in zip(old["records"], old["tokenized"]):
+        src = rec.get("source")
+        if src not in drop:
+            by_source.setdefault(src, []).append((rec, tok))
+    kept = sum(len(v) for v in by_source.values())
+    log(f"  kept {kept} chunks, dropping sources: {sorted(drop)}")
+
+    added = 0
+    for src in sorted(replace_sources):
+        path = processed_dir / (Path(src).stem + ".jsonl")
+        if not path.exists():
+            continue
+        items = []
+        with path.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    rec = json.loads(line)
+                    if rec.get("source") == src:
+                        items.append((rec, simple_tokenize(rec["text"])))
+        if items:
+            by_source[src] = items
+            added += len(items)
+    log(f"  added {added} chunks")
+
+    def file_key(src):
+        return processed_dir / (Path(src or "").stem + ".jsonl")
+
+    records: list[dict] = []
+    tokenized: list[list[str]] = []
+    for src in sorted(by_source, key=file_key):
+        for rec, tok in by_source[src]:
+            records.append(rec)
+            tokenized.append(tok)
+    _save_index(index_path, records, tokenized, cfg)
+    return len(records)
 
 
 def run(config_path: str = "config.yaml", only_files: list[str] | None = None):
@@ -67,11 +177,11 @@ def run(config_path: str = "config.yaml", only_files: list[str] | None = None):
         only_files:  optional list of JSONL filenames (basenames). When given:
                      - Load existing bm25.pkl
                      - Drop records whose `source` matches the new JSONL files
-                     - Append new chunks from those JSONL files
+                     - Add the chunks from those JSONL files
                      - Re-tokenize only the new chunks (reuse old tokenized)
-                     - Rebuild BM25 from combined tokenized
+                     - Rebuild BM25 in full-rebuild order
                      This is faster than full rebuild because tokenization for
-                     the ~3800 old chunks is skipped.
+                     the ~4000 old chunks is skipped.
                      If None → full rebuild from all *.jsonl files.
     """
     cfg = load_config(config_path)
@@ -82,58 +192,29 @@ def run(config_path: str = "config.yaml", only_files: list[str] | None = None):
     if only_files and index_path.exists():
         # ── Incremental path ──────────────────────────────────────────────
         print(f"Incremental rebuild (only-files: {sorted({Path(f).name for f in only_files})})")
-
-        print("Loading existing BM25 index…")
-        with index_path.open("rb") as f:
-            old_payload = pickle.load(f)
-        old_records = old_payload["records"]
-        old_tokenized = old_payload["tokenized"]
-        print(f"  {len(old_records)} chunks in current index.")
-
-        # Determine which source filenames to replace
-        replace_sources = {_jsonl_to_source_name(f) for f in only_files}
+        replace_sources: set[str] = set()
+        for name in only_files:
+            replace_sources |= _sources_of_jsonl(processed_dir / Path(name).name)
         print(f"  Replacing chunks from sources: {sorted(replace_sources)}")
+        size = update_index(cfg, replace_sources=replace_sources)
+        print(f"BM25 index saved → {index_path}")
+        print(f"Corpus size: {size} documents")
+        return
 
-        # Keep records whose source is NOT in the replace set
-        kept = [
-            (rec, tok) for rec, tok in zip(old_records, old_tokenized)
-            if rec.get("source") not in replace_sources
-        ]
-        kept_records  = [r for r, _ in kept]
-        kept_tokenized = [t for _, t in kept]
-        dropped = len(old_records) - len(kept_records)
-        print(f"  Dropped {dropped} stale chunks.")
+    # ── Full rebuild path (original behaviour) ────────────────────────────
+    if only_files and not index_path.exists():
+        print(f"WARNING: --only-files requested but no existing index at {index_path}. "
+              f"Falling back to full rebuild.")
+    print("Loading chunks…")
+    records = load_chunks(processed_dir)
+    print(f"  {len(records)} chunks loaded.")
 
-        # Load NEW chunks only from specified JSONL files
-        print("Loading new chunks…")
-        new_records = load_chunks(processed_dir, only_files=only_files)
-        print(f"  {len(new_records)} new chunks loaded.")
+    print("Tokenizing…")
+    tokenized = [simple_tokenize(r["text"]) for r in records]
 
-        # Tokenize ONLY new chunks (old tokenized reused as-is)
-        print("Tokenizing new chunks…")
-        new_tokenized = [simple_tokenize(r["text"]) for r in new_records]
-
-        records   = kept_records + new_records
-        tokenized = kept_tokenized + new_tokenized
-    else:
-        # ── Full rebuild path (original behaviour) ────────────────────────
-        if only_files and not index_path.exists():
-            print(f"WARNING: --only-files requested but no existing index at {index_path}. "
-                  f"Falling back to full rebuild.")
-        print("Loading chunks…")
-        records = load_chunks(processed_dir)
-        print(f"  {len(records)} chunks loaded.")
-
-        print("Tokenizing…")
-        tokenized = [simple_tokenize(r["text"]) for r in records]
-
-    # ── Build + save (shared) ───────────────────────────────────────────────
+    # ── Build + save ────────────────────────────────────────────────────────
     print("Building BM25 index…")
-    bm25 = BM25Okapi(tokenized, k1=cfg["bm25"]["k1"], b=cfg["bm25"]["b"])
-
-    payload = {"records": records, "tokenized": tokenized, "bm25": bm25}
-    with index_path.open("wb") as f:
-        pickle.dump(payload, f)
+    _save_index(index_path, records, tokenized, cfg)
 
     print(f"BM25 index saved → {index_path}")
     print(f"Corpus size: {len(records)} documents")
