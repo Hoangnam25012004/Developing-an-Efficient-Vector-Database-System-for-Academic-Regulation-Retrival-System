@@ -1,0 +1,21 @@
+{
+  "collection": "reg_chunks",
+  "count": 4224,
+  "dim": 768,
+  "dtype": "float32",
+  "order": "processed_dir/*.jsonl sorted by file name, then line order (as 02_embed_index reads them)",
+  "embedding_model": "bkai-foundation-models/vietnamese-bi-encoder",
+  "embedding_revision": "84f9d9ada0d1a3c37557398b9ae9fcedcdf40be0",
+  "exported_from": "Qdrant 1.16.1, collection 'reg_chunks'",
+  "exported_at": "2026-09-26T15:15:13+0700",
+  "files": {
+    "vectors": {
+      "name": "reg_chunks.f32.npy",
+      "sha256": "cdd67e262174f4d8e1665616e2cad4e967834d16bd8b1dac9d58f101edc07b25"
+    },
+    "ids": {
+      "name": "reg_chunks.ids.json",
+      "sha256": "933ab8922fc049a7d67c12f366d4e5edb526f8e78a9bf7e34805e4e77e87f63c"
+    }
+  }
+}

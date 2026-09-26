@@ -1,0 +1,7 @@
+{
+  "note": "Hugging Face revisions used for the KSE 2026 measurements. scripts/fetch_models.py downloads exactly these.",
+  "models": {
+    "bkai-foundation-models/vietnamese-bi-encoder": "84f9d9ada0d1a3c37557398b9ae9fcedcdf40be0",
+    "AITeamVN/Vietnamese_Reranker": "f536976248403314225d7fdfdbc87f0e9516a54e"
+  }
+}
