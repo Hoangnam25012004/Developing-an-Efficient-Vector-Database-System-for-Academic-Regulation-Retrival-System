@@ -1,0 +1,34 @@
+# Self-hosted production stack: Qdrant + the API/UI (see README, "Chạy bằng Docker").
+#   docker compose up -d            # published image from GHCR
+#   docker compose up -d --build    # or build it from this checkout
+#   open http://127.0.0.1:8000
+# The API has no login: it listens on 127.0.0.1 unless APP_BIND says otherwise.
+name: arrs
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.16.1   # the server version the paper's collection is served by
+    restart: unless-stopped
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    # No published port: only the app reaches Qdrant, over the compose network.
+
+  app:
+    image: ghcr.io/hoangnam25012004/developing-an-efficient-vector-database-system-for-academic-regulation-retrival-system:${ARRS_VERSION:-v2.0.1}
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - qdrant
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_API_KEY: ""
+    volumes:
+      - arrs_data:/app/data   # first start copies the corpus from the image; uploads persist
+      - hf_models:/models     # about 2.8 GB of models, downloaded once
+    ports:
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8000}:8000"
+
+volumes:
+  qdrant_storage:
+  arrs_data:
+  hf_models:

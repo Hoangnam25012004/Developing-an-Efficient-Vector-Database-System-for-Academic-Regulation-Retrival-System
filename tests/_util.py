@@ -16,7 +16,14 @@ import fitz  # noqa: E402
 from docx.oxml import parse_xml  # noqa: E402
 from docx.oxml.ns import nsdecls, qn  # noqa: E402
 
-ARIAL = r"C:\Windows\Fonts\arial.ttf"
+# A TrueType font with Vietnamese letters, so generated PDFs hold real text on
+# every OS: PyMuPDF's built-in Helvetica has none and writes "?" instead.
+_FONTS = (
+    r"C:\Windows\Fonts\arial.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",  # Debian/Ubuntu: fonts-dejavu-core
+    "/Library/Fonts/Arial Unicode.ttf",
+)
+ARIAL = next((f for f in _FONTS if Path(f).exists()), _FONTS[0])
 
 
 def parser():

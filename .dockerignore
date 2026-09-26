@@ -1,0 +1,13 @@
+.git
+.github
+venv
+.venv
+Report
+.claude
+.env
+eval/results
+data/processed/_ingest
+data/processed_backup_*
+**/__pycache__
+**/*.pyc
+*.log

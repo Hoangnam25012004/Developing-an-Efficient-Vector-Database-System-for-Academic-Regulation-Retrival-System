@@ -25,3 +25,6 @@ eval/results_v2/
 # NOTE: the document corpus and prebuilt indexes (data/<group>/*.pdf,
 # data/processed*/, data/**/bm25.pkl) ARE committed on purpose so the repo is
 # self-contained and runnable without re-indexing.
+
+# ─── Upload job state (per machine, not source) ──────────────────────────────
+data/processed/_ingest/
