@@ -1,0 +1,270 @@
+{
+  "version": 1,
+  "about": "Library catalogue for the documents in data/. Values were read on page 1 of each original PDF. Keys: title, title_en, doc_number, year, issued (YYYY-MM-DD), issuing_body, size (bytes of the file described), note.",
+  "documents": {
+    "26.Luat-BHYT-2008.pdf": {
+      "title": "Luật Bảo hiểm y tế",
+      "doc_number": "25/2008/QH12",
+      "year": 2008,
+      "size": 272731,
+      "note": "Số hiệu đọc ở trang 1."
+    },
+    "27.Luat-Giao-duc-dai-hoc-2012.pdf": {
+      "title": "Luật Giáo dục đại học",
+      "doc_number": "08/2012/QH13",
+      "year": 2012,
+      "size": 558649,
+      "note": "Số hiệu đọc ở trang 1."
+    },
+    "28.Luat-SDBS-cua-Luat-BHYT_2014.pdf": {
+      "title": "Luật sửa đổi, bổ sung một số điều của Luật Bảo hiểm y tế",
+      "doc_number": "46/2014/QH13",
+      "year": 2014,
+      "size": 1149904,
+      "note": "Số hiệu đọc trên ảnh trang 1."
+    },
+    "29.Luat-Nghia-vu-quan-su-2015-QH13.pdf": {
+      "title": "Luật Nghĩa vụ quân sự",
+      "doc_number": "78/2015/QH13",
+      "year": 2015,
+      "size": 4837483,
+      "note": "Số hiệu đọc ở trang 1."
+    },
+    "30.Luat-An-ninh-mang-2018.pdf": {
+      "title": "Luật An ninh mạng",
+      "doc_number": "24/2018/QH14",
+      "year": 2018,
+      "size": 12690705,
+      "note": "Số hiệu đọc ở trang 1."
+    },
+    "31.Luat-Giao-duc-dai-hoc-sua-doi-bo-sung-2018.pdf": {
+      "title": "Luật sửa đổi, bổ sung một số điều của Luật Giáo dục đại học",
+      "doc_number": "34/2018/QH14",
+      "year": 2018,
+      "size": 499713,
+      "note": "Số hiệu đọc ở trang 1."
+    },
+    "32.Luat-Giao-duc-2019.pdf": {
+      "title": "Luật Giáo dục",
+      "doc_number": "43/2019/QH14",
+      "year": 2019,
+      "size": 2683773,
+      "note": "Số hiệu đọc ở trang 1."
+    },
+    "33.Luat-Thanh-nien-2020.pdf": {
+      "title": "Luật Thanh niên",
+      "doc_number": "57/2020/QH14",
+      "year": 2020,
+      "size": 918007,
+      "note": "Số hiệu đọc trên ảnh trang 1."
+    },
+    "34.Luat-Cu-tru-2020.pdf": {
+      "title": "Luật Cư trú",
+      "doc_number": "68/2020/QH14",
+      "year": 2020,
+      "size": 924330,
+      "note": "Số hiệu đọc trên ảnh trang 1."
+    },
+    "19.-2016-Quy-che-CTSV-Bo-GD-DT.pdf": {
+      "title": "Quy chế công tác sinh viên đối với chương trình đào tạo đại học hệ chính quy",
+      "doc_number": "10/2016/TT-BGDĐT",
+      "year": 2016,
+      "issued": "2016-04-05",
+      "size": 4975183,
+      "note": "Thông tư ban hành quy chế; số và ngày đọc ở trang 1."
+    },
+    "21.-2015-Quy-che-DGKQRL-Bo-GD-DT.pdf": {
+      "title": "Quy chế đánh giá kết quả rèn luyện của người học được đào tạo trình độ đại học hệ chính quy",
+      "doc_number": "16/2015/TT-BGDĐT",
+      "year": 2015,
+      "issued": "2015-08-12",
+      "size": 2931478,
+      "note": "Thông tư ban hành quy chế; số và ngày đọc ở trang 1."
+    },
+    "24.-2013-Quy-che-CTSV-noi-tru.pdf": {
+      "title": "Quy chế công tác sinh viên nội trú",
+      "doc_number": "1178/QĐ-ĐHQG-CTSV",
+      "year": 2013,
+      "issued": "2013-10-16",
+      "size": 4016998,
+      "note": "Số viết tay đọc trên ảnh trang 1. Trang 1 là quyết định của Giám đốc ĐHQG-HCM, dù văn bản đang nằm trong nhóm Thông tư Bộ GD&ĐT."
+    },
+    "20.-2019-Quy-che-CTSV-DHQG-HCM.pdf": {
+      "title": "Quy chế công tác sinh viên",
+      "doc_number": "953/QĐ-ĐHQG",
+      "year": 2019,
+      "issued": "2019-07-15",
+      "size": 7348302,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "22.-2019-Quy-che-DGKQRL-DHQG-HCM.pdf": {
+      "title": "Quy chế đánh giá kết quả rèn luyện sinh viên tại Đại học Quốc gia Thành phố Hồ Chí Minh",
+      "doc_number": "964/QĐ-ĐHQG",
+      "year": 2019,
+      "issued": "2019-07-19",
+      "size": 3019952,
+      "note": "Số viết tay đọc trên ảnh trang 1 (OCR chỉ đọc được chữ số cuối)."
+    },
+    "23.-QD1133_22815_VNU_ban-hanh-Quy-dinh-khen-thuong-HSSV-1.pdf": {
+      "title": "Quy định công tác khen thưởng học sinh, sinh viên tại Đại học Quốc gia Thành phố Hồ Chí Minh",
+      "doc_number": "1133/QĐ-ĐHQG",
+      "year": 2022,
+      "issued": "2022-08-15",
+      "size": 3255847,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf": {
+      "title": "Quy chế đào tạo trình độ đại học",
+      "doc_number": "1342/QĐ-ĐHQG",
+      "year": 2022,
+      "issued": "2022-09-30",
+      "size": 10407262,
+      "note": "Số và ngày đọc trên ảnh trang 1 (OCR đọc nhầm thành 1524)."
+    },
+    "11.QD-586-QD-DHQT-_-Quy-tac-ung-xu-nguoi-hoc.pdf": {
+      "title": "Quy tắc ứng xử của người học tại Trường Đại học Quốc tế",
+      "doc_number": "586/QĐ-ĐHQT",
+      "year": 2019,
+      "size": 27373952,
+      "note": "Số và năm đọc trên ảnh trang 1."
+    },
+    "12.Quy-che-to-chuc-hoat-dong-cua-P.CTSV-theo-QD-515-ngay-8.9.2022.pdf": {
+      "title": "Quy chế tổ chức và hoạt động của Phòng Công tác Sinh viên Trường Đại học Quốc tế",
+      "doc_number": "515/QĐ-ĐHQT",
+      "year": 2022,
+      "issued": "2022-09-08",
+      "size": 889793,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "13.-Quy-dinh-chinh-sach-ho-tro-nguoi-hoc-khuyet-tat.-Signed-4.pdf": {
+      "title": "Quy định chính sách hỗ trợ người học khuyết tật tại Trường Đại học Quốc tế",
+      "doc_number": "912/QĐ-ĐHQT",
+      "year": 2024,
+      "issued": "2024-12-09",
+      "size": 815498,
+      "note": "Số và ngày đọc trên ảnh trang 1 (số trích tự động 51/2010/QH12 là số của luật được viện dẫn)."
+    },
+    "14.-Quy-dinh-doi-voi-Ban-can-su-lop-nam-2025-final-Signed-4.pdf": {
+      "title": "Quy định đối với Ban cán sự lớp tại Trường Đại học Quốc tế",
+      "doc_number": "151/QĐ-ĐHQT",
+      "year": 2025,
+      "issued": "2025-03-21",
+      "size": 986077,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf": {
+      "title": "Quy chế đào tạo trình độ đại học theo hệ thống tín chỉ tại Trường Đại học Quốc tế",
+      "doc_number": "719/QĐ-ĐHQT",
+      "year": 2021,
+      "issued": "2021-12-06",
+      "size": 1405976,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf": {
+      "title": "Quy định xét cấp học bổng khuyến khích học tập cho sinh viên trình độ đại học tại Trường Đại học Quốc tế",
+      "doc_number": "884/QĐ-ĐHQT",
+      "year": 2024,
+      "issued": "2024-08-19",
+      "size": 844424,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "17.-Quy-che_To-chuc-thi-HK_Tr-Tiep.ban-hanh_05.01.25-Signed-8.pdf": {
+      "title": "Quy chế tổ chức thi học kỳ trình độ đại học tại Trường Đại học Quốc tế",
+      "doc_number": "07/QĐ-ĐHQT",
+      "year": 2025,
+      "issued": "2025-01-08",
+      "size": 1122972,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "18.-QD-ban-hanh-Quy-dinh-Co-van-hoc-tap.signed.signed.signed.signed.signed.pdf": {
+      "title": "Quy định công tác cố vấn học tập tại Trường Đại học Quốc tế",
+      "doc_number": "748/QĐ-ĐHQT",
+      "year": 2022,
+      "issued": "2022-09-08",
+      "size": 811393,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "5.-Quyet-dinh-ban-hanh-_-Quy-dinh-cong-tac-khen-thuong-sinh-vien-truong-DHQT-Signed-4.pdf": {
+      "title": "Quy định công tác khen thưởng sinh viên tại Trường Đại học Quốc tế",
+      "doc_number": "808/QĐ-ĐHQT",
+      "year": 2024,
+      "issued": "2024-10-30",
+      "size": 728362,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "9.-QD688-MGHP-2024.pdf": {
+      "title": "Quy định chế độ chính sách miễn, giảm học phí",
+      "doc_number": "668/QĐ-ĐHQT",
+      "year": 2024,
+      "issued": "2024-09-16",
+      "size": 1333519,
+      "note": "Số và ngày đọc trên ảnh trang 1; tên file ghi 688."
+    },
+    "Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf": {
+      "title": "Quy chế công tác sinh viên Trường Đại học Quốc tế",
+      "doc_number": "967/QĐ-ĐHQT",
+      "year": 2022,
+      "issued": "2022-12-26",
+      "size": 539080,
+      "note": "Quy chế kèm theo quyết định; số và ngày đọc trên ảnh trang 1."
+    },
+    "10.-Noi-Quy-SV-truong-DHQT-cap-nhat-08-2009.pdf": {
+      "title": "Nội quy sinh viên",
+      "doc_number": "276/QĐ-ĐHQT/ĐT",
+      "year": 2008,
+      "issued": "2008-09-10",
+      "size": 573054,
+      "note": "Ban hành theo quyết định có số viết tay, đọc là 276 (OCR: 716); ngày 10/9/2008."
+    },
+    "2.-Quyet-dinh-dieu-chinh-Quy-che-CTSV-09_1_25-Signed-4.pdf": {
+      "title": "Sửa đổi, bổ sung Quy chế công tác sinh viên Trường Đại học Quốc tế",
+      "doc_number": "41/QĐ-ĐHQT",
+      "year": 2025,
+      "issued": "2025-01-17",
+      "size": 426502,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "272-Phu-luc-Quy-dinh-doi-voi-BCSL.pdf": {
+      "title": "Bổ sung Quy định đối với Ban cán sự lớp tại Trường Đại học Quốc tế",
+      "doc_number": "272/QĐ-ĐHQT",
+      "year": 2025,
+      "issued": "2025-05-13",
+      "size": 479002,
+      "note": "Số và ngày đọc trên ảnh trang 1."
+    },
+    "6.-QD-191_2011_Quy-dinh-che-do-chinh-sach.pdf": {
+      "title": "Quy định chế độ chính sách",
+      "doc_number": "191/QĐ-ĐHQT-CTSV",
+      "year": 2011,
+      "issued": "2011-03-31",
+      "size": 1305246,
+      "note": "Số viết tay đọc trên ảnh trang 1 (OCR đọc nhầm thành 491)."
+    },
+    "3.-Phu-luc-1-30122022-Signed-2.pdf": {
+      "title": "Phụ lục I — Một số nội dung vi phạm và khung xử lý kỷ luật sinh viên",
+      "doc_number": "967/QĐ-ĐHQT",
+      "year": 2022,
+      "issued": "2022-12-26",
+      "issuing_body": "Trường Đại học Quốc tế",
+      "size": 351541,
+      "note": "Số hiệu là của quyết định mà phụ lục đi kèm (đọc trên ảnh trang 1)."
+    },
+    "4.-Phu-luc-II-Tieu-chi-va-Khung-DRL-Signed-3.pdf": {
+      "title": "Phụ lục II — Tiêu chí và khung điểm đánh giá kết quả rèn luyện sinh viên",
+      "doc_number": "41/QĐ-ĐHQT",
+      "year": 2025,
+      "issued": "2025-01-17",
+      "issuing_body": "Trường Đại học Quốc tế",
+      "size": 444925,
+      "note": "Số hiệu là của quyết định mà phụ lục đi kèm (đọc trên ảnh trang 1)."
+    },
+    "7.-TB.486-MGHP-04112014-thong-bao-P.CTSV_.pdf": {
+      "title": "Hướng dẫn thực hiện chính sách miễn, giảm học phí mới áp dụng từ học kỳ II năm học 2014–2015",
+      "doc_number": "486-TB/ĐHQT-CTSV",
+      "year": 2014,
+      "issued": "2014-11-04",
+      "size": 3994391,
+      "note": "Số viết tay và ngày đọc trên ảnh trang 1."
+    }
+  }
+}

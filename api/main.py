@@ -1231,6 +1231,62 @@ async def upload_docs(
     }
 
 
+# ─── Library catalogue (data/catalog.json) ──────────────────────────────────
+# Display metadata (title, number, year) for documents whose files carry none.
+# Edited by hand and only read here; design: docs/design/documents-library-redesign.md.
+
+_CATALOG_TEXT_LIMITS = {"title": 300, "title_en": 300, "doc_number": 80, "issuing_body": 120}
+_ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_catalog_cache: dict = {"key": None, "data": {}}
+
+
+def _catalog_path() -> Path:
+    return Path(_load_cfg()["data"]["raw_dir"]) / "catalog.json"
+
+
+def _load_catalog() -> dict:
+    """{source: entry} from data/catalog.json; {} when the file is missing or unreadable."""
+    p = _catalog_path()
+    try:
+        st = p.stat()
+    except OSError:
+        return {}
+    key = (str(p), st.st_mtime_ns, st.st_size)
+    if _catalog_cache["key"] != key:
+        data: dict = {}
+        try:
+            raw = json.loads(p.read_text(encoding="utf-8"))
+            docs = raw.get("documents") if isinstance(raw, dict) else None
+            if not isinstance(docs, dict):
+                raise ValueError("no 'documents' object")
+            data = {k: v for k, v in docs.items() if isinstance(v, dict)}
+        except (OSError, ValueError) as exc:
+            print(f"[catalog] {p} ignored: {exc}")
+        _catalog_cache.update(key=key, data=data)
+    return _catalog_cache["data"]
+
+
+def _catalog_entry(entry: Optional[dict], size: int) -> Optional[dict]:
+    """The display fields of one catalogue entry, or None — also when the entry
+    describes another file of the same name (its recorded size differs)."""
+    if not entry:
+        return None
+    if type(entry.get("size")) is int and entry["size"] != size:
+        return None
+    out: dict = {}
+    for k, limit in _CATALOG_TEXT_LIMITS.items():
+        v = entry.get(k)
+        if isinstance(v, str) and len(v.strip()) <= limit:
+            out[k] = v.strip()
+    year = entry.get("year")
+    if type(year) is int and 1900 <= year <= 2100:
+        out["year"] = year
+    issued = entry.get("issued")
+    if isinstance(issued, str) and _ISO_DATE.match(issued.strip()):
+        out["issued"] = issued.strip()
+    return out or None
+
+
 # ─── Document registry (every document, with its indexing status) ───────────
 
 @app.get("/documents")
@@ -1242,6 +1298,9 @@ def list_documents():
     reg = _load_groups()
     for r in rows:
         r["group_label"] = (reg.get(r["group"]) or {}).get("label") or r["group"]
+    catalog = _load_catalog()
+    for r in rows:
+        r["catalog"] = _catalog_entry(catalog.get(r["source"]), r.get("size", 0))
     summary = {"total": 0, "indexed": 0, "processing": 0, "failed": 0, "not_indexed": 0, "orphan": 0}
     for r in rows:
         s = r["status"]
