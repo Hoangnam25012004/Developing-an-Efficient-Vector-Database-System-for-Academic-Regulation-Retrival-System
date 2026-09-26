@@ -32,21 +32,25 @@ def _diversify(scored: list[tuple[float, dict]], top_k: int, max_per_source: int
     """Pick top_k docs while capping how many come from the same source file."""
     source_count: dict[str, int] = {}
     result = []
+    taken: set[int] = set()  # positions in `scored` already picked
     # First pass: pick within cap
-    for score, doc in scored:
+    for i, (score, doc) in enumerate(scored):
         src = doc.get("source", "")
         if source_count.get(src, 0) < max_per_source:
             doc = dict(doc)
             doc["_score_rerank"] = float(score)
             result.append(doc)
+            taken.add(i)
             source_count[src] = source_count.get(src, 0) + 1
         if len(result) == top_k:
             return result
-    # Second pass: fill remaining slots ignoring cap
-    for score, doc in scored:
+    # Second pass: fill remaining slots ignoring cap, never re-adding a pick.
+    # Testing `doc not in result` cannot work: the entries of `result` are
+    # copies carrying `_score_rerank`, so no original ever compares equal.
+    for i, (score, doc) in enumerate(scored):
         if len(result) == top_k:
             break
-        if doc not in [r for r in result]:
+        if i not in taken:
             doc = dict(doc)
             doc["_score_rerank"] = float(score)
             result.append(doc)
