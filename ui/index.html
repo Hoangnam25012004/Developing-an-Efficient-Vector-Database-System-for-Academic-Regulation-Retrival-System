@@ -9,7 +9,7 @@
   <title>ARRS — IU Academic Regulation Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked-footnote/dist/index.umd.min.js"></script>
@@ -47,30 +47,28 @@ code{font-family:'JetBrains Mono',monospace;background:var(--bg);padding:1px 5px
   display:flex;flex-direction:column;height:100vh;
   transition:width var(--ease),min-width var(--ease);
   overflow:hidden;position:relative;z-index:100;
-  box-shadow:2px 0 12px rgba(0,0,0,.18);
 }
 #sidebar.collapsed{width:var(--sidebar-c);min-width:var(--sidebar-c)}
-.sb-logo{padding:20px 18px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap;overflow:hidden}
-.sb-logo-icon{width:40px;height:40px;min-width:40px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25);padding:3px}
+.sb-logo{padding:22px 18px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.14);white-space:nowrap;overflow:hidden}
+.sb-logo-icon{width:40px;height:40px;min-width:40px;border-radius:3px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:3px}
 .sb-logo-icon img{width:100%;height:100%;object-fit:contain;display:block}
-.sb-logo-text .brand{font-size:17px;font-weight:700;color:#fff;letter-spacing:.3px}
-.sb-logo-text .sub{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.5px;text-transform:uppercase;margin-top:1px}
-.sb-section{padding:12px 10px 4px;font-size:9.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.35);white-space:nowrap;overflow:hidden}
-.sb-item{display:flex;align-items:center;gap:14px;padding:10px 14px;margin:2px 8px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap;overflow:hidden;color:rgba(255,255,255,.65);font-size:13.5px;font-weight:500;transition:background var(--ease),color var(--ease);position:relative}
-.sb-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9)}
-.sb-item.active{background:rgba(255,255,255,.14);color:#fff}
-.sb-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--sky);border-radius:0 3px 3px 0}
-.sb-icon{font-size:16px;min-width:20px;text-align:center}
+.sb-mono{font-family:var(--lib-serif);font-weight:700;font-size:15px;color:var(--navy)}
+.sb-logo-text .brand{font-family:var(--lib-serif);font-size:21px;font-weight:600;color:#fff;letter-spacing:.02em;line-height:1.1}
+.sb-logo-text .sub{font-size:10.5px;color:rgba(255,255,255,.66);letter-spacing:.09em;text-transform:uppercase;margin-top:3px}
+.sb-nav{padding:14px 0;display:flex;flex-direction:column}
+.sb-item{display:flex;align-items:center;gap:12px;width:100%;padding:10px 20px 10px 18px;border:0;border-left:2px solid transparent;background:none;font:inherit;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;color:rgba(255,255,255,.74);font-size:14px;font-weight:500;transition:background var(--ease),color var(--ease);position:relative}
+.sb-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.sb-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--lib-gold)}
+.sb-item:focus-visible{outline:2px solid var(--lib-gold);outline-offset:-2px}
+.sb-icon{display:flex;align-items:center;justify-content:center;min-width:20px}
+.sb-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .sb-label{line-height:1}
-.sb-badge{margin-left:auto;background:var(--sky);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center}
-.sb-footer{margin-top:auto;padding:14px 10px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden}
-.sb-toggle{width:28px;height:28px;min-width:28px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background var(--ease);margin-left:auto}
-.sb-toggle:hover{background:rgba(255,255,255,.2)}
-.sb-status{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.5);font-size:11px}
-.status-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;flex-shrink:0;box-shadow:0 0 0 2px rgba(34,197,94,.25)}
-.status-dot.warn{background:var(--amber)}
-.status-dot.err{background:var(--red);box-shadow:0 0 0 2px rgba(220,38,38,.25)}
-
+.sb-count{margin-left:auto;font-size:12px;color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums}
+.sb-footer{margin-top:auto;padding:14px 20px;border-top:1px solid rgba(255,255,255,.14);display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden}
+.sb-status{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.66);font-size:11.5px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#7BC47F;flex-shrink:0}
+.status-dot.warn{background:#E0B25B}
+.status-dot.err{background:#E08A8A}
 /* MAIN */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .topbar{height:var(--top-h);min-height:var(--top-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;box-shadow:var(--shadow-xs)}
@@ -208,47 +206,148 @@ code{font-family:'JetBrains Mono',monospace;background:var(--bg);padding:1px 5px
 .cb-item label{font-size:13px;color:var(--text-2);cursor:pointer;flex:1}
 .cb-count{font-size:11px;color:var(--text-3);background:var(--bg);padding:1px 7px;border-radius:99px}
 
-/* DOCUMENTS */
-#screen-documents{flex-direction:column}
-.doc-body{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:20px 24px 0}
-.stat-row{display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;flex:1;min-width:140px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-xs)}
-.stat-icon{width:44px;height:44px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.stat-icon.blue{background:rgba(37,99,235,.1)}
-.stat-icon.teal{background:rgba(13,148,136,.1)}
-.stat-icon.amber{background:rgba(217,119,6,.1)}
-.stat-icon.green{background:rgba(22,163,74,.1)}
-.stat-info .val{font-size:24px;font-weight:700;color:var(--text);line-height:1}
-.stat-info .lbl{font-size:12px;color:var(--text-3);margin-top:4px}
-.doc-tabs{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
-.doc-tab{padding:6px 14px;border-radius:99px;font-size:12.5px;font-weight:500;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);cursor:pointer;transition:all var(--ease);display:flex;align-items:center;gap:5px}
-.doc-tab:hover{border-color:var(--blue-light);color:var(--blue)}
-.doc-tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
-.doc-tab .cnt{font-size:10.5px;padding:1px 6px;border-radius:99px;font-weight:700;background:rgba(255,255,255,.25)}
-.doc-tab:not(.active) .cnt{background:var(--bg);color:var(--text-3)}
-.doc-tab .grp-del{font-size:11px;font-weight:700;opacity:.45;padding:0 2px;border-radius:4px;margin-left:2px}
-.doc-tab .grp-del:hover{opacity:1;color:#fff;background:var(--red,#e5484d)}
-.doc-del-btn{background:none;border:none;cursor:pointer;font-size:15px;opacity:.55;padding:2px 6px;border-radius:6px;transition:all var(--ease)}
-.doc-del-btn:hover{opacity:1;background:rgba(229,72,77,.14)}
-.doc-table-wrap{flex:1;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);margin-bottom:20px}
-table.doc-table{width:100%;border-collapse:collapse}
-.doc-table thead th{padding:10px 14px;text-align:left;font-size:11.5px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;cursor:pointer;white-space:nowrap;user-select:none}
-.doc-table thead th:hover{color:var(--blue)}
-.doc-table thead th .sort-icon{font-size:10px;opacity:.5;margin-left:4px}
-.doc-table tbody tr{border-bottom:1px solid var(--border-2);transition:background var(--ease);cursor:pointer}
-.doc-table tbody tr:last-child{border-bottom:none}
-.doc-table tbody tr:hover{background:#F8FAFF}
-.doc-table td{padding:11px 14px;font-size:13px;color:var(--text)}
-.doc-table td.muted{color:var(--text-3);font-size:12.5px}
-.doc-type-badge{display:inline-flex;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600}
-.doc-type-badge.qd{background:rgba(37,99,235,.1);color:var(--blue)}
-.doc-type-badge.tt{background:rgba(13,148,136,.1);color:var(--teal)}
-.doc-type-badge.hd{background:rgba(217,119,6,.1);color:var(--amber)}
-.doc-type-badge.qc{background:rgba(22,163,74,.1);color:var(--green)}
-.doc-type-badge.cv{background:rgba(139,92,246,.1);color:#7C3AED}
-.doc-type-badge.lq{background:rgba(220,38,38,.1);color:var(--red)}
-.doc-type-badge.tb{background:rgba(100,116,139,.1);color:#64748B}
-
+/* LIBRARY — the Documents screen (design: docs/design/documents-library-redesign.md) */
+:root{
+  --lib-paper:#F7F5F0;--lib-sheet:#FFFFFF;--lib-hover:#FBFAF6;
+  --lib-ink:#1F2430;--lib-ink-2:#4A5060;--lib-ink-3:#6A6F78;
+  --lib-rule:#E4DED2;--lib-rule-strong:#CFC7B8;--lib-rule-ui:#8C8579;
+  --lib-navy:#1B3A6B;--lib-navy-2:#13294D;--lib-gold:#C8A24A;
+  --lib-ok:#2F6B3B;--lib-busy:#8A5A00;--lib-bad:#A12A2A;--lib-hl:#FFF1B8;
+  --lib-serif:'Source Serif 4','Noto Serif','Times New Roman',serif;
+  --lib-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+#screen-documents{flex-direction:column;background:var(--lib-paper);color:var(--lib-ink)}
+#screen-documents :focus-visible{outline:2px solid var(--lib-navy);outline-offset:2px}
+.lib-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.lib-i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.lib-scroll{flex:1;overflow-y:auto}
+.lib-page{max-width:1280px;margin:0 auto;padding:30px 40px 64px}
+.lib-masthead{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap}
+.lib-mast-text{flex:1;min-width:320px}
+.lib-kicker{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--lib-ink-3)}
+.lib-h1{font-family:var(--lib-serif);font-size:34px;line-height:1.15;font-weight:600;letter-spacing:-.005em;margin-top:6px;color:var(--lib-ink)}
+.lib-lede{max-width:64ch;color:var(--lib-ink-2);margin-top:8px;font-size:15px}
+.lib-summary{margin-top:12px;font-size:13px;color:var(--lib-ink-2);font-variant-numeric:tabular-nums}
+.lib-summary b{color:var(--lib-ink);font-weight:600}
+.lib-summary button{background:none;border:0;padding:0;font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.lib-summary .warn{color:var(--lib-busy)}
+.lib-summary .bad{color:var(--lib-bad)}
+.lib-actions{display:flex;gap:8px;align-items:center;padding-bottom:4px;flex-wrap:wrap}
+.lib-btn{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border:1px solid var(--lib-rule-ui);border-radius:3px;background:var(--lib-sheet);color:var(--lib-ink);font:inherit;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer}
+.lib-btn:hover{border-color:var(--lib-ink)}
+.lib-btn:disabled{opacity:.65;cursor:progress}
+.lib-btn-primary{background:var(--lib-navy);border-color:var(--lib-navy);color:#fff}
+.lib-btn-primary:hover{background:var(--lib-navy-2);border-color:var(--lib-navy-2)}
+.lib-btn-quiet{border-color:transparent;background:transparent;color:var(--lib-ink-2);padding:0 8px}
+.lib-btn-quiet:hover{border-color:transparent;color:var(--lib-ink);text-decoration:underline;text-underline-offset:3px}
+#screen-documents .spinner.dark{border-top-color:var(--lib-navy)}
+.lib-rule{margin:22px 0;border:0;border-top:1px solid var(--lib-ink);border-bottom:1px solid var(--lib-rule-strong);height:4px}
+.lib-search{position:relative;display:flex;align-items:center}
+.lib-search .lib-i{position:absolute;left:14px;color:var(--lib-ink-3);width:18px;height:18px;pointer-events:none}
+.lib-search input{width:100%;height:46px;padding:0 48px 0 44px;border:1px solid var(--lib-rule-ui);border-radius:3px;background:var(--lib-sheet);font:inherit;font-size:15px;color:var(--lib-ink)}
+.lib-search input::placeholder{color:var(--lib-ink-3)}
+.lib-search input:focus{outline:2px solid var(--lib-navy);outline-offset:-1px;border-color:var(--lib-navy)}
+.lib-search input::-webkit-search-cancel-button{display:none}
+.lib-search kbd{position:absolute;right:12px;font-family:var(--lib-mono);font-size:11px;color:var(--lib-ink-3);border:1px solid var(--lib-rule-strong);border-radius:3px;padding:1px 6px;background:var(--lib-paper)}
+.lib-search-hint{margin-top:7px;font-size:12px;color:var(--lib-ink-3)}
+.lib-body{display:grid;grid-template-columns:220px minmax(0,1fr);gap:36px;margin-top:26px;align-items:start}
+.lib-refine{position:sticky;top:18px}
+.lib-refine-h{font-family:var(--lib-serif);font-size:17px;font-weight:600;padding-bottom:8px;border-bottom:1px solid var(--lib-ink);list-style:none;cursor:pointer}
+.lib-refine-h::-webkit-details-marker{display:none}
+.lib-refine-state{font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:400;color:var(--lib-ink-3);margin-left:8px}
+.lib-facet{padding:14px 0 12px;border-bottom:1px solid var(--lib-rule)}
+.lib-facet h3{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--lib-ink-3);margin-bottom:6px}
+.lib-facet ul{list-style:none}
+.lib-facet li{display:flex;align-items:center}
+.lib-fi{flex:1;display:flex;align-items:baseline;gap:8px;padding:5px 8px 5px 10px;border:0;border-left:2px solid transparent;background:none;font:inherit;text-align:left;font-size:13.5px;color:var(--lib-ink-2);min-width:0;cursor:pointer}
+.lib-fi .lbl{flex:1;min-width:0}
+.lib-fi .cnt{font-size:12px;color:var(--lib-ink-3);font-variant-numeric:tabular-nums}
+.lib-fi:hover{color:var(--lib-ink);background:var(--lib-hover)}
+.lib-fi[aria-pressed="true"]{border-left-color:var(--lib-navy);color:var(--lib-ink);font-weight:600;background:var(--lib-sheet)}
+.lib-fi:disabled{opacity:.45;cursor:default;background:none}
+.lib-fmore{width:26px;height:26px;min-width:26px;display:flex;align-items:center;justify-content:center;border:0;background:none;color:var(--lib-ink-3);border-radius:3px;opacity:0;cursor:pointer}
+.lib-facet li:hover .lib-fmore,.lib-fmore:focus-visible,.lib-fmore[aria-expanded="true"]{opacity:1}
+.lib-fmore:hover{color:var(--lib-ink);background:var(--lib-rule)}
+@media (hover:none){.lib-fmore{opacity:1}}
+.lib-link{background:none;border:0;padding:0;font:inherit;color:var(--lib-navy);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.lib-clear{margin-top:12px;font-size:12.5px}
+.lib-resultbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-bottom:10px;min-height:40px}
+.lib-count{font-size:13px;color:var(--lib-ink-2)}
+.lib-count b{color:var(--lib-ink)}
+.lib-filters{font-size:12.5px;color:var(--lib-ink-3);display:flex;gap:12px;flex-wrap:wrap}
+.lib-filters b{color:var(--lib-ink-2)}
+.lib-sort{margin-left:auto;font-size:12.5px;color:var(--lib-ink-3);display:flex;align-items:center;gap:8px}
+.lib-sort select{height:30px;border:1px solid var(--lib-rule-ui);border-radius:3px;background:var(--lib-sheet);font:inherit;font-size:13px;color:var(--lib-ink);padding:0 8px}
+.lib-dir{height:30px;border:1px solid var(--lib-rule-ui);border-radius:3px;background:var(--lib-sheet);color:var(--lib-ink-2);font:inherit;font-size:12px;padding:0 8px;cursor:pointer}.lib-table{width:100%;border-collapse:collapse;background:var(--lib-sheet);border-top:2px solid var(--lib-ink);border-bottom:2px solid var(--lib-ink)}
+.lib-table thead th{position:sticky;top:0;z-index:2;background:var(--lib-sheet);border-bottom:1px solid var(--lib-ink);padding:9px 12px;text-align:left;font-size:12px;font-weight:600;color:var(--lib-ink-2);white-space:nowrap}
+.lib-table thead th button{display:inline-flex;align-items:center;gap:4px;border:0;background:none;padding:0;font:inherit;font-weight:600;color:inherit;cursor:pointer}
+.lib-table thead th button:hover{color:var(--lib-ink);text-decoration:underline;text-underline-offset:3px}
+.lib-table thead th .dir{font-size:10px;color:var(--lib-navy)}
+.lib-table td{padding:13px 12px;border-bottom:1px solid var(--lib-rule);vertical-align:top;font-size:13px;color:var(--lib-ink)}
+.lib-table tr.lib-row{cursor:pointer}
+.lib-table tr.lib-row:hover td{background:var(--lib-hover)}
+.lib-table tr.lib-row.is-orphan{cursor:default}
+.lib-table .c-no{width:40px;text-align:right;color:var(--lib-ink-3);font-size:12.5px;font-variant-numeric:tabular-nums}
+.lib-table .c-year{width:56px;font-variant-numeric:tabular-nums;color:var(--lib-ink-2)}
+.lib-table .c-n{width:72px;text-align:right;font-variant-numeric:tabular-nums;color:var(--lib-ink-2)}
+.lib-table .c-status{width:136px}
+.lib-table .c-act{width:40px;text-align:right}
+.lib-rec-title{font-family:var(--lib-serif);font-size:16px;font-weight:600;line-height:1.35;color:var(--lib-ink);text-decoration:none}
+a.lib-rec-title:hover{color:var(--lib-navy);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.lib-rec-meta{margin-top:3px;font-size:12.5px;color:var(--lib-ink-2)}
+.lib-rec-meta .sep{color:var(--lib-rule-ui);margin:0 6px}
+.lib-rec-file{margin-top:3px;font-family:var(--lib-mono);font-size:11.5px;color:var(--lib-ink-3);word-break:break-all}
+.lib-rec-file .ft{font-family:'Inter',system-ui,sans-serif;font-size:10.5px;letter-spacing:.06em;margin-left:8px}
+.lib-rec-small{display:none;margin-top:6px;font-size:12px;color:var(--lib-ink-2)}
+#screen-documents mark{background:var(--lib-hl);color:inherit;border-radius:2px;padding:0 1px}
+.lib-section th{padding:22px 12px 8px;text-align:left;background:var(--lib-paper);border-bottom:1px solid var(--lib-rule-strong);font-weight:400}
+.lib-table tbody tr.lib-section:first-child th{padding-top:14px}
+.lib-section .t{font-family:var(--lib-serif);font-size:17px;font-weight:600;color:var(--lib-ink)}
+.lib-section .m{margin-left:10px;font-size:12.5px;color:var(--lib-ink-3)}
+.lib-msg td{padding:52px 12px;text-align:center;color:var(--lib-ink-2)}
+.lib-msg .t{font-family:var(--lib-serif);font-size:19px;color:var(--lib-ink);margin-bottom:6px}
+.lib-msg.err .t{color:var(--lib-bad)}
+.lib-source-note{margin-top:12px;font-size:12px;color:var(--lib-ink-3);max-width:90ch}
+.lib-source-note code{font-family:var(--lib-mono);font-size:11px;color:var(--lib-ink-2);background:none;padding:0}
+.lib-st{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;white-space:nowrap}
+.lib-st .mk{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.st-indexed{color:var(--lib-ok)}
+.st-queued,.st-processing,.st-removing,.st-empty{color:var(--lib-busy)}
+.st-failed{color:var(--lib-bad)}
+.st-not_indexed,.st-orphan{color:var(--lib-ink-3)}
+.st-queued .mk,.st-not_indexed .mk{background:transparent;border:1.5px solid currentColor}
+.st-orphan .mk{background:transparent;border:1.5px dashed currentColor}
+.st-processing .mk,.st-removing .mk{background:transparent;border:1.5px solid currentColor;border-right-color:transparent;animation:spin .9s linear infinite}
+@media (prefers-reduced-motion:reduce){.st-processing .mk,.st-removing .mk{animation:none}}
+.lib-st-note{display:block;margin-top:3px;font-size:11.5px;color:var(--lib-ink-3);white-space:normal;max-width:24ch}
+.lib-retry{display:inline-block;margin-top:4px;font-size:12px}
+.lib-more{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:0;background:none;border-radius:3px;color:var(--lib-ink-3);cursor:pointer}
+.lib-more:hover,.lib-more[aria-expanded="true"]{color:var(--lib-ink);background:var(--lib-rule)}
+.lib-menu{position:fixed;z-index:500;min-width:230px;background:var(--lib-sheet);border:1px solid var(--lib-rule-strong);border-radius:3px;box-shadow:0 6px 24px rgba(31,36,48,.12);padding:6px 0}
+.lib-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;border:0;background:none;font:inherit;font-size:13px;color:var(--lib-ink);text-align:left;cursor:pointer}
+.lib-menu button .lib-i{color:var(--lib-ink-3)}
+.lib-menu button:hover,.lib-menu button:focus-visible{background:var(--lib-paper);outline:none}
+.lib-menu .danger,.lib-menu .danger .lib-i{color:var(--lib-bad)}
+.lib-menu hr{border:0;border-top:1px solid var(--lib-rule);margin:6px 0}
+@media (max-width:1279px){
+  .lib-body{grid-template-columns:1fr;gap:18px}
+  .lib-refine{position:static}
+  #lib-refine-box[open]{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));column-gap:28px}
+  .lib-refine-h,.lib-clear{grid-column:1/-1}
+  .lib-refine-h::after{content:' +';font-family:'Inter',system-ui,sans-serif;color:var(--lib-ink-3)}
+  #lib-refine-box[open] .lib-refine-h::after{content:' \2212'}
+}
+@media (max-width:900px){
+  .lib-page{padding:22px 18px 48px}
+  .lib-table .c-passages{display:none}
+}
+@media (max-width:640px){
+  .lib-h1{font-size:27px}
+  .lib-mast-text{min-width:0}
+  .lib-table thead,.lib-table .c-no,.lib-table .c-year,.lib-table .c-n,.lib-table .c-status{display:none}
+  .lib-rec-small{display:block}
+  .lib-table td{padding:12px 6px}
+}
 /* ANALYTICS */
 #screen-analytics{flex-direction:column}
 .analytics-body{flex:1;overflow-y:auto;padding:20px 24px}
@@ -329,93 +428,79 @@ canvas.gauge{display:block}
 .pill.teal{background:rgba(13,148,136,.1);color:var(--teal)}
 .pill.red{background:rgba(220,38,38,.1);color:var(--red)}
 
-/* UPLOAD CONFIRM MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);z-index:9998;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease-out}
-.modal{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);max-width:560px;width:92%;max-height:80vh;display:flex;flex-direction:column;overflow:hidden}
-.modal-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.modal-head h3{font-size:16px;font-weight:600;color:var(--text)}
-.modal-head .icon{font-size:20px}
-.modal-body{padding:16px 24px;overflow-y:auto;flex:1}
-.modal-body .hint{font-size:12.5px;color:var(--text-2);background:rgba(13,148,136,.08);border-left:3px solid var(--teal);padding:10px 12px;border-radius:var(--r-sm);margin-bottom:14px;line-height:1.5}
+/* ADD DOCUMENTS MODAL (opened from the Library) */
+.modal-overlay{position:fixed;inset:0;background:rgba(31,36,48,.45);z-index:9998;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease-out}
+.modal{background:var(--lib-sheet);border-radius:4px;border-top:3px solid var(--lib-navy);box-shadow:0 20px 60px rgba(31,36,48,.25);max-width:560px;width:92%;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;color:var(--lib-ink)}
+.modal-head{padding:18px 24px 14px;border-bottom:1px solid var(--lib-rule);display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.modal-head h3{font-family:var(--lib-serif);font-size:21px;font-weight:600;color:var(--lib-ink)}
+.modal-body{padding:18px 24px;overflow-y:auto;flex:1}
+.modal-body .hint{display:flex;gap:8px;font-size:12.5px;color:var(--lib-ink-2);line-height:1.6;margin-bottom:14px}
+.modal-body .hint .lib-i{margin-top:3px;color:var(--lib-ink-3)}
+#upload-modal :focus-visible{outline:2px solid var(--lib-navy);outline-offset:2px}
 
 /* Drag & drop zone */
-.dropzone{
-  border:2px dashed var(--border-2);
-  border-radius:var(--r);
-  padding:28px 20px;
-  text-align:center;
-  background:var(--bg);
-  cursor:pointer;
-  transition:all var(--ease);
-  margin-bottom:14px;
-}
-.dropzone:hover{border-color:var(--blue-light);background:rgba(59,130,246,.04)}
-.dropzone.dragover{border-color:var(--blue);background:rgba(59,130,246,.08);border-style:solid}
-.dropzone-icon{font-size:32px;margin-bottom:6px;opacity:.7}
-.dropzone-text{font-size:13.5px;color:var(--text);font-weight:500;margin-bottom:3px}
-.dropzone-sub{font-size:11.5px;color:var(--text-3)}
-.dropzone-list-title{font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 6px;padding:0 2px}
+.dropzone{border:1px dashed var(--lib-rule-ui);border-radius:3px;padding:26px 20px;text-align:center;background:var(--lib-paper);cursor:pointer;transition:all var(--ease);margin-bottom:14px}
+.dropzone:hover{border-color:var(--lib-ink)}
+.dropzone.dragover{border-color:var(--lib-navy);background:#EEF2F8;border-style:solid}
+.dropzone-icon{display:flex;justify-content:center;color:var(--lib-ink-3);margin-bottom:6px}
+.dropzone-icon .lib-i{width:26px;height:26px}
+.dropzone-text{font-size:13.5px;color:var(--lib-ink);font-weight:600;margin-bottom:3px}
+.dropzone-sub{font-size:12px;color:var(--lib-ink-3)}
+.dropzone-list-title{font-size:11px;font-weight:600;color:var(--lib-ink-3);text-transform:uppercase;letter-spacing:.1em;margin:14px 0 4px;padding:0 2px}
 
-.modal-file{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;transition:background var(--ease)}
-.modal-file:hover{background:var(--bg)}
-.modal-file input[type="checkbox"]{width:16px;height:16px;cursor:pointer;accent-color:var(--blue);flex-shrink:0}
-.modal-file .fname{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.modal-file .fsize{font-size:11px;color:var(--text-3);font-family:'JetBrains Mono',monospace;flex-shrink:0}
-.modal-file .fremove{background:none;border:none;cursor:pointer;color:var(--text-3);font-size:16px;padding:2px 6px;border-radius:4px;transition:all var(--ease)}
-.modal-file .fremove:hover{color:var(--red);background:rgba(220,38,38,.08)}
+.modal-file{display:flex;align-items:center;gap:12px;padding:8px 2px;border-bottom:1px solid var(--lib-rule)}
+.modal-file .fname{font-size:13px;color:var(--lib-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.modal-file .fsize{font-size:11.5px;color:var(--lib-ink-3);font-family:var(--lib-mono);flex-shrink:0}
+.modal-file .fremove{width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--lib-ink-3);border-radius:3px;transition:all var(--ease)}
+.modal-file .fremove:hover{color:var(--lib-bad);background:var(--lib-paper)}
 
-.modal-foot{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:var(--bg)}
-.modal-foot button{padding:8px 16px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:13px;font-weight:500;font-family:inherit;transition:all var(--ease)}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--lib-rule);display:flex;justify-content:flex-end;gap:8px;background:var(--lib-sheet)}
+.modal-foot button{height:34px;padding:0 14px;border-radius:3px;cursor:pointer;font-size:13px;font-weight:500;font-family:inherit;transition:all var(--ease)}
 .modal-foot button:disabled{opacity:.5;cursor:not-allowed}
-.modal-foot .btn-cancel{background:var(--surface);color:var(--text-2);border:1px solid var(--border-2)}
-.modal-foot .btn-cancel:hover{background:var(--bg)}
-.modal-foot .btn-primary{background:var(--blue);color:#fff}
-.modal-foot .btn-primary:hover:not(:disabled){background:var(--blue-light)}
+.modal-foot .btn-cancel{background:var(--lib-sheet);color:var(--lib-ink);border:1px solid var(--lib-rule-ui)}
+.modal-foot .btn-cancel:hover{border-color:var(--lib-ink)}
+.modal-foot .btn-primary{background:var(--lib-navy);color:#fff;border:1px solid var(--lib-navy)}
+.modal-foot .btn-primary:hover:not(:disabled){background:var(--lib-navy-2)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* UPLOAD v2 — steps, per-file report, statuses */
+/* UPLOAD v2 — steps, per-file report */
 .modal.wide{max-width:900px;max-height:88vh}
-.up-steps{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:12px;color:var(--text-3)}
-.up-step{padding:2px 8px;border-radius:99px}
-.up-step.active{background:rgba(37,99,235,.1);color:var(--blue);font-weight:600}
+.up-steps{margin-left:auto;display:flex;gap:14px;align-items:center;font-size:12.5px;color:var(--lib-ink-3)}
+.up-step .n{margin-right:5px;font-variant-numeric:tabular-nums}
+.up-step.active{color:var(--lib-ink);font-weight:600}
+.up-label{display:block;font-size:12px;font-weight:600;color:var(--lib-ink-2);margin:2px 0 6px}
 .up-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:150px}
-.up-field label{font-size:11.5px;font-weight:600;color:var(--text-2)}
-.up-field input,.up-field select,.up-row select,.up-meta input{width:100%;padding:7px 9px;border-radius:var(--r-sm);border:1px solid var(--border-2);font-family:inherit;font-size:12.5px;background:var(--surface);color:var(--text)}
-.up-newgroup{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.up-progress{height:8px;background:var(--bg);border-radius:99px;overflow:hidden;margin:4px 0 6px}
-.up-progress .bar{height:100%;width:0;background:var(--blue);transition:width .2s}
-.up-progress-lbl{font-size:12px;color:var(--text-2);margin-bottom:10px}
-.up-row{border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px}
-.up-row.rejected{background:#FEF2F2;border-color:#FECACA}
-.up-row.warn{background:#FFFBEB;border-color:#FDE68A}
+.up-field label{font-size:11.5px;font-weight:600;color:var(--lib-ink-2)}
+.up-select,.up-field input,.up-field select,.up-row select,.up-meta input{width:100%;padding:7px 9px;border-radius:3px;border:1px solid var(--lib-rule-ui);font-family:inherit;font-size:13px;background:var(--lib-sheet);color:var(--lib-ink)}
+.up-newgroup{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.up-progress{height:3px;background:var(--lib-rule);overflow:hidden;margin:2px 0 8px}
+.up-progress .bar{height:100%;width:0;background:var(--lib-navy);transition:width .2s}
+.up-progress-lbl{font-size:12.5px;color:var(--lib-ink-2);margin-bottom:12px}
+.up-row{padding:10px 12px;border-left:3px solid var(--lib-ok);border-bottom:1px solid var(--lib-rule)}
+.up-row.warn{border-left-color:var(--lib-busy)}
+.up-row.rejected{border-left-color:var(--lib-bad)}
 .up-row-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.up-row-head .ic{font-size:15px;width:18px;text-align:center}
+.up-row-head .ic{display:flex;color:var(--lib-ok)}
+.up-row.warn .up-row-head .ic{color:var(--lib-busy)}
+.up-row.rejected .up-row-head .ic{color:var(--lib-bad)}
 .up-row-head .nm{font-weight:600;font-size:13px;flex:1;min-width:180px;word-break:break-all}
-.up-row-head .meta{font-size:11.5px;color:var(--text-3);font-family:'JetBrains Mono',monospace}
+.up-row-head .meta{font-size:11.5px;color:var(--lib-ink-3);font-family:var(--lib-mono)}
 .up-row-head select{width:auto;min-width:120px}
-.up-msg{font-size:12px;margin-top:6px;color:var(--text-2);line-height:1.5}
-.up-msg.err{color:var(--red)}
-.up-msg.warn{color:#92400E}
-.up-meta-toggle{font-size:12px;color:var(--blue);cursor:pointer;margin-top:6px;display:inline-block;user-select:none}
+.up-msg{font-size:12px;margin-top:5px;color:var(--lib-ink-2);line-height:1.5}
+.up-msg.err{color:var(--lib-bad)}
+.up-msg.warn{color:var(--lib-busy)}
+.up-msg code{font-family:var(--lib-mono);font-size:11.5px;background:var(--lib-paper);color:var(--lib-ink-2)}
+.up-meta-toggle{font-size:12px;color:var(--lib-navy);cursor:pointer;margin-top:6px;display:inline-block;user-select:none;text-decoration:underline;text-underline-offset:3px}
 .up-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.st-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
-.st-badge.indexed{background:rgba(22,163,74,.1);color:var(--green)}
-.st-badge.queued,.st-badge.processing,.st-badge.removing{background:rgba(37,99,235,.1);color:var(--blue)}
-.st-badge.failed{background:rgba(220,38,38,.1);color:var(--red)}
-.st-badge.empty{background:rgba(217,119,6,.12);color:var(--amber)}
-.st-badge.not_indexed,.st-badge.orphan{background:rgba(100,116,139,.12);color:#475569}
-.doc-act-btn{background:none;border:none;cursor:pointer;font-size:14px;opacity:.6;padding:2px 5px;border-radius:6px;transition:all var(--ease)}
-.doc-act-btn:hover{opacity:1;background:rgba(37,99,235,.1)}
 @media (max-width:640px){.up-meta{grid-template-columns:1fr}}
 
 /* TOAST */
 .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.toast{background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--r-sm);font-size:13px;box-shadow:var(--shadow-lg);animation:slideIn .25s ease-out;max-width:360px}
-.toast.success{background:var(--green)}
-.toast.error{background:var(--red)}
-.toast.info{background:var(--blue)}
-@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-
+.toast{background:#1F2430;color:#fff;padding:10px 14px 10px 12px;border-left:3px solid #9DB4D8;border-radius:3px;font-size:13px;box-shadow:0 6px 24px rgba(31,36,48,.18);animation:toastIn .15s ease-out;max-width:380px}
+.toast.success{border-left-color:#7BC47F}
+.toast.error{border-left-color:#E08A8A}
+.toast.info{border-left-color:#9DB4D8}
+@keyframes toastIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .text-muted{color:var(--text-3)}
 .text-sm{font-size:12px}
 .hidden{display:none!important}
@@ -432,10 +517,10 @@ canvas.gauge{display:block}
 /* Below 900px: sidebar compact-only, search filters stack */
 @media (max-width:900px){
   #sidebar:not(.collapsed){width:var(--sidebar-c);min-width:var(--sidebar-c)}
+  #sidebar:not(.collapsed) .sb-logo{padding:18px 14px}
   #sidebar:not(.collapsed) .sb-logo-text,
-  #sidebar:not(.collapsed) .sb-section,
   #sidebar:not(.collapsed) .sb-label,
-  #sidebar:not(.collapsed) .sb-badge,
+  #sidebar:not(.collapsed) .sb-count,
   #sidebar:not(.collapsed) .sb-status{display:none}
   .search-body{flex-direction:column}
   .search-right{width:100%;min-width:0;order:-1}
@@ -443,23 +528,12 @@ canvas.gauge{display:block}
   .topbar-title{font-size:14px}
   .topbar-actions .btn span:not(.icon){display:none}
 }
-/* Below 640px: stack stat cards, scrollable doc-tabs, smaller bubble */
+/* Below 640px: smaller bubble */
 @media (max-width:640px){
-  .stat-row{gap:8px}
-  .stat-card{min-width:0;padding:12px 14px}
-  .stat-info .val{font-size:18px}
-  .doc-tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
-  .doc-tab{flex-shrink:0}
-  .doc-table-wrap{overflow:auto}
-  .doc-table thead th{font-size:10.5px;padding:8px 10px}
-  .doc-table tbody td{font-size:12px;padding:8px 10px!important}
   .bubble{max-width:88%}
-  .chat-history,.search-body,.doc-body{padding:14px 12px}
+  .chat-history,.search-body{padding:14px 12px}
   .chat-input-bar{padding:10px 12px}
-}
-/* Always: prevent table from forcing horizontal page scroll */
-.doc-table-wrap{overflow-x:auto}
-</style>
+}</style>
 </head>
 <body>
 
@@ -468,26 +542,24 @@ canvas.gauge{display:block}
 <script>window.API_BASE = window.API_BASE ||
   (/^https?:$/.test(location.protocol) ? location.origin : 'http://127.0.0.1:8000');</script>
 
-<aside id="sidebar">
+<aside id="sidebar" aria-label="Main navigation">
   <div class="sb-logo">
-    <div class="sb-logo-icon"><img src="/img/Logo-HCMIU.svg" alt="HCMIU" onerror="this.onerror=null;this.src='/img/Logo-HCMIU.svg.png'"></div>
+    <div class="sb-logo-icon"><img src="/img/Logo-HCMIU.svg" alt="HCMIU" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='/img/Logo-HCMIU.svg.png'}else{this.replaceWith(Object.assign(document.createElement('span'),{className:'sb-mono',textContent:'IU'}))}"></div>
     <div class="sb-logo-text">
       <div class="brand">ARRS</div>
       <div class="sub">IU Academic Assistant</div>
     </div>
   </div>
 
-  <div class="sb-section">Main</div>
-  <div class="sb-item active" data-screen="chat">
-    <span class="sb-icon">💬</span><span class="sb-label">Chat</span>
-  </div>
-
-  <div class="sb-section">Data</div>
-  <div class="sb-item" data-screen="documents">
-    <span class="sb-icon">📁</span><span class="sb-label">Documents</span>
-    <span class="sb-badge" id="sb-doc-count">–</span>
-  </div>
-
+  <nav class="sb-nav">
+    <button type="button" class="sb-item active" data-screen="chat" title="Chat" aria-current="page">
+      <span class="sb-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3.5V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span><span class="sb-label">Chat</span>
+    </button>
+    <button type="button" class="sb-item" data-screen="documents" title="Regulation Library">
+      <span class="sb-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6.5C10.5 5.2 8.3 4.5 5 4.5v13c3.3 0 5.5.7 7 2 1.5-1.3 3.7-2 7-2v-13c-3.3 0-5.5.7-7 2z"/><path d="M12 6.5v13"/></svg></span><span class="sb-label">Library</span>
+      <span class="sb-count" id="sb-doc-count">–</span>
+    </button>
+  </nav>
 
   <div class="sb-footer">
     <div class="sb-status">
@@ -496,7 +568,6 @@ canvas.gauge{display:block}
     </div>
   </div>
 </aside>
-
 <div id="main">
 
   <!-- CHAT -->
@@ -561,126 +632,141 @@ canvas.gauge{display:block}
     </div>
   </div>
 
-  <!-- DOCUMENTS -->
+  <!-- LIBRARY (the Documents screen) -->
   <div class="screen" id="screen-documents">
-    <div class="topbar">
-      <div class="topbar-title"><span class="icon">📁</span> Documents</div>
-      <div class="topbar-actions">
-        <button class="btn btn-primary" id="reindex-docs" title="Tải tài liệu PDF/DOCX lên và index">📥 Update Documents</button>
-        <button class="btn btn-ghost" id="sync-index" title="Parse lại toàn bộ tài liệu và đồng bộ chỉ mục (Chat vẫn hoạt động)">⟳ Đồng bộ chỉ mục</button>
-        <button class="btn btn-ghost" id="refresh-docs" title="Reload list">↻ Refresh</button>
-        <input type="text" id="doc-search" placeholder="🔍  Search file name…"
-          style="border:1.5px solid var(--border);border-radius:var(--r-sm);padding:6px 12px;font-family:inherit;font-size:13px;outline:none;width:210px" />
-      </div>
-    </div>
+    <div class="lib-scroll" id="lib-scroll">
+      <div class="lib-page">
+        <header class="lib-masthead">
+          <div class="lib-mast-text">
+            <p class="lib-kicker">International University · VNU-HCM</p>
+            <h1 class="lib-h1">Regulation Library</h1>
+            <p class="lib-lede">Laws, circulars, decisions and university rules that the assistant searches and cites when it answers questions.</p>
+            <p class="lib-summary" id="lib-summary" aria-live="polite">Loading the register…</p>
+          </div>
+          <div class="lib-actions" role="toolbar" aria-label="Manage the library">
+            <button type="button" class="lib-btn lib-btn-primary" id="reindex-docs" title="Upload PDF or DOCX files and index them"></button>
+            <button type="button" class="lib-btn" id="sync-index" title="Re-read every document and bring the index up to date (Chat keeps working)"></button>
+            <button type="button" class="lib-btn lib-btn-quiet" id="refresh-docs" title="Reload the list"></button>
+          </div>
+        </header>
+        <hr class="lib-rule">
 
-    <div class="doc-body">
-      <div class="stat-row">
-        <div class="stat-card">
-          <div class="stat-icon blue">📄</div>
-          <div class="stat-info"><div class="val" id="stat-docs">–</div><div class="lbl">Total documents</div></div>
+        <div class="lib-search" role="search">
+          <label for="doc-search" class="lib-sr">Search the library</label>
+          <svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+          <input id="doc-search" type="search" autocomplete="off" spellcheck="false" placeholder="Search by title, number, issuing body or file name">
+          <kbd aria-hidden="true">/</kbd>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon teal">🧩</div>
-          <div class="stat-info"><div class="val" id="stat-chunks">–</div><div class="lbl">Chunks</div></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon amber">📂</div>
-          <div class="stat-info"><div class="val" id="stat-groups">–</div><div class="lbl">Document groups</div></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon green">✅</div>
-          <div class="stat-info"><div class="val" id="stat-indexed">–</div><div class="lbl">Indexed</div></div>
-        </div>
-      </div>
+        <p class="lib-search-hint">Accents are optional: <i>hoc bong</i> finds <i>học bổng</i>.</p>
 
-      <div class="doc-tabs" id="doc-tabs">
-        <div class="doc-tab active" data-group="all">All <span class="cnt">–</span></div>
-      </div>
+        <div class="lib-body">
+          <nav class="lib-refine" aria-label="Refine the list">
+            <details id="lib-refine-box" open>
+              <summary class="lib-refine-h">Refine<span class="lib-refine-state" id="lib-refine-state"></span></summary>
+              <section class="lib-facet"><h3 id="fh-collection">Collection</h3><ul id="facet-collection" aria-labelledby="fh-collection"></ul></section>
+              <section class="lib-facet"><h3 id="fh-issuer">Issued by</h3><ul id="facet-issuer" aria-labelledby="fh-issuer"></ul></section>
+              <section class="lib-facet"><h3 id="fh-type">Document type</h3><ul id="facet-type" aria-labelledby="fh-type"></ul></section>
+              <section class="lib-facet hidden" id="facet-status-wrap"><h3 id="fh-status">Availability</h3><ul id="facet-status" aria-labelledby="fh-status"></ul></section>
+              <button type="button" class="lib-link lib-clear hidden" id="facet-clear">Clear all filters</button>
+            </details>
+          </nav>
 
-      <div class="doc-table-wrap">
-        <table class="doc-table" id="doc-table">
-          <thead>
-            <tr>
-              <th data-col="source">File name <span class="sort-icon">↕</span></th>
-              <th data-col="doc_type">Type <span class="sort-icon">↕</span></th>
-              <th data-col="doc_number">Doc. number <span class="sort-icon">↕</span></th>
-              <th data-col="issuing_body">Issuing body <span class="sort-icon">↕</span></th>
-              <th data-col="doc_group">Group <span class="sort-icon">↕</span></th>
-              <th data-col="language">Ngôn ngữ <span class="sort-icon">↕</span></th>
-              <th data-col="status">Trạng thái <span class="sort-icon">↕</span></th>
-              <th data-col="chunk_count" style="text-align:right">Chunks <span class="sort-icon">↕</span></th>
-              <th data-col="max_page" style="text-align:right">Pages <span class="sort-icon">↕</span></th>
-              <th style="text-align:center">Hành động</th>
-            </tr>
-          </thead>
-          <tbody id="doc-tbody">
-            <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3)">Loading…</td></tr>
-          </tbody>
-        </table>
+          <section class="lib-register" aria-labelledby="lib-register-h">
+            <h2 id="lib-register-h" class="lib-sr">Register of documents</h2>
+            <div class="lib-resultbar">
+              <p class="lib-count" id="lib-count" aria-live="polite"></p>
+              <p class="lib-filters" id="lib-filters"></p>
+              <label class="lib-sort">Order
+                <select id="lib-sort">
+                  <option value="collection">By collection (hierarchy)</option>
+                  <option value="title">Title</option>
+                  <option value="year">Year</option>
+                  <option value="number">Number</option>
+                  <option value="issuer">Issued by</option>
+                  <option value="type">Document type</option>
+                  <option value="pages">Pages</option>
+                  <option value="passages">Passages</option>
+                  <option value="status">Status</option>
+                  <option value="file">File name</option>
+                </select>
+              </label>
+              <button type="button" class="lib-dir hidden" id="lib-dir" aria-label="Reverse the order"></button>
+            </div>
+            <table class="lib-table" id="doc-table">
+              <thead>
+                <tr>
+                  <th class="c-no" scope="col">No.</th>
+                  <th class="c-rec" scope="col" data-col="title" aria-sort="none"><button type="button">Title</button></th>
+                  <th class="c-year" scope="col" data-col="year" aria-sort="none"><button type="button">Year</button></th>
+                  <th class="c-n" scope="col" data-col="pages" aria-sort="none"><button type="button">Pages</button></th>
+                  <th class="c-n c-passages" scope="col" data-col="passages" aria-sort="none"><button type="button" title="Indexed text passages the search engine can return">Passages</button></th>
+                  <th class="c-status" scope="col" data-col="status" aria-sort="none"><button type="button">Status</button></th>
+                  <th class="c-act" scope="col"><span class="lib-sr">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="doc-tbody">
+                <tr class="lib-msg"><td colspan="7"><span class="spinner dark"></span> Loading the register…</td></tr>
+              </tbody>
+            </table>
+            <p class="lib-source-note">Titles, numbers and years come from the library catalogue (<code>data/catalog.json</code>) when an entry exists, otherwise from the details given at upload or the file name.</p>
+          </section>
+        </div>
       </div>
     </div>
   </div>
-
-
 </div><!-- /main -->
 
-<!-- Upload modal: drag & drop files from local computer (no OS file picker).
-     Step 1 picks files + group, step 2 shows the server's check of every file
+<!-- Add-documents modal: drag & drop files from this computer (no OS file picker).
+     Step 1 picks files + collection, step 2 shows the server's check of every file
      and lets the user decide conflicts/language before anything is stored. -->
-<div id="upload-modal" class="modal-overlay hidden">
+<div id="upload-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="upload-modal-title">
   <div class="modal wide">
     <div class="modal-head">
-      <span class="icon">📄</span>
-      <h3>Tải tài liệu lên hệ thống</h3>
+      <h3 id="upload-modal-title">Add documents to the library</h3>
       <div class="up-steps">
-        <span class="up-step active" data-step="1">① Chọn file</span>›
-        <span class="up-step" data-step="2">② Kiểm tra</span>›
-        <span class="up-step" data-step="3">③ Xử lý</span>
+        <span class="up-step active" data-step="1"><span class="n">1</span>Select files</span>
+        <span class="up-step" data-step="2"><span class="n">2</span>Check</span>
+        <span class="up-step" data-step="3"><span class="n">3</span>Index</span>
       </div>
     </div>
     <div class="modal-body">
       <div id="up-step1">
         <!-- Drag & drop zone: drops files into the list without opening OS file picker -->
         <div class="dropzone" id="upload-dropzone">
-          <div class="dropzone-icon">📁</div>
-          <div class="dropzone-text">Kéo thả file PDF/DOCX vào đây</div>
-          <div class="dropzone-sub">Chỉ chấp nhận file từ máy tính của bạn · tối đa <span id="up-limit-files">20</span> file, mỗi file ≤ <span id="up-limit-mb">50</span> MB</div>
+          <div class="dropzone-icon"><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5"/><path d="M7.5 9.5L12 5l4.5 4.5"/><path d="M5 19h14"/></svg></div>
+          <div class="dropzone-text">Drag PDF or DOCX files here</div>
+          <div class="dropzone-sub">Files from this computer only · up to <span id="up-limit-files">20</span> files, <span id="up-limit-mb">50</span> MB each</div>
         </div>
 
         <div class="upload-group-row" style="margin-top:14px">
-          <label for="upload-group-select" style="display:block;font-weight:600;margin-bottom:6px">
-            Nhóm (group) cho các file này
-          </label>
-          <select id="upload-group-select" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border,#ccc)"></select>
+          <label for="upload-group-select" class="up-label">Collection for these files</label>
+          <select id="upload-group-select" class="up-select"></select>
           <div id="upload-newgroup-wrap" style="display:none">
             <div class="up-newgroup">
-              <div class="up-field"><label for="upload-newgroup-name">Tên nhóm mới *</label>
-                <input id="upload-newgroup-name" type="text" placeholder="vd: Chính sách nhân sự" /></div>
-              <div class="up-field"><label for="upload-newgroup-type">Loại tài liệu</label>
-                <input id="upload-newgroup-type" type="text" list="up-doctype-list" placeholder="vd: Chính sách" /></div>
-              <div class="up-field"><label for="upload-newgroup-body">Đơn vị ban hành / tác giả</label>
-                <input id="upload-newgroup-body" type="text" placeholder="vd: Phòng Nhân sự" /></div>
-              <div class="up-field" style="max-width:150px"><label for="upload-newgroup-lang">Ngôn ngữ mặc định</label>
-                <select id="upload-newgroup-lang"><option value="vi">Tiếng Việt</option><option value="en">English</option></select></div>
+              <div class="up-field"><label for="upload-newgroup-name">Collection name *</label>
+                <input id="upload-newgroup-name" type="text" placeholder="e.g. Chính sách nhân sự" /></div>
+              <div class="up-field"><label for="upload-newgroup-type">Document type</label>
+                <input id="upload-newgroup-type" type="text" list="up-doctype-list" placeholder="e.g. Chính sách" /></div>
+              <div class="up-field"><label for="upload-newgroup-body">Issuing body / author</label>
+                <input id="upload-newgroup-body" type="text" placeholder="e.g. Phòng Nhân sự" /></div>
+              <div class="up-field" style="max-width:150px"><label for="upload-newgroup-lang">Default language</label>
+                <select id="upload-newgroup-lang"><option value="vi">Vietnamese</option><option value="en">English</option></select></div>
             </div>
           </div>
           <datalist id="up-doctype-list">
-            <option value="Luật"></option><option value="Thông tư"></option><option value="Quyết định"></option>
-            <option value="Quy chế"></option><option value="Thông báo"></option><option value="Hướng dẫn"></option>
-            <option value="Chính sách"></option><option value="Hợp đồng"></option><option value="Báo cáo"></option>
-            <option value="Tài liệu kỹ thuật"></option><option value="Khác"></option>
+            <option value="Luật" label="Law"></option><option value="Thông tư" label="Circular"></option><option value="Quyết định" label="Decision"></option>
+            <option value="Quy chế" label="Regulation"></option><option value="Thông báo" label="Notice"></option><option value="Hướng dẫn" label="Guideline"></option>
+            <option value="Chính sách" label="Policy"></option><option value="Hợp đồng" label="Contract"></option><option value="Báo cáo" label="Report"></option>
+            <option value="Tài liệu kỹ thuật" label="Technical document"></option><option value="Khác" label="Other"></option>
           </datalist>
         </div>
 
         <div class="hint" style="margin-top:14px">
-          Chọn <strong>nhóm có sẵn</strong> hoặc <strong>tạo nhóm mới</strong> để phân loại tài liệu.
-          Hệ thống dùng nhóm này làm <em>doc_group / loại văn bản / cơ quan ban hành</em> —
-          không đoán từ nội dung. Bấm <strong>Kiểm tra</strong> để hệ thống đọc thử từng file
-          trước khi đưa vào kho.
+          <svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
+          <span>Choose an <strong>existing collection</strong> or <strong>create a new one</strong>. Its document type and issuing body are used for these files — nothing is guessed from their content. <strong>Check files</strong> reads every file and reports problems before anything is stored.</span>
         </div>
 
-        <div class="dropzone-list-title" id="upload-list-title" style="display:none">File đã chọn</div>
+        <div class="dropzone-list-title" id="upload-list-title" style="display:none">Selected files</div>
         <div id="upload-file-list"></div>
       </div>
 
@@ -691,13 +777,12 @@ canvas.gauge{display:block}
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn-cancel" id="upload-cancel">Hủy</button>
-      <button class="btn-cancel hidden" id="upload-back">← Quay lại</button>
-      <button class="btn-primary" id="upload-confirm" disabled>Kiểm tra</button>
+      <button class="btn-cancel" id="upload-cancel">Cancel</button>
+      <button class="btn-cancel hidden" id="upload-back">Back</button>
+      <button class="btn-primary" id="upload-confirm" disabled>Check files</button>
     </div>
   </div>
 </div>
-
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
@@ -831,20 +916,6 @@ function fmtTime(n) {
   return n < 1 ? `${Math.round(n * 1000)}ms` : `${n.toFixed(2)}s`;
 }
 
-function typeSlug(t) {
-  if (!t) return 'tb';
-  const k = String(t).toLowerCase();
-  if (k === 'law' || k.includes('luật') || k.includes('luat')) return 'lq';
-  if (k === 'circular' || k.includes('thông tư') || k.includes('thong tu')) return 'tt';
-  if (k.startsWith('school_decision') || k === 'decision' || k.includes('quyết định') || k.includes('quyet dinh')) return 'qd';
-  if (k === 'decree' || k.includes('nghị định') || k.includes('nghi dinh')) return 'qd';
-  if (k === 'guideline' || k.includes('hướng dẫn') || k.includes('huong dan')) return 'hd';
-  if (k === 'regulation' || k.includes('quy chế') || k.includes('quy che')) return 'qc';
-  if (k === 'dispatch' || k.includes('công văn') || k.includes('cong van')) return 'cv';
-  if (k === 'notice' || k.includes('thông báo') || k.includes('thong bao')) return 'tb';
-  return 'tb';
-}
-
 function classForScore(v, good, ok) {
   if (v === null || v === undefined || isNaN(v)) return 'muted';
   if (v >= good) return 'good';
@@ -858,7 +929,10 @@ function classForScore(v, good, ok) {
 const screenInit = { chat: false, documents: false };
 
 function showScreen(id) {
-  document.querySelectorAll('.sb-item').forEach(x => x.classList.toggle('active', x.dataset.screen === id));
+  document.querySelectorAll('.sb-item').forEach(x => {
+    x.classList.toggle('active', x.dataset.screen === id);
+    if (x.dataset.screen === id) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current');
+  });
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + id));
 
   if (id === 'documents' && !screenInit.documents) { loadDocuments(); screenInit.documents = true; }
@@ -1118,96 +1192,185 @@ async function sendChat() {
 }
 
 // ═══════════════════════════════════════════════════
-//  DOCUMENTS
+//  LIBRARY (the Documents screen)
+//  Design: docs/design/documents-library-redesign.md
 // ═══════════════════════════════════════════════════
 let allDocs = [];
 let docSummary = null;
-let currentGroup = 'all';
+let docChunkTotal = 0;
+let currentGroup = 'all';                  // Collection filter: 'all' | group id | 'Khác'
+const libFilter = { issuer: 'all', type: 'all', status: 'all' };
 let docFilter = '';
-let sortCol = null, sortAsc = true;
+let sortCol = null, sortAsc = true;        // sortCol null: grouped by collection, hierarchy order
 let _docsPoll = null;
-const UPLOAD_BTN_LABEL = '📥 Update Documents';
-const SYNC_BTN_LABEL = '⟳ Đồng bộ chỉ mục';
+
+const LIB_ICONS = {
+  plus: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  sync: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 0 1-13.4 4.6"/><path d="M4.5 12a7.5 7.5 0 0 1 13.4-4.6"/><path d="M18.5 3.8v3.9h-3.9"/><path d="M5.5 20.2v-3.9h3.9"/></svg>',
+  reload: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4h-4"/></svg>',
+  more: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>',
+  open: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5"/><path d="M19 5l-8 8"/><path d="M17 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h4"/></svg>',
+  download: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg>',
+  trash: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 12h8l1-12"/></svg>',
+  x: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>',
+  check: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  warn: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5l8.5 15h-17z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>',
+};
+const UPLOAD_BTN_LABEL = LIB_ICONS.plus + '<span>Add documents</span>';
+const SYNC_BTN_LABEL = LIB_ICONS.sync + '<span>Sync index</span>';
+const REFRESH_BTN_LABEL = LIB_ICONS.reload + '<span>Reload</span>';
 
 // Document status, as reconciled by GET /documents (file ↔ sidecar ↔ index ↔ jobs).
 const STATUS_LABELS = {
-  indexed: '✅ Đã index', queued: '⏳ Đang chờ', processing: '⚙ Đang xử lý', removing: '🗑 Đang xoá',
-  failed: '❌ Lỗi', empty: '⚠ Rỗng', not_indexed: '○ Chưa index', orphan: '◌ Còn trong chỉ mục',
+  indexed: 'Available', queued: 'Queued', processing: 'Processing', removing: 'Removing',
+  failed: 'Failed', empty: 'No text found', not_indexed: 'Not indexed', orphan: 'Index leftovers',
 };
-const STEP_LABELS = { parse: 'Parse', embed: 'Embed', bm25: 'Index', cleanup: 'Hoàn tất',
-                      qdrant: 'Xoá vector', chunks: 'Xoá chunk', queued: 'Chờ' };
+const STATUS_ORDER = ['indexed', 'queued', 'processing', 'removing', 'failed', 'empty', 'not_indexed', 'orphan'];
+const STEP_LABELS = { parse: 'Reading', embed: 'Embedding', bm25: 'Indexing', cleanup: 'Finishing',
+                      qdrant: 'Removing vectors', chunks: 'Removing passages', queued: 'Waiting',
+                      running: 'Syncing' };
+
+// Document types in English for this page only: DOC_TYPE_LABELS above feeds
+// the Chat's References panel and stays as it is.
+const LIB_TYPE_LABELS = {
+  law: 'Law', decree: 'Decree', circular: 'Circular',
+  university_decision: 'Decision', school_decision: 'Decision', school_decision_full: 'Decision',
+  school_decision_brief: 'Decision (short form)', regulation: 'Regulation', guideline: 'Guideline',
+  notice: 'Notice', announcement: 'Notice', dispatch: 'Official letter', appendix: 'Appendix',
+};
+// Types typed in Vietnamese at upload, matched by keyword (first match wins).
+const LIB_TYPE_WORDS = [
+  ['luật', 'Law'], ['nghị định', 'Decree'], ['thông tư', 'Circular'], ['quyết định', 'Decision'],
+  ['quy chế', 'Regulation'], ['quy định', 'Regulation'], ['hướng dẫn', 'Guideline'], ['thông báo', 'Notice'],
+  ['công văn', 'Official letter'], ['phụ lục', 'Appendix'], ['chính sách', 'Policy'], ['hợp đồng', 'Contract'],
+  ['báo cáo', 'Report'], ['tài liệu kỹ thuật', 'Technical document'], ['khác', 'Other'],
+];
+// Collections in legal-hierarchy order, by the collection's doc_type; the rest after, by name.
+const LIB_RANK = { law: 1, decree: 2, circular: 3, university_decision: 4, school_decision_full: 5,
+  school_decision: 5, regulation: 5, school_decision_brief: 6, guideline: 7, dispatch: 7,
+  appendix: 8, announcement: 9, notice: 9 };
+const LIB_RANK_BY_LABEL = { Law: 1, Decree: 2, Circular: 3, Decision: 5, Regulation: 5,
+  Guideline: 7, 'Official letter': 7, Appendix: 8, Notice: 9 };
+
+function libTypeLabel(t) {
+  if (t === null || t === undefined || t === '') return '';
+  const k = String(t).toLowerCase();
+  if (LIB_TYPE_LABELS[k]) return LIB_TYPE_LABELS[k];
+  const hit = LIB_TYPE_WORDS.find(([vi]) => k.includes(vi));
+  return hit ? hit[1] : String(t);
+}
+function libGroupKey(d) {
+  return (d.doc_group === null || d.doc_group === undefined || d.doc_group === '') ? 'Khác' : String(d.doc_group);
+}
+function libGroupLabel(g) { return g === 'Khác' ? 'Other' : (groupLabel(g) || g); }
+function libGroupInfo(g) { return GROUPS.find(x => x.id === g) || {}; }
+function libRank(g) {
+  const code = String(libGroupInfo(g).doc_type || '').toLowerCase();
+  return LIB_RANK[code] || LIB_RANK_BY_LABEL[libTypeLabel(code)] || 10;
+}
+
+// What a record shows: upload details first, then the library catalogue
+// (data/catalog.json), then the file itself. A catalogue key that is present
+// wins even when empty, which hides a wrongly extracted number.
+const libHas = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k);
+function libNameFromFile(src) {
+  const s = String(src || '');
+  return s.replace(/\.(pdf|docx)$/i, '').replace(/^\d+[.\-_ ]*/, '').replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim() || s;
+}
+function libTitle(d) { return d.title || (d.catalog && d.catalog.title) || libNameFromFile(d.source); }
+function libNumber(d) { return libHas(d.catalog, 'doc_number') ? d.catalog.doc_number : (d.doc_number || ''); }
+function libIssuer(d) { return libHas(d.catalog, 'issuing_body') ? d.catalog.issuing_body : (d.issuing_body || ''); }
+function libYear(d) {
+  if (d.catalog && d.catalog.year) return String(d.catalog.year);
+  const m = /\/((?:19|20)\d{2})\//.exec(libNumber(d));
+  return m ? m[1] : '';
+}
+function libIssued(d) {
+  const s = d.catalog && d.catalog.issued;
+  if (!s) return '';
+  const dt = new Date(s + 'T00:00:00Z');
+  return isNaN(dt) ? '' : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
+// Accent-insensitive search: "hoc bong" finds "học bổng".
+function libFold(s) {
+  return String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+}
+function libTerms() { return libFold(docFilter).split(/\s+/).filter(Boolean); }
+function libHaystack(d) {
+  const c = d.catalog || {};
+  return libFold([libTitle(d), d.title, c.title_en, d.source, d.original_filename, libNumber(d), d.doc_number,
+    libIssuer(d), d.issuing_body, libGroupLabel(libGroupKey(d)), libTypeLabel(d.doc_type), libYear(d)]
+    .filter(Boolean).join(' | '));
+}
+// Wraps the matched characters in <mark>, mapping positions of the folded text back to the original.
+function libHighlight(text, terms) {
+  const s = String(text ?? '');
+  if (!terms.length) return escapeHtml(s);
+  const chars = [...s];
+  let folded = '';
+  const map = [];
+  chars.forEach((c, i) => { for (const x of libFold(c)) { folded += x; map.push(i); } });
+  const on = new Array(chars.length).fill(false);
+  for (const t of terms) {
+    let from = 0, k;
+    while ((k = folded.indexOf(t, from)) >= 0) {
+      for (let j = k; j < k + t.length; j++) on[map[j]] = true;
+      from = k + t.length;
+    }
+  }
+  let out = '', open = false;
+  chars.forEach((c, i) => {
+    if (on[i] && !open) { out += '<mark>'; open = true; }
+    if (!on[i] && open) { out += '</mark>'; open = false; }
+    out += escapeHtml(c);
+  });
+  return out + (open ? '</mark>' : '');
+}
+
 function statusBadge(d) {
   const s = d.status || 'not_indexed';
   const det = d.status_detail || {};
   let label = STATUS_LABELS[s] || s;
   if (s === 'processing' && det.step) label += ` · ${STEP_LABELS[det.step] || det.step}`;
   let tip = det.message || '';
-  if (!tip && s === 'orphan') tip = 'File không còn nhưng dữ liệu vẫn nằm trong chỉ mục — bấm 🗑 để dọn.';
-  if (!tip && s === 'empty') tip = 'Không trích được nội dung từ tài liệu.';
-  return `<span class="st-badge ${escapeHtml(s)}" title="${escapeHtml(tip)}">${escapeHtml(label)}</span>`;
+  if (!tip && s === 'orphan') tip = 'The file is gone but its passages are still in the index. Use the ⋯ menu to remove them.';
+  if (!tip && s === 'empty') tip = 'No text could be extracted from this document.';
+  if (!tip && s === 'indexed') tip = 'Searchable and citable in Chat.';
+  const note = (s === 'failed' || s === 'empty') && det.message ? `<span class="lib-st-note">${escapeHtml(det.message)}</span>` : '';
+  const retry = ['failed', 'empty', 'not_indexed'].includes(s)
+    ? `<button type="button" class="lib-link lib-retry" data-retry="${escapeHtml(d.source || '')}">Retry indexing</button>` : '';
+  return `<span class="lib-st st-${escapeHtml(s)}" title="${escapeHtml(tip)}"><i class="mk" aria-hidden="true"></i>${escapeHtml(label)}</span>${note}${retry}`;
 }
-function langLabel(l) { return l === 'en' ? 'EN' : (l === 'vi' ? 'VI' : '—'); }
 function isBusy(d) { return ['queued', 'processing', 'removing'].includes(d.status); }
 function errDetail(d) {
   if (!d) return '';
   if (typeof d.detail === 'string') return d.detail;
   return (d.detail && (d.detail.message || d.detail.code)) || '';
 }
-
 async function loadDocuments(silent = false) {
   const tbody = document.getElementById('doc-tbody');
   if (!silent) {
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3)"><span class="spinner dark"></span> Loading documents…</td></tr>';
+    tbody.innerHTML = '<tr class="lib-msg"><td colspan="7"><span class="spinner dark"></span> Loading the register…</td></tr>';
   }
   try {
-    await loadGroups();   // populate group label map before rendering pills/tabs
+    await loadGroups();   // populate group label map before rendering
     const [dRes, stRes] = await Promise.all([api('/documents'), api('/stats')]);
     if (!dRes.ok || !stRes.ok) throw new Error('HTTP error');
     const dData = await dRes.json();
     const stData = await stRes.json();
 
-    // doc_group keeps the name the table and tabs always used.
+    // doc_group keeps the name the page always used.
     allDocs = (dData.documents || []).map(d => ({ ...d, doc_group: d.group }));
     docSummary = dData.summary || {};
-    const s = docSummary;
-    document.getElementById('stat-docs').textContent = s.total ?? allDocs.length;
-    document.getElementById('stat-chunks').textContent = (stData.total_chunks ?? 0).toLocaleString('vi-VN');
-    document.getElementById('stat-groups').textContent =
-      new Set(allDocs.filter(d => d.status !== 'orphan').map(d => d.doc_group || 'Khác')).size;
-    document.getElementById('stat-indexed').textContent = s.total ? `${s.indexed}/${s.total}` : '0';
-    document.getElementById('sb-doc-count').textContent = s.total ?? allDocs.length;
+    docChunkTotal = stData.total_chunks ?? 0;
+    document.getElementById('sb-doc-count').textContent = docSummary.total ?? allDocs.length;
 
-    const tabs = document.getElementById('doc-tabs');
-    const groupCounts = {};
-    allDocs.forEach(d => {
-      const key = (d.doc_group === null || d.doc_group === undefined || d.doc_group === '') ? 'Khác' : d.doc_group;
-      groupCounts[key] = (groupCounts[key] || 0) + 1;
-    });
-    if (currentGroup !== 'all' && !groupCounts[currentGroup]) currentGroup = 'all';
-    tabs.innerHTML = `<div class="doc-tab${currentGroup === 'all' ? ' active' : ''}" data-group="all">Tất cả <span class="cnt">${allDocs.length}</span></div>` +
-      Object.entries(groupCounts).sort((a,b) => b[1]-a[1]).map(([g, c]) => {
-        // 'Khác' (ungrouped/empty) is not a real folder → not deletable.
-        const delBtn = (g !== 'Khác')
-          ? `<span class="grp-del" title="Xóa nhóm" data-del-group="${escapeHtml(g)}">✕</span>` : '';
-        return `<div class="doc-tab${String(currentGroup) === String(g) ? ' active' : ''}" data-group="${escapeHtml(g)}">${escapeHtml(groupLabel(g) || g)} <span class="cnt">${c}</span>${delBtn}</div>`;
-      }).join('');
-    tabs.querySelectorAll('.doc-tab').forEach(t => {
-      t.onclick = (e) => {
-        // Click on the ✕ → delete the group instead of selecting it.
-        const del = e.target.closest('.grp-del');
-        if (del) {
-          e.stopPropagation();
-          const gid = del.dataset.delGroup;
-          window.deleteGroup(gid, groupLabel(gid) || gid);
-          return;
-        }
-        tabs.querySelectorAll('.doc-tab').forEach(x => x.classList.remove('active'));
-        t.classList.add('active');
-        currentGroup = t.dataset.group;
-        renderDocs();
-      };
-    });
-
+    // A filter whose value is gone (collection deleted, last document removed) falls back to "All".
+    if (currentGroup !== 'all' && !allDocs.some(d => libGroupKey(d) === String(currentGroup))) currentGroup = 'all';
+    for (const f of ['issuer', 'type', 'status']) {
+      if (libFilter[f] !== 'all' && !allDocs.some(d => String(libFacetValue(f, d)) === libFilter[f])) libFilter[f] = 'all';
+    }
     renderDocs();
 
     // Keep the list live while documents are queued, indexing or being removed.
@@ -1216,70 +1379,371 @@ async function loadDocuments(silent = false) {
     if (!busy && _docsPoll) { clearInterval(_docsPoll); _docsPoll = null; }
   } catch (e) {
     if (!silent) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--red)">Error: ${escapeHtml(e.message || String(e))}</td></tr>`;
+      document.getElementById('lib-summary').textContent = 'The register could not be loaded.';
+      tbody.innerHTML = `<tr class="lib-msg err"><td colspan="7"><div class="t">Could not load the register (${escapeHtml(e.message || String(e))}).</div>` +
+        '<button type="button" class="lib-link" data-lib-reload>Try again</button></td></tr>';
     }
   }
 }
 
-function renderDocs() {
-  let rows = allDocs.filter(d => {
-    const gKey = (d.doc_group === null || d.doc_group === undefined || d.doc_group === '') ? 'Khác' : d.doc_group;
-    const matchGroup = currentGroup === 'all' || String(gKey) === String(currentGroup);
-    const q = docFilter.toLowerCase();
-    const matchFilter = !q ||
-      (d.source || '').toLowerCase().includes(q) ||
-      (d.doc_number || '').toLowerCase().includes(q) ||
-      (d.issuing_body || '').toLowerCase().includes(q) ||
-      (d.title || '').toLowerCase().includes(q) ||
-      (d.original_filename || '').toLowerCase().includes(q);
-    return matchGroup && matchFilter;
-  });
-  if (sortCol) {
-    rows.sort((a, b) => {
-      const av = a[sortCol] ?? '', bv = b[sortCol] ?? '';
-      if (typeof av === 'number') return sortAsc ? av - bv : bv - av;
-      return sortAsc ? String(av).localeCompare(String(bv), 'vi') : String(bv).localeCompare(String(av), 'vi');
-    });
-  }
-  const tbody = document.getElementById('doc-tbody');
-  if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3)">No matching documents</td></tr>';
-    return;
-  }
-  tbody.innerHTML = rows.map(d => {
-    const cls = typeSlug(d.doc_type);
-    const icon = d.file_type === 'docx' ? '📝' : '📄';
-    const jsName = escapeHtml((d.source || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
-    const openable = d.status !== 'orphan';
-    const rowClick = openable ? `onclick="window.open('${docUrl(d.source)}', '_blank')"` : '';
-    const sub = d.title || (d.original_filename && d.original_filename !== d.source ? d.original_filename : '');
-    const retry = ['failed', 'empty', 'not_indexed'].includes(d.status)
-      ? `<button class="doc-act-btn" title="Index lại tài liệu này"
-                 onclick="event.stopPropagation(); window.retryDoc('${jsName}')">↻</button>` : '';
-    const delTitle = d.status === 'orphan' ? 'Dọn khỏi chỉ mục' : 'Xóa tài liệu';
-    const del = d.status === 'removing' ? '' :
-      `<button class="doc-del-btn" title="${delTitle}"
-               onclick="event.stopPropagation(); window.deleteDoc('${jsName}')">🗑</button>`;
-    const lang = d.language || (d.status === 'orphan' ? '' : 'vi');
-    return `
-      <tr ${rowClick}>
-        <td style="font-weight:500">${icon} ${escapeHtml(d.source || '')}${sub ? `<div class="text-muted text-sm" style="font-weight:400">${escapeHtml(sub)}</div>` : ''}</td>
-        <td>${d.doc_type ? `<span class="doc-type-badge ${cls}">${escapeHtml(typeLabel(d.doc_type))}</span>` : '<span class="text-muted">—</span>'}</td>
-        <td class="muted">${escapeHtml(d.doc_number || '—')}</td>
-        <td class="muted">${escapeHtml(d.issuing_body || '—')}</td>
-        <td>${(d.doc_group !== null && d.doc_group !== undefined && d.doc_group !== '') ? `<span class="pill teal">${escapeHtml(groupLabel(d.doc_group))}</span>` : '—'}</td>
-        <td class="muted">${langLabel(lang)}</td>
-        <td>${statusBadge(d)}</td>
-        <td style="text-align:right;font-weight:600">${d.chunk_count || 0}</td>
-        <td style="text-align:right" class="muted">${d.max_page || 0}</td>
-        <td style="text-align:center;white-space:nowrap">${retry}${del}</td>
-      </tr>
-    `;
-  }).join('');
+function renderLibSummary() {
+  const s = docSummary || {};
+  const live = allDocs.filter(d => d.status !== 'orphan');
+  const total = s.total ?? live.length;
+  const indexed = s.indexed ?? 0;
+  const groups = new Set(live.map(d => d.doc_group || 'Khác')).size;
+  let html = `<b id="stat-docs">${total}</b> document${total === 1 ? '' : 's'} in <b id="stat-groups">${groups}</b> ` +
+    `collection${groups === 1 ? '' : 's'} · <b id="stat-chunks">${Number(docChunkTotal).toLocaleString('en-US')}</b> indexed passages · ` +
+    `<span id="stat-indexed">${total && indexed === total ? `all ${total}` : `${indexed} of ${total}`}</span> available in Chat`;
+  if (s.processing) html += ` · <button type="button" class="warn" data-lib-status="busy">${s.processing} in progress</button>`;
+  if (s.failed) html += ` · <button type="button" class="bad" data-lib-status="failed">${s.failed} need${s.failed === 1 ? 's' : ''} attention</button>`;
+  document.getElementById('lib-summary').innerHTML = html;
 }
 
+// ─── Refine: collection, issuing body, type, availability ────────────────
+const LIB_FACETS = ['collection', 'issuer', 'type', 'status'];
+const LIB_FACET_LABEL = {
+  collection: v => libGroupLabel(v),
+  issuer: v => v || 'Not specified',
+  type: v => v || 'Not specified',
+  status: v => STATUS_LABELS[v] || v,
+};
+function libFacetValue(f, d) {
+  if (f === 'collection') return libGroupKey(d);
+  if (f === 'issuer') return libIssuer(d);
+  if (f === 'type') return libTypeLabel(d.doc_type);
+  return d.status || 'not_indexed';
+}
+function libFacetSel(f) { return f === 'collection' ? String(currentGroup) : libFilter[f]; }
+function libMatches(d, except, terms) {
+  if (terms.length) {
+    const h = libHaystack(d);
+    if (!terms.every(t => h.includes(t))) return false;
+  }
+  for (const f of LIB_FACETS) {
+    if (f === except) continue;
+    const sel = libFacetSel(f);
+    if (sel !== 'all' && String(libFacetValue(f, d)) !== sel) return false;
+  }
+  return true;
+}
+// Counts follow the search box and the other filters, as in a library catalogue.
+function libFacetEntries(f, terms) {
+  const all = new Map();
+  for (const d of allDocs) {
+    const v = String(libFacetValue(f, d) ?? '');
+    if (!all.has(v)) all.set(v, { v, n: 0, rank: 99 });
+    const e = all.get(v);
+    e.rank = Math.min(e.rank, libRank(libGroupKey(d)));
+    if (libMatches(d, f, terms)) e.n++;
+  }
+  const list = [...all.values()];
+  if (f === 'status') return list.sort((a, b) => STATUS_ORDER.indexOf(a.v) - STATUS_ORDER.indexOf(b.v));
+  if (f === 'collection') return list.sort((a, b) => libRank(a.v) - libRank(b.v) || libGroupLabel(a.v).localeCompare(libGroupLabel(b.v), 'vi'));
+  return list.sort((a, b) => (a.v === '') - (b.v === '') || a.rank - b.rank || a.v.localeCompare(b.v, 'vi'));
+}
+function renderFacet(f, ulId, terms) {
+  const sel = libFacetSel(f);
+  const allCount = allDocs.filter(d => libMatches(d, f, terms)).length;
+  let html = `<li><button type="button" class="lib-fi" aria-pressed="${sel === 'all'}" data-f="${f}" data-v="all">` +
+    `<span class="lbl">All</span><span class="cnt">${allCount}</span></button></li>`;
+  for (const e of libFacetEntries(f, terms)) {
+    const pressed = sel === e.v;
+    const more = (f === 'collection' && e.v !== 'Khác')
+      ? `<button type="button" class="lib-fmore" aria-haspopup="menu" aria-expanded="false" data-group="${escapeHtml(e.v)}"` +
+        ` aria-label="Actions for the collection ${escapeHtml(libGroupLabel(e.v))}">${LIB_ICONS.more}</button>` : '';
+    html += `<li><button type="button" class="lib-fi" aria-pressed="${pressed}" data-f="${f}" data-v="${escapeHtml(e.v)}"${e.n || pressed ? '' : ' disabled'}>` +
+      `<span class="lbl">${escapeHtml(LIB_FACET_LABEL[f](e.v))}</span><span class="cnt">${e.n}</span></button>${more}</li>`;
+  }
+  document.getElementById(ulId).innerHTML = html;
+}
+function renderFacets(terms) {
+  renderFacet('collection', 'facet-collection', terms);
+  renderFacet('issuer', 'facet-issuer', terms);
+  renderFacet('type', 'facet-type', terms);
+  const statuses = new Set(allDocs.map(d => d.status || 'not_indexed'));
+  document.getElementById('facet-status-wrap').classList.toggle('hidden', statuses.size < 2 && libFilter.status === 'all');
+  renderFacet('status', 'facet-status', terms);
+  const active = LIB_FACETS.filter(f => libFacetSel(f) !== 'all').length;
+  document.getElementById('facet-clear').classList.toggle('hidden', !active);
+  document.getElementById('lib-refine-state').textContent = active ? `${active} filter${active === 1 ? '' : 's'} on` : '';
+}
+function renderLibFilters() {
+  const names = { collection: 'Collection', issuer: 'Issued by', type: 'Type', status: 'Availability' };
+  document.getElementById('lib-filters').innerHTML = LIB_FACETS.filter(f => libFacetSel(f) !== 'all').map(f =>
+    `<span>${names[f]}: <b>${escapeHtml(LIB_FACET_LABEL[f](libFacetSel(f)))}</b> ` +
+    `<button type="button" class="lib-link" data-unset="${f}" aria-label="Remove the ${names[f]} filter">remove</button></span>`).join('');
+}
+
+// ─── Order ───────────────────────────────────────────────────────────────
+const LIB_SORT = {
+  title: d => libFold(libTitle(d)), year: d => Number(libYear(d)) || 0, number: d => libNumber(d),
+  issuer: d => libIssuer(d), type: d => libTypeLabel(d.doc_type), pages: d => d.max_page || 0,
+  passages: d => d.chunk_count || 0, status: d => STATUS_ORDER.indexOf(d.status || 'not_indexed'),
+  file: d => d.source || '',
+};
+const LIB_DESC_FIRST = new Set(['year', 'pages', 'passages']);
+function libCompare(a, b, key, asc) {
+  const x = LIB_SORT[key](a), y = LIB_SORT[key](b);
+  const r = (typeof x === 'number') ? x - y : String(x).localeCompare(String(y), 'vi', { numeric: true });
+  return asc ? r : -r;
+}
+function libByYearThenTitle(a, b) {
+  return (Number(libYear(b)) || 0) - (Number(libYear(a)) || 0) || libTitle(a).localeCompare(libTitle(b), 'vi');
+}
+function renderSortUi() {
+  document.getElementById('lib-sort').value = sortCol || 'collection';
+  const dir = document.getElementById('lib-dir');
+  dir.classList.toggle('hidden', !sortCol);
+  dir.textContent = sortAsc ? '↑ Ascending' : '↓ Descending';
+  document.querySelectorAll('#doc-table thead th[data-col]').forEach(th => {
+    const on = th.dataset.col === sortCol;
+    th.setAttribute('aria-sort', on ? (sortAsc ? 'ascending' : 'descending') : 'none');
+    const b = th.querySelector('button');
+    b.querySelector('.dir')?.remove();
+    if (on) b.insertAdjacentHTML('beforeend', `<span class="dir" aria-hidden="true">${sortAsc ? '▲' : '▼'}</span>`);
+  });
+}
+// ─── The register ────────────────────────────────────────────────────────
+function libRowHtml(d, n, terms) {
+  const orphan = d.status === 'orphan';
+  const title = libTitle(d), num = libNumber(d), issuer = libIssuer(d), type = libTypeLabel(d.doc_type), year = libYear(d);
+  const meta = [type && escapeHtml(type), num && `No. ${libHighlight(num, terms)}`, issuer && libHighlight(issuer, terms)]
+    .filter(Boolean).join('<span class="sep">·</span>');
+  const titleTip = d.catalog && d.catalog.title_en ? ` title="${escapeHtml(d.catalog.title_en)}"` : '';
+  const titleHtml = orphan
+    ? `<span class="lib-rec-title"${titleTip}>${libHighlight(title, terms)}</span>`
+    : `<a class="lib-rec-title" href="${escapeHtml(docUrl(d.source))}" target="_blank" rel="noopener"${titleTip}>${libHighlight(title, terms)}</a>`;
+  const fileTip = d.original_filename && d.original_filename !== d.source ? ` title="Uploaded as ${escapeHtml(d.original_filename)}"` : '';
+  const kind = escapeHtml(String(d.file_type || String(d.source || '').split('.').pop() || '').toUpperCase()) + (d.language === 'en' ? ' · EN' : '');
+  const issued = libIssued(d);
+  const small = [year, d.max_page ? `${d.max_page} pp` : '', STATUS_LABELS[d.status] || ''].filter(Boolean).join(' · ');
+  const menu = d.status === 'removing' ? '' :
+    `<button type="button" class="lib-more" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${escapeHtml(title)}" data-menu="${escapeHtml(d.source || '')}">${LIB_ICONS.more}</button>`;
+  return `<tr class="lib-row${orphan ? ' is-orphan' : ''}" data-source="${escapeHtml(d.source || '')}">
+    <td class="c-no">${n}</td>
+    <td class="c-rec">${titleHtml}
+      ${meta ? `<div class="lib-rec-meta">${meta}</div>` : ''}
+      <div class="lib-rec-file"${fileTip}>${libHighlight(d.source || '', terms)}<span class="ft">${kind}</span></div>
+      <div class="lib-rec-small">${escapeHtml(small)}</div></td>
+    <td class="c-year"${issued ? ` title="Issued ${escapeHtml(issued)}"` : ''}>${year ? escapeHtml(year) : '—'}</td>
+    <td class="c-n">${d.max_page || '—'}</td>
+    <td class="c-n c-passages">${(d.chunk_count || 0).toLocaleString('en-US')}</td>
+    <td class="c-status">${statusBadge(d)}</td>
+    <td class="c-act">${menu}</td>
+  </tr>`;
+}
+
+function renderDocs() {
+  closeLibMenu();
+  const terms = libTerms();
+  renderLibSummary();
+  renderFacets(terms);
+  renderLibFilters();
+  renderSortUi();
+  const tbody = document.getElementById('doc-tbody');
+  const rows = allDocs.filter(d => libMatches(d, null, terms));
+  const shown = rows.filter(d => d.status !== 'orphan').length;
+  const total = allDocs.filter(d => d.status !== 'orphan').length;
+  const left = rows.length - shown;
+  document.getElementById('lib-count').innerHTML = `Showing <b>${shown}</b> of ${total} document${total === 1 ? '' : 's'}` +
+    (left ? ` · ${left} index leftover${left === 1 ? '' : 's'}` : '');
+  if (!allDocs.length) {
+    tbody.innerHTML = '<tr class="lib-msg"><td colspan="7"><div class="t">The library is empty.</div>' +
+      '<button type="button" class="lib-link" data-lib-add>Add documents</button> to start.</td></tr>';
+    return;
+  }
+  if (!rows.length) {
+    const q = docFilter.trim();
+    tbody.innerHTML = `<tr class="lib-msg"><td colspan="7"><div class="t">No documents match${q ? ` “${escapeHtml(q)}”` : ' these filters'}.</div>` +
+      '<button type="button" class="lib-link" data-lib-clear-all>Clear the search and filters</button></td></tr>';
+    return;
+  }
+  const hl = terms.filter(t => t.length >= 2);
+  let html = '', n = 0;
+  if (!sortCol) {
+    const byGroup = new Map();
+    for (const d of rows) {
+      const k = libGroupKey(d);
+      if (!byGroup.has(k)) byGroup.set(k, []);
+      byGroup.get(k).push(d);
+    }
+    const keys = [...byGroup.keys()].sort((a, b) => libRank(a) - libRank(b) || libGroupLabel(a).localeCompare(libGroupLabel(b), 'vi'));
+    const single = keys.length === 1 && currentGroup !== 'all';
+    for (const k of keys) {
+      const list = byGroup.get(k).sort(libByYearThenTitle);
+      if (!single) {
+        const body = libGroupInfo(k).issuing_body;
+        html += `<tr class="lib-section"><th colspan="7" scope="rowgroup"><span class="t">${escapeHtml(libGroupLabel(k))}</span>` +
+          `<span class="m">${body ? escapeHtml(body) + ' · ' : ''}${list.length} document${list.length === 1 ? '' : 's'}</span></th></tr>`;
+      }
+      for (const d of list) html += libRowHtml(d, ++n, hl);
+    }
+  } else {
+    rows.sort((a, b) => libCompare(a, b, sortCol, sortAsc) || libByYearThenTitle(a, b));
+    for (const d of rows) html += libRowHtml(d, ++n, hl);
+  }
+  tbody.innerHTML = html;
+}
+
+// ─── Menus: one per record, one per collection ───────────────────────────
+let _libMenu = null;
+function closeLibMenu() {
+  if (!_libMenu) return;
+  _libMenu.btn.setAttribute('aria-expanded', 'false');
+  _libMenu.el.remove();
+  _libMenu = null;
+}
+function openLibMenu(btn, items) {
+  closeLibMenu();
+  const el = document.createElement('div');
+  el.className = 'lib-menu';
+  el.setAttribute('role', 'menu');
+  for (const it of items) {
+    if (it === '-') { el.appendChild(document.createElement('hr')); continue; }
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'menuitem');
+    if (it.danger) b.className = 'danger';
+    b.innerHTML = (LIB_ICONS[it.icon] || '') + `<span>${escapeHtml(it.label)}</span>`;
+    b.addEventListener('click', () => { closeLibMenu(); it.run(); });
+    el.appendChild(b);
+  }
+  document.body.appendChild(el);
+  const r = btn.getBoundingClientRect();
+  let top = r.bottom + 4, left = Math.max(8, r.right - el.offsetWidth);
+  if (top + el.offsetHeight > innerHeight - 8) top = Math.max(8, r.top - el.offsetHeight - 4);
+  if (left + el.offsetWidth > innerWidth - 8) left = innerWidth - el.offsetWidth - 8;
+  el.style.top = top + 'px';
+  el.style.left = left + 'px';
+  btn.setAttribute('aria-expanded', 'true');
+  _libMenu = { el, btn };
+  el.addEventListener('keydown', e => {
+    const bs = [...el.querySelectorAll('button')];
+    const i = bs.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); bs[(i + 1) % bs.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); bs[(i - 1 + bs.length) % bs.length].focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); closeLibMenu(); btn.focus(); }
+    else if (e.key === 'Tab') closeLibMenu();
+  });
+  el.querySelector('button')?.focus();
+}
+function openRowMenu(btn, d) {
+  const items = [];
+  if (d.status !== 'orphan') {
+    const pdf = /\.pdf$/i.test(d.source || '');
+    items.push({ icon: pdf ? 'open' : 'download', label: pdf ? 'Open the PDF' : 'Download the original',
+                 run: () => window.open(docUrl(d.source), '_blank') });
+  }
+  if (['failed', 'empty', 'not_indexed'].includes(d.status)) {
+    items.push({ icon: 'reload', label: 'Retry indexing', run: () => window.retryDoc(d.source) });
+  }
+  if (items.length) items.push('-');
+  items.push({ icon: 'trash', danger: true,
+               label: d.status === 'orphan' ? 'Remove index leftovers…' : 'Delete document…',
+               run: () => window.deleteDoc(d.source) });
+  openLibMenu(btn, items);
+}
+// ─── Page wiring ─────────────────────────────────────────────────────────
+function libClearAll() {
+  docFilter = '';
+  document.getElementById('doc-search').value = '';
+  currentGroup = 'all';
+  libFilter.issuer = libFilter.type = libFilter.status = 'all';
+  renderDocs();
+}
+document.getElementById('reindex-docs').innerHTML = UPLOAD_BTN_LABEL;
+document.getElementById('sync-index').innerHTML = SYNC_BTN_LABEL;
+document.getElementById('refresh-docs').innerHTML = REFRESH_BTN_LABEL;
 document.getElementById('doc-search').addEventListener('input', e => { docFilter = e.target.value; renderDocs(); });
-document.getElementById('refresh-docs').addEventListener('click', () => { loadDocuments(); toast('Refreshing…', 'info'); });
+document.getElementById('refresh-docs').addEventListener('click', () => { loadDocuments(); toast('Reloading the list…', 'info'); });
+document.getElementById('lib-sort').addEventListener('change', e => {
+  const v = e.target.value;
+  sortCol = v === 'collection' ? null : v;
+  sortAsc = !LIB_DESC_FIRST.has(v);
+  renderDocs();
+});
+document.getElementById('lib-dir').addEventListener('click', () => { sortAsc = !sortAsc; renderDocs(); });
+document.querySelectorAll('#doc-table thead th[data-col] button').forEach(b => b.addEventListener('click', () => {
+  const col = b.closest('th').dataset.col;
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = !LIB_DESC_FIRST.has(col); }
+  renderDocs();
+}));
+document.getElementById('facet-clear').addEventListener('click', () => {
+  currentGroup = 'all';
+  libFilter.issuer = libFilter.type = libFilter.status = 'all';
+  renderDocs();
+});
+document.querySelector('.lib-refine').addEventListener('click', e => {
+  const more = e.target.closest('.lib-fmore');
+  if (more) {
+    e.stopPropagation();
+    const id = more.dataset.group;
+    openLibMenu(more, [{ icon: 'trash', danger: true, label: 'Delete collection…',
+                         run: () => window.deleteGroup(id, libGroupLabel(id)) }]);
+    return;
+  }
+  const fi = e.target.closest('.lib-fi');
+  if (!fi || fi.disabled) return;
+  if (fi.dataset.f === 'collection') currentGroup = fi.dataset.v;
+  else libFilter[fi.dataset.f] = fi.dataset.v;
+  renderDocs();
+});
+document.getElementById('lib-filters').addEventListener('click', e => {
+  const b = e.target.closest('[data-unset]');
+  if (!b) return;
+  if (b.dataset.unset === 'collection') currentGroup = 'all';
+  else libFilter[b.dataset.unset] = 'all';
+  renderDocs();
+});
+document.getElementById('lib-summary').addEventListener('click', e => {
+  const b = e.target.closest('[data-lib-status]');
+  if (!b) return;
+  const want = b.dataset.libStatus === 'busy' ? ['processing', 'queued', 'removing'] : ['failed', 'empty'];
+  const hit = want.find(st => allDocs.some(d => d.status === st));
+  if (hit) { libFilter.status = hit; renderDocs(); }
+});
+document.getElementById('doc-tbody').addEventListener('click', e => {
+  const m = e.target.closest('[data-menu]');
+  if (m) {
+    e.stopPropagation();
+    const d = allDocs.find(x => x.source === m.dataset.menu);
+    if (d) openRowMenu(m, d);
+    return;
+  }
+  const r = e.target.closest('[data-retry]');
+  if (r) { e.stopPropagation(); window.retryDoc(r.dataset.retry); return; }
+  if (e.target.closest('[data-lib-reload]')) { loadDocuments(); return; }
+  if (e.target.closest('[data-lib-add]')) { document.getElementById('reindex-docs').click(); return; }
+  if (e.target.closest('[data-lib-clear-all]')) { libClearAll(); return; }
+  if (e.target.closest('a')) return;               // the title link opens the document itself
+  const row = e.target.closest('tr.lib-row');
+  if (row && !row.classList.contains('is-orphan')) window.open(docUrl(row.dataset.source), '_blank');
+});
+document.addEventListener('click', e => {
+  if (_libMenu && !_libMenu.el.contains(e.target) && !_libMenu.btn.contains(e.target)) closeLibMenu();
+});
+document.getElementById('lib-scroll').addEventListener('scroll', closeLibMenu, { passive: true });
+window.addEventListener('resize', closeLibMenu);
+// "/" jumps to the search box while the Library is on screen.
+document.addEventListener('keydown', e => {
+  if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (!document.getElementById('screen-documents').classList.contains('active')) return;
+  if (!document.getElementById('upload-modal').classList.contains('hidden')) return;
+  const a = document.activeElement;
+  if (a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable)) return;
+  e.preventDefault();
+  document.getElementById('doc-search').focus();
+});
+// Below 1280 px the Refine panel sits above the register and starts closed;
+// on wider screens it is a fixed column that cannot be collapsed.
+const _libNarrow = window.matchMedia('(max-width:1279px)');
+const _libRefineBox = document.getElementById('lib-refine-box');
+function _syncRefineBox() { _libRefineBox.open = !_libNarrow.matches; }
+_libNarrow.addEventListener('change', _syncRefineBox);
+_libRefineBox.querySelector('summary').addEventListener('click', e => { if (!_libNarrow.matches) e.preventDefault(); });
+_syncRefineBox();
 
 // ─── Indexing jobs: follow one job to its end ─────────────────────────────
 const _trackedJobs = new Set();
@@ -1295,9 +1759,9 @@ function trackJob(jobId, what = 'index') {
       const p = job.progress || {};
       if (job.status === 'queued' || job.status === 'running') {
         if (what === 'index' && job.status === 'running' && p.total) {
-          btn.innerHTML = `<span class="spinner"></span> ${STEP_LABELS[p.step] || p.step || 'index'} ${Math.min((p.done || 0) + 1, p.total)}/${p.total}…`;
+          btn.innerHTML = `<span class="spinner"></span> ${STEP_LABELS[p.step] || p.step || 'Indexing'} ${Math.min((p.done || 0) + 1, p.total)}/${p.total}…`;
         } else if (what === 'index') {
-          btn.innerHTML = `<span class="spinner"></span> đang chờ index…`;
+          btn.innerHTML = `<span class="spinner"></span> Waiting to index…`;
         }
         return;
       }
@@ -1308,11 +1772,12 @@ function trackJob(jobId, what = 'index') {
       const ok = results.filter(x => x.status === 'indexed' || x.status === 'removed').length;
       const bad = results.filter(x => x.status === 'failed' || x.status === 'empty');
       if (job.status === 'succeeded') {
-        toast(what === 'remove' ? 'Đã cập nhật chỉ mục sau khi xoá.' : `Đã index xong ${ok} tài liệu — có thể hỏi ngay trong Chat.`, 'success', 5000);
+        toast(what === 'remove' ? 'The index is up to date after the deletion.'
+          : `Indexed ${ok} document${ok === 1 ? '' : 's'} — you can ask about ${ok === 1 ? 'it' : 'them'} in Chat now.`, 'success', 5000);
       } else {
         const first = bad[0] || {};
-        const msg = (job.error && job.error.message) || first.message || 'Không rõ lỗi';
-        toast(`Index xong ${ok}/${results.length} tài liệu. Lỗi: ${msg}`, 'error', 8000);
+        const msg = (job.error && job.error.message) || first.message || 'unknown error';
+        toast(`Indexed ${ok} of ${results.length} documents. Error: ${msg}`, 'error', 8000);
       }
       loadDocuments(true);
     } catch (e) {
@@ -1322,15 +1787,14 @@ function trackJob(jobId, what = 'index') {
     }
   }, 2000);
 }
-
 // ─── Delete / retry (index follows automatically) ─────────────────────────
 window.deleteDoc = async function (name) {
   if (!name) return;
   const d = allDocs.find(x => x.source === name);
   const orphan = d && d.status === 'orphan';
   const msg = orphan
-    ? `Dọn dữ liệu chỉ mục còn sót của "${name}"?`
-    : `Xóa tài liệu "${name}"?\nFile và toàn bộ dữ liệu chỉ mục của tài liệu này sẽ bị xoá.`;
+    ? `Remove the leftover index data of “${name}”?`
+    : `Delete “${name}”?\nThe file and all of its index data will be removed.`;
   if (!confirm(msg)) return;
   try {
     const r = await api('/documents/' + encodeURIComponent(name), { method: 'DELETE' });
@@ -1339,17 +1803,17 @@ window.deleteDoc = async function (name) {
       throw new Error(errDetail(body) || ('HTTP ' + r.status));
     }
     const data = await r.json();
-    toast(orphan ? `Đang dọn "${name}" khỏi chỉ mục…` : `Đã xóa "${name}" — đang cập nhật chỉ mục…`, 'success', 3500);
+    toast(orphan ? `Removing “${name}” from the index…` : `Deleted “${name}” — updating the index…`, 'success', 3500);
     trackJob(data.job_id, 'remove');
     await loadDocuments(true);
   } catch (e) {
-    toast('Xóa thất bại: ' + (e.message || e), 'error', 5000);
+    toast('Could not delete: ' + (e.message || e), 'error', 5000);
   }
 };
 
 window.deleteGroup = async function (id, label) {
   if (!id) return;
-  if (!confirm(`Xóa nhóm "${label}" và TẤT CẢ tài liệu bên trong?\nFile và dữ liệu chỉ mục sẽ bị xoá. Hành động này không thể hoàn tác.`)) return;
+  if (!confirm(`Delete the collection “${label}” and ALL documents in it?\nThe files and their index data will be removed. This cannot be undone.`)) return;
   try {
     const r = await api('/groups/' + encodeURIComponent(id), { method: 'DELETE' });
     if (!r.ok) {
@@ -1357,12 +1821,12 @@ window.deleteGroup = async function (id, label) {
       throw new Error(errDetail(body) || ('HTTP ' + r.status));
     }
     const d = await r.json();
-    toast(`Đã xóa nhóm "${label}" (${d.removed_files} file) — đang cập nhật chỉ mục…`, 'success', 4000);
+    toast(`Deleted the collection “${label}” (${d.removed_files} file${d.removed_files === 1 ? '' : 's'}) — updating the index…`, 'success', 4000);
     currentGroup = 'all';
     trackJob(d.job_id, 'remove');
     await loadDocuments(true);
   } catch (e) {
-    toast('Xóa nhóm thất bại: ' + (e.message || e), 'error', 5000);
+    toast('Could not delete the collection: ' + (e.message || e), 'error', 5000);
   }
 };
 
@@ -1374,11 +1838,11 @@ window.retryDoc = async function (name) {
       throw new Error(errDetail(body) || ('HTTP ' + r.status));
     }
     const data = await r.json();
-    toast(`Đã xếp "${name}" vào hàng đợi index.`, 'info', 3500);
+    toast(`“${name}” is queued for indexing.`, 'info', 3500);
     trackJob(data.job_id, 'index');
     await loadDocuments(true);
   } catch (e) {
-    toast('Không thể index lại: ' + (e.message || e), 'error', 5000);
+    toast('Could not queue it for indexing: ' + (e.message || e), 'error', 5000);
   }
 };
 
@@ -1387,16 +1851,16 @@ let _reindexPoll = null;
 function pollReindexStatus(btn, label = SYNC_BTN_LABEL) {
   api('/reindex/status').then(r => r.json()).then(s => {
     const p = s.progress || {};
-    const step = STEP_LABELS[s.stage] || s.stage || 'running';
+    const step = STEP_LABELS[s.stage] || s.stage || 'Syncing';
     btn.innerHTML = `<span class="spinner dark"></span> ${step}${p.total ? ` ${p.done || 0}/${p.total}` : ''}…`;
     if (!s.running) {
       clearInterval(_reindexPoll); _reindexPoll = null;
       btn.disabled = false;
       btn.innerHTML = label;
       if (s.error) {
-        toast('Đồng bộ thất bại: ' + s.error, 'error', 6000);
+        toast('Index sync failed: ' + s.error, 'error', 6000);
       } else {
-        toast('Đồng bộ chỉ mục hoàn tất.', 'success', 4500);
+        toast('Index sync complete.', 'success', 4500);
       }
       loadDocuments(true);
     }
@@ -1404,20 +1868,20 @@ function pollReindexStatus(btn, label = SYNC_BTN_LABEL) {
     clearInterval(_reindexPoll); _reindexPoll = null;
     btn.disabled = false;
     btn.innerHTML = label;
-    toast('Status check failed: ' + (e.message || e), 'error');
+    toast('Could not read the sync status: ' + (e.message || e), 'error');
   });
 }
 
 document.getElementById('sync-index').addEventListener('click', async () => {
   const ok = confirm(
-    'Đồng bộ lại toàn bộ chỉ mục?\n\n' +
-    'Hệ thống parse lại mọi tài liệu và cập nhật chỉ mục tại chỗ — Chat vẫn hoạt động trong lúc chạy.\n' +
-    'Lần đầu có thể mất 10–15 phút vì phải tạo lại vector cho toàn bộ tài liệu.'
+    'Sync the whole index?\n\n' +
+    'Every document is read again and the index is updated in place — Chat keeps working meanwhile.\n' +
+    'The first run can take 10–15 minutes because every document is embedded again.'
   );
   if (!ok) return;
   const btn = document.getElementById('sync-index');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner dark"></span> đang đồng bộ…';
+  btn.innerHTML = '<span class="spinner dark"></span> Syncing…';
   try {
     const r = await api('/reindex', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'sync' }),
@@ -1426,15 +1890,14 @@ document.getElementById('sync-index').addEventListener('click', async () => {
       const body = await r.json().catch(() => ({}));
       throw new Error(errDetail(body) || ('HTTP ' + r.status));
     }
-    toast('Đang đồng bộ chỉ mục ở chế độ nền. Chat vẫn dùng được.', 'info', 4500);
+    toast('Syncing the index in the background. Chat keeps working.', 'info', 4500);
     _reindexPoll = setInterval(() => pollReindexStatus(btn), 2500);
   } catch (e) {
     btn.disabled = false;
     btn.innerHTML = SYNC_BTN_LABEL;
-    toast('Không thể đồng bộ: ' + (e.message || e), 'error', 6000);
+    toast('Could not start the sync: ' + (e.message || e), 'error', 6000);
   }
 });
-
 // ─── Upload v2: drag & drop → server check → confirm → background indexing ───
 // (no OS file picker → no "Upload from mobile" button)
 
@@ -1476,9 +1939,9 @@ function renderUploadList() {
     const row = document.createElement('div');
     row.className = 'modal-file';
     row.innerHTML = `
-      <span class="fname" title="${escapeHtml(f.name)}">${/\.docx$/i.test(f.name) ? '📝' : '📄'} ${escapeHtml(f.name)}</span>
+      <span class="fname" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span>
       <span class="fsize">${_humanSize(f.size)}</span>
-      <button class="fremove" data-idx="${idx}" title="Bỏ file này">✕</button>
+      <button class="fremove" data-idx="${idx}" title="Remove this file" aria-label="Remove ${escapeHtml(f.name)}">${LIB_ICONS.x}</button>
     `;
     list.appendChild(row);
   });
@@ -1515,20 +1978,20 @@ function addFilesToQueue(fileList) {
   }
   const room = UPLOAD_LIMITS.maxFiles - _pendingUploadFiles.length;
   if (accepted.length > room) {
-    toast(`Mỗi lần tối đa ${UPLOAD_LIMITS.maxFiles} file — ${accepted.length - Math.max(room, 0)} file bị bỏ qua`, 'error', 4000);
+    toast(`At most ${UPLOAD_LIMITS.maxFiles} files at a time — ${accepted.length - Math.max(room, 0)} skipped`, 'error', 4000);
     accepted.splice(Math.max(room, 0));
   }
   _pendingUploadFiles = _pendingUploadFiles.concat(accepted);
   if (rejected.length) {
-    toast(`Bỏ qua ${rejected.length} file không phải PDF/DOCX`, 'error', 4000);
+    toast(`Skipped ${rejected.length} file${rejected.length === 1 ? '' : 's'} that ${rejected.length === 1 ? 'is' : 'are'} not PDF or DOCX`, 'error', 4000);
   }
   if (tooBig.length) {
-    toast(`Bỏ qua ${tooBig.length} file lớn hơn ${UPLOAD_LIMITS.maxFileMb} MB`, 'error', 4000);
+    toast(`Skipped ${tooBig.length} file${tooBig.length === 1 ? '' : 's'} larger than ${UPLOAD_LIMITS.maxFileMb} MB`, 'error', 4000);
   }
   renderUploadList();
 }
 
-// Populate the upload group <select> from the registry (+ "create new" option).
+// Populate the upload collection <select> from the registry (+ "new" option).
 const NEW_GROUP_SENTINEL = '__new__';
 async function populateUploadGroupSelect() {
   const sel = document.getElementById('upload-group-select');
@@ -1538,7 +2001,7 @@ async function populateUploadGroupSelect() {
     .sort((a, b) => String(a.label).localeCompare(String(b.label), 'vi'))
     .map(g => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.label)} (${g.file_count})</option>`)
     .join('');
-  sel.innerHTML = opts + `<option value="${NEW_GROUP_SENTINEL}">➕ Tạo nhóm mới…</option>`;
+  sel.innerHTML = opts + `<option value="${NEW_GROUP_SENTINEL}">New collection…</option>`;
   _toggleNewGroupInput();
 }
 function _toggleNewGroupInput() {
@@ -1548,12 +2011,12 @@ function _toggleNewGroupInput() {
 }
 document.getElementById('upload-group-select').addEventListener('change', _toggleNewGroupInput);
 
-// The chosen group: an existing id, or a new group with its metadata.
+// The chosen collection: an existing id, or a new one with its metadata.
 function _selectedGroup() {
   const sel = document.getElementById('upload-group-select');
   if (sel.value === NEW_GROUP_SENTINEL) {
     const label = document.getElementById('upload-newgroup-name').value.trim();
-    if (!label) return { error: 'Vui lòng nhập tên nhóm mới' };
+    if (!label) return { error: 'Enter a name for the new collection' };
     return {
       hint: label,
       spec: { new: {
@@ -1564,7 +2027,7 @@ function _selectedGroup() {
       } },
     };
   }
-  if (!sel.value) return { error: 'Vui lòng chọn nhóm cho tài liệu' };
+  if (!sel.value) return { error: 'Choose a collection for these files' };
   return { hint: sel.value, spec: { id: sel.value } };
 }
 
@@ -1578,7 +2041,7 @@ function setUploadStep(n) {
   document.getElementById('upload-back').classList.toggle('hidden', n !== 2);
   const confirmBtn = document.getElementById('upload-confirm');
   if (n === 1) {
-    confirmBtn.textContent = 'Kiểm tra';
+    confirmBtn.textContent = 'Check files';
     confirmBtn.disabled = !_pendingUploadFiles.length;
   }
 }
@@ -1594,7 +2057,7 @@ function closeUploadModal() {
   document.getElementById('upload-modal').classList.add('hidden');
 }
 
-// Click "Update Documents" → open empty modal (no OS file picker)
+// Click "Add documents" → open empty modal (no OS file picker)
 document.getElementById('reindex-docs').addEventListener('click', () => {
   discardUploadSession();
   _pendingUploadFiles = [];
@@ -1623,7 +2086,6 @@ document.getElementById('upload-back').addEventListener('click', () => {
   setUploadStep(1);
   renderUploadList();
 });
-
 // ─── Drag & Drop on the modal dropzone ───
 const _dropzone = document.getElementById('upload-dropzone');
 
@@ -1661,15 +2123,15 @@ function _postWithProgress(path, formData, onProgress) {
       try { body = JSON.parse(xhr.responseText); } catch {}
       resolve({ status: xhr.status, body });
     };
-    xhr.onerror = () => reject(new Error('Không kết nối được máy chủ'));
+    xhr.onerror = () => reject(new Error('Could not reach the server'));
     xhr.send(formData);
   });
 }
 
 const WARNING_TEXT = {
-  needs_ocr: f => `Tài liệu có trang scan — cần OCR khoảng ${f.scanned_pages_estimate} trang (~${f.ocr_seconds_estimate} giây).`,
-  ocr_unavailable: () => 'Có trang scan nhưng Tesseract (OCR) không khả dụng — các trang này có thể không có nội dung.',
-  broken_text_layer: () => 'Lớp chữ có vẻ bị hỏng (không có dấu tiếng Việt) — hệ thống sẽ OCR lại các trang đó.',
+  needs_ocr: f => `${f.scanned_pages_estimate} scanned page${f.scanned_pages_estimate === 1 ? '' : 's'} need OCR (about ${f.ocr_seconds_estimate} seconds).`,
+  ocr_unavailable: () => 'Some pages are scanned but OCR (Tesseract) is not available — those pages may come out empty.',
+  broken_text_layer: () => 'The text layer looks broken (no Vietnamese accents) — those pages will be read again with OCR.',
 };
 
 async function runUploadCheck() {
@@ -1681,10 +2143,11 @@ async function runUploadCheck() {
   const lbl = document.getElementById('up-progress-lbl');
   const report = document.getElementById('up-report');
   confirmBtn.disabled = true;
-  confirmBtn.textContent = 'Đang kiểm tra…';
+  confirmBtn.textContent = 'Checking…';
   report.innerHTML = '';
   bar.style.width = '0%';
-  lbl.textContent = `Đang tải ${_pendingUploadFiles.length} file lên để kiểm tra…`;
+  const count = _pendingUploadFiles.length;
+  lbl.textContent = `Uploading ${count} file${count === 1 ? '' : 's'} for checking…`;
 
   const fd = new FormData();
   _pendingUploadFiles.forEach(f => fd.append('files', f));
@@ -1692,7 +2155,7 @@ async function runUploadCheck() {
   try {
     const res = await _postWithProgress('/uploads', fd, frac => {
       bar.style.width = Math.round(frac * 100) + '%';
-      if (frac >= 1) lbl.textContent = 'Đang đọc và kiểm tra nội dung từng file…';
+      if (frac >= 1) lbl.textContent = 'Reading and checking each file…';
     });
     if (res.status !== 201 || !res.body) {
       throw new Error(errDetail(res.body) || ('HTTP ' + res.status));
@@ -1701,11 +2164,11 @@ async function runUploadCheck() {
     bar.style.width = '100%';
     const n = _uploadSession.files.length;
     const okCount = _uploadSession.files.filter(f => f.status === 'ok').length;
-    lbl.textContent = `Đã kiểm tra ${n} file: ${okCount} hợp lệ, ${n - okCount} bị từ chối. Xem lại rồi bấm xác nhận.`;
+    lbl.textContent = `Checked ${n} file${n === 1 ? '' : 's'}: ${okCount} accepted, ${n - okCount} rejected. Review them, then confirm.`;
     renderUploadReport();
   } catch (e) {
-    lbl.textContent = 'Kiểm tra thất bại: ' + (e.message || e);
-    confirmBtn.textContent = 'Kiểm tra';
+    lbl.textContent = 'The check failed: ' + (e.message || e);
+    confirmBtn.textContent = 'Check files';
     confirmBtn.disabled = true;
   }
 }
@@ -1718,45 +2181,45 @@ function renderUploadReport() {
     const shownName = escapeHtml(f.safe_name || f.original_name || '');
     if (f.status !== 'ok') {
       return `<div class="up-row rejected">
-        <div class="up-row-head"><span class="ic">✗</span><span class="nm">${escapeHtml(f.original_name || '(không tên)')}</span>
+        <div class="up-row-head"><span class="ic">${LIB_ICONS.x}</span><span class="nm">${escapeHtml(f.original_name || '(no name)')}</span>
           <span class="meta">${_humanSize(f.size || 0)}</span></div>
-        <div class="up-msg err">${escapeHtml(f.message || f.reason_code || 'Bị từ chối')}</div>
+        <div class="up-msg err">${escapeHtml(f.message || f.reason_code || 'Rejected')}</div>
       </div>`;
     }
     const warn = (f.warnings && f.warnings.length) || f.conflict;
     const renamed = f.original_name && f.safe_name && f.original_name !== f.safe_name
-      ? `<div class="up-msg">Tên được chuẩn hoá: <code>${escapeHtml(f.original_name)}</code> → <code>${shownName}</code></div>` : '';
-    const pages = f.pages ? `${f.pages} tr · ` : '';
-    const langSel = `<select data-lang="${key}" title="Ngôn ngữ tài liệu">
-        <option value="vi"${f.language_suggestion !== 'en' ? ' selected' : ''}>Tiếng Việt</option>
+      ? `<div class="up-msg">File name normalised: <code>${escapeHtml(f.original_name)}</code> → <code>${shownName}</code></div>` : '';
+    const pages = f.pages ? `${f.pages} pp · ` : '';
+    const langSel = `<select data-lang="${key}" title="Document language" aria-label="Document language">
+        <option value="vi"${f.language_suggestion !== 'en' ? ' selected' : ''}>Vietnamese</option>
         <option value="en"${f.language_suggestion === 'en' ? ' selected' : ''}>English</option></select>`;
     let conflictSel = '';
     let conflictMsg = '';
     if (f.conflict) {
       const same = f.conflict.type === 'same_group';
-      conflictSel = `<select data-action="${key}" title="Xử lý khi trùng tên">
-          ${same ? '<option value="replace" selected>Thay thế bản cũ</option>' : ''}
-          <option value="rename"${same ? '' : ' selected'}>Đổi tên (thêm -2)</option>
-          <option value="skip">Bỏ qua</option></select>`;
-      conflictMsg = `<div class="up-msg warn">⚠ ${escapeHtml(f.conflict.message || 'Trùng tên')}${f.conflict.source ? ` (${escapeHtml(f.conflict.source)})` : ''}</div>`;
+      conflictSel = `<select data-action="${key}" title="When the name is already taken" aria-label="When the name is already taken">
+          ${same ? '<option value="replace" selected>Replace the old version</option>' : ''}
+          <option value="rename"${same ? '' : ' selected'}>Rename (add “-2”)</option>
+          <option value="skip">Skip</option></select>`;
+      conflictMsg = `<div class="up-msg warn">${escapeHtml(f.conflict.message || 'This name is already taken')}${f.conflict.source ? ` (${escapeHtml(f.conflict.source)})` : ''}</div>`;
     }
-    const warnings = (f.warnings || []).map(w => WARNING_TEXT[w] ? `<div class="up-msg warn">⚠ ${escapeHtml(WARNING_TEXT[w](f))}</div>` : '').join('');
+    const warnings = (f.warnings || []).map(w => WARNING_TEXT[w] ? `<div class="up-msg warn">${escapeHtml(WARNING_TEXT[w](f))}</div>` : '').join('');
     const langHint = f.language_suggestion === 'en'
-      ? '<div class="up-msg">Gợi ý ngôn ngữ: tiếng Anh (có thể đổi).</div>' : '';
+      ? '<div class="up-msg">Suggested language: English (you can change it).</div>' : '';
     return `<div class="up-row${warn ? ' warn' : ''}">
       <div class="up-row-head">
-        <span class="ic">${warn ? '⚠' : '✓'}</span>
-        <span class="nm">${/\.docx$/i.test(f.safe_name || '') ? '📝' : '📄'} ${shownName}</span>
+        <span class="ic">${warn ? LIB_ICONS.warn : LIB_ICONS.check}</span>
+        <span class="nm">${shownName}</span>
         <span class="meta">${escapeHtml((f.file_type || '').toUpperCase())} · ${pages}${_humanSize(f.size || 0)}</span>
         ${langSel}${conflictSel}
       </div>
       ${renamed}${conflictMsg}${warnings}${langHint}
-      <span class="up-meta-toggle" data-meta-toggle="${key}">▸ Tuỳ chỉnh thông tin (tiêu đề · số hiệu · loại · đơn vị)</span>
+      <span class="up-meta-toggle" data-meta-toggle="${key}">▸ Edit record details (title · number · type · issuing body)</span>
       <div class="up-meta hidden" data-meta="${key}">
-        <input data-meta-field="title" placeholder="Tiêu đề hiển thị" />
-        <input data-meta-field="doc_number" placeholder="Số hiệu (để trống = tự trích)" />
-        <input data-meta-field="doc_type" list="up-doctype-list" placeholder="Loại (để trống = theo nhóm)" />
-        <input data-meta-field="issuing_body" placeholder="Đơn vị ban hành (để trống = theo nhóm)" />
+        <input data-meta-field="title" placeholder="Display title" />
+        <input data-meta-field="doc_number" placeholder="Number (blank = extract automatically)" />
+        <input data-meta-field="doc_type" list="up-doctype-list" placeholder="Type (blank = from the collection)" />
+        <input data-meta-field="issuing_body" placeholder="Issuing body (blank = from the collection)" />
       </div>
     </div>`;
   }).join('');
@@ -1771,7 +2234,6 @@ function renderUploadReport() {
   report.querySelectorAll('select[data-action]').forEach(s => s.addEventListener('change', _updateCommitButton));
   _updateCommitButton();
 }
-
 function _commitSelections() {
   const report = document.getElementById('up-report');
   const out = [];
@@ -1793,7 +2255,7 @@ function _commitSelections() {
 function _updateCommitButton() {
   const confirmBtn = document.getElementById('upload-confirm');
   const n = _commitSelections().filter(x => x.action !== 'skip').length;
-  confirmBtn.textContent = n ? `Tải lên & index ${n} file` : 'Không có file để tải lên';
+  confirmBtn.textContent = n ? `Upload & index ${n} file${n === 1 ? '' : 's'}` : 'No files to upload';
   confirmBtn.disabled = !n;
 }
 
@@ -1803,7 +2265,7 @@ async function commitUpload() {
   if (g.error) { toast(g.error, 'error', 3500); return; }
   const confirmBtn = document.getElementById('upload-confirm');
   confirmBtn.disabled = true;
-  confirmBtn.textContent = 'Đang lưu…';
+  confirmBtn.textContent = 'Saving…';
   const files = _commitSelections();
   try {
     const r = await api('/uploads/' + encodeURIComponent(_uploadSession.upload_id) + '/commit', {
@@ -1820,10 +2282,10 @@ async function commitUpload() {
     const docs = data.documents || [];
     const queued = docs.filter(d => d.status === 'queued');
     const failed = docs.filter(d => d.status === 'error');
-    // A group created by this upload is not in the label map yet: use the name typed.
+    // A collection created by this upload is not in the label map yet: use the name typed.
     const groupName = g.spec.new ? g.spec.new.label : (groupLabel(data.group) || data.group);
     if (queued.length) {
-      toast(`Đã lưu ${queued.length} file vào nhóm "${groupName}" — đang index…`, 'success', 4500);
+      toast(`Saved ${queued.length} file${queued.length === 1 ? '' : 's'} in “${groupName}” — indexing…`, 'success', 4500);
     }
     failed.slice(0, 3).forEach(d => toast(`${d.original_name || d.file_key}: ${d.message || d.code}`, 'error', 7000));
     if (data.job_id) trackJob(data.job_id, 'index');
@@ -1832,7 +2294,7 @@ async function commitUpload() {
   } catch (e) {
     confirmBtn.disabled = false;
     _updateCommitButton();
-    toast('Tải lên thất bại: ' + (e.message || e), 'error', 6000);
+    toast('Upload failed: ' + (e.message || e), 'error', 6000);
   }
 }
 
@@ -1845,16 +2307,6 @@ document.getElementById('upload-confirm').addEventListener('click', async () => 
     await commitUpload();
   }
 });
-document.querySelectorAll('.doc-table thead th').forEach(th => {
-  th.addEventListener('click', () => {
-    const col = th.dataset.col;
-    if (!col) return;
-    if (sortCol === col) sortAsc = !sortAsc;
-    else { sortCol = col; sortAsc = true; }
-    renderDocs();
-  });
-});
-
 // ═══════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════
