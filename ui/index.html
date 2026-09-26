@@ -463,8 +463,10 @@ canvas.gauge{display:block}
 </head>
 <body>
 
-<!-- API base URL -->
-<script>window.API_BASE = window.API_BASE || 'http://127.0.0.1:8000';</script>
+<!-- API base URL: the server that served this page (any host or port);
+     opened straight from disk, the page falls back to the local default. -->
+<script>window.API_BASE = window.API_BASE ||
+  (/^https?:$/.test(location.protocol) ? location.origin : 'http://127.0.0.1:8000');</script>
 
 <aside id="sidebar">
   <div class="sb-logo">
