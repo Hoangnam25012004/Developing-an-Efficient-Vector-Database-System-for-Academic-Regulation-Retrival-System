@@ -35,6 +35,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from qdrant_client import QdrantClient
 
 from src.chat.rag_chain import RAGChain
 from src.evaluation.evaluator import run_evaluation
@@ -215,11 +216,47 @@ def _iter_chunks(cfg: dict | None = None) -> list[dict]:
 
 # ─── Health ───────────────────────────────────────────────────────────────────
 
+# Every open UI tab polls /health every 30 s; one probe answers them all.
+_QDRANT_PROBE_TTL_S = 5.0
+_qdrant_probe: dict = {"at": float("-inf"), "ok": False}
+
+
+def _qdrant_ok() -> bool:
+    """True when the configured Qdrant answers and holds the collection.
+
+    Resolves URL and key the way VectorRetriever does, and never touches the
+    RAG chain, so it also answers while the models are still loading.
+    """
+    now = time.monotonic()
+    if now - _qdrant_probe["at"] < _QDRANT_PROBE_TTL_S:
+        return _qdrant_probe["ok"]
+    ok, client = False, None
+    try:
+        from src.config import load_config
+
+        vs = load_config(CONFIG_PATH)["vector_store"]
+        api_key = vs.get("qdrant_api_key") or os.environ.get("QDRANT_API_KEY", "")
+        client = QdrantClient(url=vs["qdrant_url"], api_key=api_key or None,
+                              timeout=2, check_compatibility=False)
+        ok = bool(client.collection_exists(vs["collection_name"]))
+    except Exception:
+        ok = False
+    finally:
+        if client is not None:
+            try:
+                client.close()
+            except Exception:
+                pass
+    _qdrant_probe.update(at=now, ok=ok)
+    return ok
+
+
 @app.get("/health")
 def health():
     return {
         "status": "ok",
         "ready": _chain is not None,
+        "qdrant": _qdrant_ok(),
         "timestamp": time.time(),
     }
 

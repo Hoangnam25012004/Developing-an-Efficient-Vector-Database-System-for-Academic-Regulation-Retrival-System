@@ -128,6 +128,7 @@ class IngestionE2ETest(unittest.TestCase):
         job = self.client.post("/reindex", json={"mode": "sync"}).json()
         self.assertEqual(self.wait(job["job_id"])["status"], "succeeded")
         self.health()
+        self.assertIs(self.client.get("/health").json()["qdrant"], True)  # the status bar's signal
         legacy_chunks = self.docs()[self.legacy.name]["chunk_count"]
         self.assertGreater(legacy_chunks, 0)
         legacy_jsonl = (self.raw / "processed" / (self.legacy.stem + ".jsonl")).read_bytes()
