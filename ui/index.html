@@ -318,7 +318,7 @@ a.lib-rec-title:hover{color:var(--lib-navy);text-decoration:underline;text-under
 .st-queued .mk,.st-not_indexed .mk{background:transparent;border:1.5px solid currentColor}
 .st-orphan .mk{background:transparent;border:1.5px dashed currentColor}
 .st-processing .mk,.st-removing .mk{background:transparent;border:1.5px solid currentColor;border-right-color:transparent;animation:spin .9s linear infinite}
-@media (prefers-reduced-motion:reduce){.st-processing .mk,.st-removing .mk{animation:none}}
+@media (prefers-reduced-motion:reduce){.st-processing .mk,.st-removing .mk,#screen-documents .spinner{animation:none}}
 .lib-st-note{display:block;margin-top:3px;font-size:11.5px;color:var(--lib-ink-3);white-space:normal;max-width:24ch}
 .lib-retry{display:inline-block;margin-top:4px;font-size:12px}
 .lib-more{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:0;background:none;border-radius:3px;color:var(--lib-ink-3);cursor:pointer}
@@ -708,7 +708,7 @@ canvas.gauge{display:block}
                 <tr class="lib-msg"><td colspan="7"><span class="spinner dark"></span> Loading the register…</td></tr>
               </tbody>
             </table>
-            <p class="lib-source-note">Titles, numbers and years come from the library catalogue (<code>data/catalog.json</code>) when an entry exists, otherwise from the details given at upload or the file name.</p>
+            <p class="lib-source-note">Titles, numbers and years come from the library catalogue (<code>data/catalog.json</code>) and from the details given at upload; a document with neither is listed under a name derived from its file name.</p>
           </section>
         </div>
       </div>
