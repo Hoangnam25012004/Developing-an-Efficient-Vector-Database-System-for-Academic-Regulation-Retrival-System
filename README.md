@@ -46,6 +46,8 @@ Mở http://127.0.0.1:8000. Lần chạy đầu, container tải hai model (kho�
 - Image dựng sẵn được lấy từ GitHub Container Registry. Muốn tự build từ mã nguồn: `docker compose up -d --build`.
 - Đổi cổng: đặt `APP_PORT=8080` (biến môi trường hoặc file `.env` cạnh `docker-compose.yml`).
 - Tài liệu upload thêm nằm trong volume `arrs_data`. `docker compose down -v` xoá toàn bộ volume và đưa hệ thống về corpus gốc.
+- Stack đã tạo trước bản 2.1.0 giữ volume `arrs_data` cũ nên chưa có `data/catalog.json` (tên, số hiệu, năm của văn bản trên trang Library). Chép vào bằng `docker compose cp data/catalog.json app:/app/data/catalog.json`; nếu không chép, trang vẫn chạy và hiện tên suy từ tên file.
+- Trên Windows, nếu `git clone` báo *Filename too long*, chạy `git config --global core.longpaths true` rồi clone lại, hoặc clone vào một thư mục ngắn hơn.
 - Chạy script đánh giá trong container: `docker compose exec app python eval/run_ablation.py --gt eval/test_queries_gt_v2.jsonl`.
 - Mỗi câu trả lời mất khoảng 15–30 giây trên CPU; phần lớn thời gian là cross-encoder rerank (paper, mục V-B).
 
@@ -220,7 +222,7 @@ Response: {
 ## Cấu Trúc Dự Án
 
 ```
-chatbot_rag_ranking/
+academic_vector_database/
 ├── api/                          # FastAPI backend
 │   ├── __init__.py
 │   └── main.py                  # REST API server
@@ -573,7 +575,7 @@ curl http://localhost:8000/health
 | `POST /uploads` | Tải file lên vùng tạm và kiểm tra (multipart `files`, tuỳ chọn `group`) → báo cáo từng file |
 | `POST /uploads/{id}/commit` | Xác nhận: chọn nhóm, hành động khi trùng tên (`add`/`replace`/`rename`/`skip`), ngôn ngữ, metadata → tạo job index |
 | `DELETE /uploads/{id}` | Huỷ phiên tải lên |
-| `GET /documents` | Mọi tài liệu kèm trạng thái index |
+| `GET /documents` | Mọi tài liệu kèm trạng thái index; khoá `catalog` mang tên, số hiệu, năm lấy từ `data/catalog.json` (`null` nếu không có mục) |
 | `GET /documents/{tên}/file` | File gốc (PDF mở trên trình duyệt, DOCX tải về) |
 | `POST /documents/{tên}/retry` | Index lại một tài liệu |
 | `DELETE /documents/{tên}` · `DELETE /groups/{nhóm}` | Xoá file và xoá khỏi mọi chỉ mục |
@@ -594,11 +596,13 @@ Truy cập `http://localhost:8000` để mở UI. UI là HTML/CSS/JS tĩnh, đư
 - Nhận câu trả lời Markdown kèm nguồn tài liệu (clickable PDF)
 - Hiển thị metadata Điều / Khoản / số trang cho mỗi nguồn
 
-### 2. Documents
+### 2. Library (màn hình Documents)
 
-- Liệt kê mọi tài liệu theo nhóm, kèm ngôn ngữ và **trạng thái index** (đã index / đang xử lý / lỗi / chưa index)
-- Upload PDF/DOCX hai bước: *Kiểm tra* (báo cáo từng file) → *Tải lên & index* (index tăng dần ở chế độ nền)
-- Xoá tài liệu/nhóm (tự xoá khỏi chỉ mục), *Index lại* tài liệu lỗi, *Đồng bộ chỉ mục* toàn bộ
+- Sổ văn bản theo nhóm (*collection*), xếp theo thứ bậc: Luật → Thông tư Bộ → Quyết định ĐHQG-HCM → Quy chế và nội quy của Trường → Phụ lục → Thông báo. Mỗi văn bản hiện tên, loại, số hiệu, cơ quan ban hành, năm (từ `data/catalog.json`), số trang, số đoạn đã index và **trạng thái** (*Available*, *Queued*, *Processing*, *Failed*…)
+- Tìm kiếm không phân biệt dấu (*hoc bong* tìm ra *học bổng*); lọc theo *Collection*, *Issued by*, *Document type*, *Availability*; đổi thứ tự sắp xếp
+- *Add documents*: upload PDF/DOCX hai bước — *Check files* (báo cáo từng file) → *Upload & index* (index tăng dần ở chế độ nền)
+- Menu ⋯ của từng văn bản: mở văn bản, *Retry indexing*, xoá; menu ⋯ của từng collection: xoá cả nhóm (tự xoá khỏi chỉ mục); *Sync index* đồng bộ toàn bộ chỉ mục
+- Thiết kế: [`docs/design/documents-library-redesign.md`](docs/design/documents-library-redesign.md)
 
 ### 3. Dashboard / Evaluation
 
@@ -748,14 +752,36 @@ Sửa các giá trị `top_k_dense`, `top_k_sparse`, `top_k_fusion`, `reranking.
 
 ### Thêm tài liệu mới
 
-**Cách khuyến nghị — qua giao diện** (màn hình Documents → *📥 Update Documents*):
-kéo thả file PDF/DOCX, chọn nhóm, bấm *Kiểm tra*. Hệ thống đọc thử từng file
+**Cách khuyến nghị — qua giao diện** (màn hình Library → *Add documents*):
+kéo thả file PDF/DOCX, chọn nhóm, bấm *Check files*. Hệ thống đọc thử từng file
 (loại file thật, mật khẩu, trùng tên/trùng nội dung, gợi ý ngôn ngữ Việt/Anh),
 bạn xác nhận rồi file được index ở chế độ nền — chỉ tài liệu mới được xử lý,
-Chat vẫn hoạt động, thường xong sau vài chục giây. Cột *Trạng thái* cho biết
-file nào đã tìm được trong Chat, đang xử lý hay bị lỗi (kèm lý do, nút *Index lại*).
+Chat vẫn hoạt động, thường xong sau vài chục giây. Cột *Status* cho biết
+file nào đã tìm được trong Chat, đang xử lý hay bị lỗi (kèm lý do và nút *Retry indexing*).
 Xoá tài liệu/nhóm cũng tự xoá khỏi chỉ mục. Thiết kế chi tiết:
 [`docs/design/upload-documents-v2.md`](docs/design/upload-documents-v2.md).
+
+### Danh mục văn bản (`data/catalog.json`)
+
+Trang Library lấy tên, số hiệu và năm ban hành của văn bản từ file này, vì phần lớn
+văn bản gốc không mang sẵn các thông tin đó. File được sửa tay và đọc lại ngay ở lần
+tải trang sau, không cần khởi động lại server. Mỗi mục có khoá là tên file:
+
+```json
+"19.-2016-Quy-che-CTSV-Bo-GD-DT.pdf": {
+  "title": "Quy chế công tác sinh viên đối với chương trình đào tạo đại học hệ chính quy",
+  "doc_number": "10/2016/TT-BGDĐT",
+  "year": 2016,
+  "issued": "2016-04-05",
+  "size": 4975183,
+  "note": "Ghi chú cho người biên mục, không hiển thị."
+}
+```
+
+- Các khoá đều không bắt buộc: `title`, `title_en`, `doc_number`, `year`, `issued` (`YYYY-MM-DD`), `issuing_body`, `size`, `note`.
+- Tiêu đề nhập khi upload được ưu tiên hơn catalog. `doc_number` hoặc `issuing_body` có mặt trong mục thì luôn được dùng, kể cả chuỗi rỗng (để ẩn một số hiệu trích sai).
+- `size` là kích thước (byte) của file mà mục mô tả; nếu file bị thay bằng bản khác cùng tên, mục bị bỏ qua.
+- Chỉ trang Library dùng file này. Chat, chỉ mục và các endpoint khác không đọc nó.
 
 **Cách thủ công** (tái lập đúng pipeline offline của paper):
 1. Đặt file PDF/DOCX vào `data/<nhóm>/`
@@ -797,7 +823,7 @@ llm:
 ### Quick start trên Windows
 
 ```cmd
-cd C:\chatbot_rag_ranking
+cd C:\academic_vector_database
 start.bat
 ```
 
@@ -830,7 +856,7 @@ Các chỉ số chất lượng tái lập đến 4 chữ số; độ trễ thay
 
 ## Vấn Đề Đã Biết
 
-- **Chạy lại chỉ mục sẽ OCR lại các PDF scan.** Nút *Đồng bộ chỉ mục* (`POST /reindex`) parse lại mọi tài liệu. Trong container, OCR dùng Tesseract 5.3 của Debian, khác bản Tesseract 5.4 đã dùng để dựng chỉ mục đi kèm. Đo thực tế: 15 PDF có lớp chữ cho kết quả giống hệt, còn 19 PDF scan cho chunk khác đi. Muốn giữ đúng corpus của paper thì không cần chạy lại chỉ mục; `docker compose down -v` đưa hệ thống về trạng thái gốc.
+- **Chạy lại chỉ mục sẽ OCR lại các PDF scan.** Nút *Sync index* trên trang Library (`POST /reindex`) parse lại mọi tài liệu. Trong container, OCR dùng Tesseract 5.3 của Debian, khác bản Tesseract 5.4 đã dùng để dựng chỉ mục đi kèm. Đo thực tế: 15 PDF có lớp chữ cho kết quả giống hệt, còn 19 PDF scan cho chunk khác đi. Muốn giữ đúng corpus của paper thì không cần chạy lại chỉ mục; `docker compose down -v` đưa hệ thống về trạng thái gốc.
 - **Khử trùng trước rerank** (`src/retrieval/reranker.py`, `_dedup`) coi hai chunk là một khi 80 ký tự đầu giống nhau. 208/4.224 chunk bị ảnh hưởng, chủ yếu là các dòng của cùng một bảng. Bước này được giữ nguyên vì nó thuộc hệ thống đã được đo trong paper.
 - **Dữ liệu đánh giá cũ:** `eval/test_queries_gt_100_v1.jsonl`, `eval/test_queries_gt_100_strict.jsonl` và `eval/cache/corpus_*` mang `chunk_id` từ trước khi chia lại chunk. Chỉ dùng `eval/test_queries_gt_v2.jsonl`.
 - **Chia chunk:** đoạn "Điều N" rất ngắn có thể bị gộp vào chunk sau, hoặc bị bỏ nếu nằm ở cuối tài liệu (giữ nguyên như trong paper).
