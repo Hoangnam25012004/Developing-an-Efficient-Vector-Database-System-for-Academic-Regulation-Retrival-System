@@ -1,0 +1,68 @@
+name: Release image
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: docker build -t "$IMAGE:ci" .
+
+      - name: Start the stack (downloads the pinned models, loads the vector seed)
+        run: ARRS_VERSION=ci docker compose up -d --no-build
+
+      - name: Wait until the API is ready and sees Qdrant
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:8000/health | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get("ready") and d.get("qdrant") else 1)'; then
+              echo "ready after ~$((i * 20)) s"; exit 0
+            fi
+            sleep 20
+          done
+          echo "not ready"; exit 1
+
+      - name: Smoke test /chat
+        run: |
+          curl -fsS -X POST http://127.0.0.1:8000/chat -H 'Content-Type: application/json' \
+            -d '{"question": "Quy định MGHP áp dụng cho đối tượng sinh viên nào?"}' > chat.json
+          python3 - <<'EOF'
+          import json
+          d = json.load(open("chat.json", encoding="utf-8"))
+          assert d["sources"], "no sources"
+          assert "không tìm thấy" not in d["answer"], d["answer"][:200]
+          ids = [s["chunk_id"] for s in d["sources"]]
+          assert len(ids) == len(set(ids)), "duplicate sources"
+          print("answer:", len(d["answer"]), "chars,", len(ids), "sources")
+          EOF
+
+      - name: Unit and end-to-end tests inside the container
+        run: |
+          docker compose exec -T app python -m unittest discover -s tests -t .
+          docker compose exec -T -e ARRS_E2E=1 app python -m unittest tests.test_api_e2e -v
+
+      - name: Push to GitHub Container Registry
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker tag "$IMAGE:ci" "$IMAGE:${GITHUB_REF_NAME}"
+          docker tag "$IMAGE:ci" "$IMAGE:latest"
+          docker push "$IMAGE:${GITHUB_REF_NAME}"
+          docker push "$IMAGE:latest"
+
+      - name: Logs
+        if: always()
+        run: docker compose logs --no-color --tail 200

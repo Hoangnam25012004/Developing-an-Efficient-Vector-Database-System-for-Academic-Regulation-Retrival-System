@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software or its test collection, please cite the paper below."
+type: software
+title: "Developing an Efficient Vector Database System for Academic Regulation Retrieval System"
+version: "2.0.1"
+license: MIT
+repository-code: "https://github.com/Hoangnam25012004/Developing-an-Efficient-Vector-Database-System-for-Academic-Regulation-Retrival-System"
+authors:
+  - family-names: "Dang"
+    given-names: "Hoang Nam"
+    affiliation: "International University, VNU-HCM"
+preferred-citation:
+  type: conference-paper
+  title: "Developing an Efficient Vector Database System for Academic Regulation Retrieval System"
+  authors:
+    - family-names: "Dang"
+      given-names: "Hoang Nam"
+      affiliation: "International University, VNU-HCM"
+  conference:
+    name: "International Conference on Knowledge and Systems Engineering (KSE 2026)"
+    city: "Kanazawa"
+    country: "JP"
+    date-start: "2026-11-11"
+    date-end: "2026-11-14"
+  year: 2026

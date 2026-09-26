@@ -1,11 +1,14 @@
-# Chatbot RAG Ranking — Hỏi Đáp Quy Chế Trường Đại Học Quốc Tế (ĐHQG-HCM)
+# Hệ thống truy xuất văn bản pháp quy học thuật
 
-Hệ thống chatbot hỏi đáp thông minh dựa trên kiến trúc **RAG (Retrieval-Augmented Generation)** với **Hybrid Search** và **Reranking**, chuyên biệt cho việc tra cứu quy chế, quy định của Trường Đại học Quốc tế – ĐHQG-HCM.
+Hệ thống tra cứu quy chế, quy định của Trường Đại học Quốc tế – ĐHQG-HCM: tìm kiếm lai (vector + BM25), rerank bằng cross-encoder và **trả lời bằng cách trích nguyên văn** Điều/Khoản kèm số trang. Hệ thống không dùng mô hình sinh (LLM), nên câu trả lời không chứa nội dung nằm ngoài tài liệu.
+
+Đây là mã nguồn, bộ test collection và các script của bài báo *Developing an Efficient Vector Database System for Academic Regulation Retrieval System* (Dang Hoang Nam, KSE 2026). Xem [Tái lập kết quả paper](#tái-lập-kết-quả-paper).
 
 ---
 
 ## Mục Lục
 
+- [Chạy Nhanh Bằng Docker](#chạy-nhanh-bằng-docker)
 - [Tổng Quan](#tổng-quan)
 - [Kiến Trúc Hệ Thống](#kiến-trúc-hệ-thống)
 - [Luồng Chạy (Data Flow)](#luồng-chạy-data-flow)
@@ -21,6 +24,32 @@ Hệ thống chatbot hỏi đáp thông minh dựa trên kiến trúc **RAG (Ret
 - [Đánh Giá Hệ Thống](#đánh-giá-hệ-thống)
 - [Kết Quả Đánh Giá](#kết-quả-đánh-giá)
 - [Tùy Chỉnh & Mở Rộng](#tùy-chỉnh--mở-rộng)
+- [Tái Lập Kết Quả Paper](#tái-lập-kết-quả-paper)
+- [Vấn Đề Đã Biết](#vấn-đề-đã-biết)
+- [Giấy Phép](#giấy-phép)
+- [Trích Dẫn](#trích-dẫn)
+
+---
+
+## Chạy Nhanh Bằng Docker
+
+Cần Docker (Docker Desktop trên Windows/macOS) được cấp **ít nhất 6 GB RAM** và khoảng **6 GB** đĩa trống.
+
+```bash
+git clone https://github.com/Hoangnam25012004/Developing-an-Efficient-Vector-Database-System-for-Academic-Regulation-Retrival-System.git arrs
+cd arrs
+docker compose up -d
+```
+
+Mở http://127.0.0.1:8000. Lần chạy đầu, container tải hai model (khoảng 2.8 GB, đúng revision đã dùng trong paper, ghi ở `models.lock.json`) và nạp 4.224 vector của corpus vào Qdrant từ `data/qdrant_seed/`, nên mất vài phút. Các lần sau khởi động trong khoảng 30 giây. Theo dõi tiến trình: `docker compose logs -f app`.
+
+- Image dựng sẵn được lấy từ GitHub Container Registry. Muốn tự build từ mã nguồn: `docker compose up -d --build`.
+- Đổi cổng: đặt `APP_PORT=8080` (biến môi trường hoặc file `.env` cạnh `docker-compose.yml`).
+- Tài liệu upload thêm nằm trong volume `arrs_data`. `docker compose down -v` xoá toàn bộ volume và đưa hệ thống về corpus gốc.
+- Chạy script đánh giá trong container: `docker compose exec app python eval/run_ablation.py --gt eval/test_queries_gt_v2.jsonl`.
+- Mỗi câu trả lời mất khoảng 15–30 giây trên CPU; phần lớn thời gian là cross-encoder rerank (paper, mục V-B).
+
+> **Bảo mật:** API không có đăng nhập. Ai truy cập được cổng của ứng dụng đều có thể upload/xoá tài liệu, chạy lại chỉ mục, sửa `/config` và chạy `/evaluate`. Vì vậy compose chỉ mở cổng trên `127.0.0.1`. Chỉ đặt `APP_BIND=0.0.0.0` (mở ra mạng LAN) trong mạng tin cậy, và đừng đưa cổng này ra Internet khi chưa có reverse proxy có xác thực.
 
 ---
 
@@ -265,8 +294,8 @@ chatbot_rag_ranking/
 
 - **Python**: 3.10 hoặc cao hơn (đã test trên 3.11)
 - **RAM**: Tối thiểu 8 GB; khuyến nghị 16 GB
-- **GPU**: Không bắt buộc — CPU vẫn chạy, chỉ chậm hơn (~2-5s/query). Có CUDA giúp embed + rerank nhanh hơn nhiều
-- **Disk**: ~3 GB (model weights: bi-encoder ~1.3 GB + reranker ~500 MB + data + index)
+- **GPU**: Không bắt buộc. Trên CPU mỗi câu hỏi mất khoảng 15–30 giây, phần lớn là rerank; có CUDA thì embed và rerank nhanh hơn nhiều
+- **Disk**: ~4 GB (model: bi-encoder ~0.5 GB, reranker ~2.3 GB; cùng dữ liệu và chỉ mục)
 - **Qdrant**: Local (Docker) hoặc Qdrant Cloud
 - **Không cần API key của LLM** — hệ thống chạy hoàn toàn local cho cả retrieval, rerank và synthesis. Chỉ cần `QDRANT_URL` + `QDRANT_API_KEY` nếu dùng Qdrant Cloud.
 ---
@@ -276,7 +305,8 @@ chatbot_rag_ranking/
 ### Bước 1: Clone dự án
 
 ```bash
-cd chatbot_rag_ranking
+git clone https://github.com/Hoangnam25012004/Developing-an-Efficient-Vector-Database-System-for-Academic-Regulation-Retrival-System.git arrs
+cd arrs
 ```
 
 ### Bước 2: Tạo virtual environment
@@ -293,9 +323,11 @@ source venv/bin/activate        # Linux/Mac
 pip install -r requirements.txt
 ```
 
-> **Lưu ý:** Lần đầu chạy sẽ tự download models:
-> - `bkai-foundation-models/vietnamese-bi-encoder` (~1.3 GB)
-> - `AITeamVN/Vietnamese_Reranker` (~500 MB)
+> **Lưu ý:** Lần đầu chạy sẽ tự tải model từ Hugging Face:
+> - `bkai-foundation-models/vietnamese-bi-encoder` (~0.5 GB)
+> - `AITeamVN/Vietnamese_Reranker` (~2.3 GB)
+>
+> Revision dùng trong paper được ghi ở `models.lock.json` (image Docker luôn dùng đúng các revision này). Phiên bản thư viện của môi trường đo nằm ở `requirements.lock`: cài `torch==2.11.0` từ `https://download.pytorch.org/whl/cpu` trước, rồi `pip install -r requirements.lock`.
 
 ### Bước 4: Cài đặt Qdrant (Local)
 
@@ -413,7 +445,7 @@ python -m src.pipeline.03_bm25_index --only-files Tai-lieu-moi.jsonl
 
 **Output:**
 - `data/processed/*.jsonl` — 35 file JSONL chứa các chunks
-- Qdrant collection `rag_docs` — dense vectors
+- Qdrant collection `reg_chunks` — dense vectors
 - `data/processed/bm25.pkl` — BM25 index (~2.3 MB)
 
 ---
@@ -522,12 +554,15 @@ curl -X POST http://localhost:8000/evaluate
 
 ### `GET /health`
 
-Kiểm tra trạng thái server.
+Kiểm tra trạng thái server. Luôn trả HTTP 200 khi API đang chạy.
 
 ```bash
 curl http://localhost:8000/health
-# {"status": "ok"}
+# {"status": "ok", "ready": true, "qdrant": true, "timestamp": 1790412345.6}
 ```
+
+- `ready`: model đã nạp xong.
+- `qdrant`: Qdrant trả lời và có collection cấu hình trong `config.yaml`. Thanh trạng thái của giao diện đọc field này ("System online" hoặc "Qdrant offline"). Kết quả được cache 5 giây.
 
 ---
 
@@ -578,6 +613,8 @@ Truy cập `http://localhost:8000` để mở UI. UI là HTML/CSS/JS tĩnh, đư
 Hệ thống dùng **reference-based evaluation** — so sánh output của RAG pipeline với bộ ground truth do người gán nhãn, bằng các phép đo lexical (bigram, ROUGE) và embedding (BERTScore). Toàn bộ pipeline (cả retrieval, generation lẫn evaluation) đều không gọi LLM, nên kết quả tái lập 100% giữa các lần chạy và không phát sinh chi phí API.
 
 ### Bộ ground truth
+
+> Bộ ground truth hợp lệ hiện nay là `eval/test_queries_gt_v2.jsonl` (100 câu, gán nhãn theo giao thức ở `eval/ANNOTATION.md`, dùng trong paper). Các file v1 và strict chỉ được giữ lại để đối chiếu lịch sử.
 
 File: `eval/test_queries_gt.jsonl` (đường dẫn đặt trong `config.yaml > evaluation.test_queries_path`).
 
@@ -670,6 +707,8 @@ Sửa các giá trị `top_k_dense`, `top_k_sparse`, `top_k_fusion`, `reranking.
 ---
 
 ## Kết Quả Đánh Giá
+
+> **Lưu ý:** Các bảng trong mục này là kết quả nội bộ ngày 2026-05-01 trên bộ ground truth cũ (v1). Bộ này sau đó được chứng minh là gán nhãn theo văn bản chứ không theo Khoản (paper, mục IV-B), nên các con số dưới đây không dùng để so sánh. Số liệu chính thức: [Tái lập kết quả paper](#tái-lập-kết-quả-paper).
 
 > Bộ test: **30 câu hỏi** đã gán `relevant_ids`, đánh giá ngày 2026-05-01 với cấu hình mặc định (`config.yaml`: hybrid retrieval `top_k_dense=top_k_sparse=30`, RRF `top_k_fusion=20`, reranker `top_k=10`, `max_per_source=5`, generation = LLM-free Tier).
 
@@ -772,6 +811,51 @@ reranking:
 
 ---
 
+## Tái Lập Kết Quả Paper
+
+Tag `kse2026-paper` là mã nguồn đúng như lúc đo các số liệu trong bài báo; nhánh `main` có thêm các thay đổi sau đó (ghi ở `docs/design/`).
+
+- **Môi trường đo:** Windows 11, chỉ dùng CPU, Qdrant 1.16.1 chạy bằng Docker. Phiên bản thư viện ở `requirements.lock`, revision model ở `models.lock.json`.
+- **Corpus:** 34 văn bản, 4.224 chunk trong `data/processed/`. Vector đúng như lúc đo nằm ở `data/qdrant_seed/`; nạp vào Qdrant bằng `python scripts/seed_qdrant.py` (image Docker tự làm việc này).
+
+| Kết quả | Lệnh | Thời gian (CPU) |
+|---|---|---|
+| Bảng II và kiểm định McNemar (mục V-B) | `python eval/run_ablation.py --gt eval/test_queries_gt_v2.jsonl` | ~35–50 phút, chủ yếu là rerank |
+| Mục V-F (ghép Khoản) | `python eval/compare_answers.py --n 20` | ~8 phút |
+| Bảng III, Hình 2–3 (benchmark vector DB) | xem [`eval/README.md`](eval/README.md) (`eval/bench_vectordb.py`) | |
+
+Các chỉ số chất lượng tái lập đến 4 chữ số; độ trễ thay đổi theo máy và tải (paper, mục IV-A). `eval/README.md` được viết trước bộ GT v2: khi chạy ablation, luôn truyền `--gt eval/test_queries_gt_v2.jsonl`.
+
+---
+
+## Vấn Đề Đã Biết
+
+- **Chạy lại chỉ mục sẽ OCR lại các PDF scan.** Nút *Đồng bộ chỉ mục* (`POST /reindex`) parse lại mọi tài liệu. Trong container, OCR dùng Tesseract 5.3 của Debian, khác bản Tesseract 5.4 đã dùng để dựng chỉ mục đi kèm. Đo thực tế: 15 PDF có lớp chữ cho kết quả giống hệt, còn 19 PDF scan cho chunk khác đi. Muốn giữ đúng corpus của paper thì không cần chạy lại chỉ mục; `docker compose down -v` đưa hệ thống về trạng thái gốc.
+- **Khử trùng trước rerank** (`src/retrieval/reranker.py`, `_dedup`) coi hai chunk là một khi 80 ký tự đầu giống nhau. 208/4.224 chunk bị ảnh hưởng, chủ yếu là các dòng của cùng một bảng. Bước này được giữ nguyên vì nó thuộc hệ thống đã được đo trong paper.
+- **Dữ liệu đánh giá cũ:** `eval/test_queries_gt_100_v1.jsonl`, `eval/test_queries_gt_100_strict.jsonl` và `eval/cache/corpus_*` mang `chunk_id` từ trước khi chia lại chunk. Chỉ dùng `eval/test_queries_gt_v2.jsonl`.
+- **Chia chunk:** đoạn "Điều N" rất ngắn có thể bị gộp vào chunk sau, hoặc bị bỏ nếu nằm ở cuối tài liệu (giữ nguyên như trong paper).
+- `eval/make_tables.py` mặc định ghi vào `Report/tables.tex`, thư mục không có trong repo; truyền `--out` để chọn nơi ghi.
+
+---
+
 ## Giấy Phép
 
-Dự án được phát triển cho mục đích nghiên cứu và học thuật tại Trường Đại học Quốc tế – ĐHQG-HCM.
+- Mã nguồn: MIT ([`LICENSE`](LICENSE)).
+- Bộ test collection trong `eval/` (GT v2, judgments, pool): CC BY 4.0 ([`eval/LICENSE`](eval/LICENSE)).
+- Các PDF trong `data/` là văn bản của cơ quan ban hành, được đưa vào để tái lập nghiên cứu; chúng không thuộc phạm vi hai license trên.
+- Model `bkai-foundation-models/vietnamese-bi-encoder` và `AITeamVN/Vietnamese_Reranker` (Apache-2.0) được tải từ Hugging Face khi chạy.
+
+---
+
+## Trích Dẫn
+
+```bibtex
+@inproceedings{dang2026regulation,
+  author    = {Dang, Hoang Nam},
+  title     = {Developing an Efficient Vector Database System for Academic Regulation Retrieval System},
+  booktitle = {Proceedings of the International Conference on Knowledge and Systems Engineering (KSE)},
+  year      = {2026}
+}
+```
+
+Metadata trích dẫn cũng có trong [`CITATION.cff`](CITATION.cff).

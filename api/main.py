@@ -50,7 +50,7 @@ CONFIG_PATH = os.environ.get("CONFIG_PATH", "config.yaml")
 app = FastAPI(
     title="ARRS – RAG Chatbot API",
     description="Hybrid search + reranking RAG over Vietnamese university regulations",
-    version="2.0.0",
+    version="2.0.1",
 )
 
 app.add_middleware(
