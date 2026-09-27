@@ -174,8 +174,10 @@ def _doc_to_source(d: dict, text_limit: int = 800) -> SourceDoc:
         source        = d.get("source"),
         page          = d.get("page"),
         text          = d.get("text", "")[:text_limit],
-        score_rrf     = d.get("_score_rrf"),
-        score_rerank  = d.get("_score_rerank"),
+        # retrieve() and search keep the internal _score_* keys; the sources of
+        # chain.query() carry them as score_rrf / score_rerank.
+        score_rrf     = d.get("_score_rrf", d.get("score_rrf")),
+        score_rerank  = d.get("_score_rerank", d.get("score_rerank")),
         score_dense   = d.get("_score_dense"),
         score_sparse  = d.get("_score_sparse"),
         doc_group     = d.get("doc_group"),
