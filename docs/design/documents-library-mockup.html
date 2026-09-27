@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regulation Library — design mockup</title>
+<!-- Design mockup for docs/design/documents-library-redesign.md.
+     Static: it does not call the API. Data = the 34 documents of the corpus
+     (GET /documents on 2026-09-27) + the catalogue of appendix D (data/catalog.json). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --paper:#F7F5F0; --sheet:#FFFFFF; --hover:#FBFAF6;
+  --ink:#1F2430; --ink-2:#4A5060; --ink-3:#6A6F78;
+  --rule:#E4DED2; --rule-strong:#CFC7B8; --rule-ui:#8C8579;
+  --navy:#1B3A6B; --navy-2:#13294D; --gold:#C8A24A;
+  --ok:#2F6B3B; --busy:#8A5A00; --bad:#A12A2A; --hl:#FFF1B8;
+  --serif:'Source Serif 4','Noto Serif','Times New Roman',serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+  --sidebar-w:240px; --sidebar-c:68px;
+}
+html,body{height:100%}
+body{display:flex;overflow:hidden;font-family:var(--sans);font-size:14px;line-height:1.55;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+
+/* ── Sidebar (shared with Chat) ─────────────────────────────── */
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100vh;background:var(--navy);color:#fff;display:flex;flex-direction:column}
+.sb-logo{display:flex;align-items:center;gap:12px;padding:22px 20px 20px;border-bottom:1px solid rgba(255,255,255,.14);white-space:nowrap;overflow:hidden}
+.sb-logo-icon{width:40px;height:40px;min-width:40px;background:#fff;border-radius:3px;padding:3px;display:flex}
+.sb-logo-icon img{width:100%;height:100%;object-fit:contain}
+.sb-mono{margin:auto;font-family:var(--serif);font-weight:700;font-size:15px;color:var(--navy)}
+.sb-logo-text .brand{font-family:var(--serif);font-size:21px;font-weight:600;letter-spacing:.02em;line-height:1.1}
+.sb-logo-text .sub{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.66);margin-top:3px}
+.sb-nav{padding:14px 0;display:flex;flex-direction:column}
+.sb-item{display:flex;align-items:center;gap:12px;padding:10px 20px 10px 18px;border-left:2px solid transparent;color:rgba(255,255,255,.74);font-size:14px;font-weight:500;text-align:left;white-space:nowrap}
+.sb-item:hover{color:#fff;background:rgba(255,255,255,.05)}
+.sb-item.active{color:#fff;border-left-color:var(--gold);background:rgba(255,255,255,.07)}
+.sb-item svg.i{width:18px;height:18px}
+.sb-count{margin-left:auto;font-size:12px;color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums}
+.sb-footer{margin-top:auto;padding:14px 20px;border-top:1px solid rgba(255,255,255,.14);display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(255,255,255,.66);white-space:nowrap}
+.status-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#7BC47F}
+
+/* ── Library page ────────────────────────────────────────────── */
+#main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.lib-scroll{flex:1;overflow-y:auto}
+.lib-page{max-width:1280px;margin:0 auto;padding:30px 40px 64px}
+.lib-masthead{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap}
+.lib-mast-text{flex:1;min-width:320px}
+.lib-kicker{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.lib-h1{font-family:var(--serif);font-size:34px;line-height:1.15;font-weight:600;letter-spacing:-.005em;margin-top:6px}
+.lib-lede{max-width:64ch;color:var(--ink-2);margin-top:8px;font-size:15px}
+.lib-summary{margin-top:12px;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.lib-summary b{color:var(--ink);font-weight:600}
+.lib-summary .warn{color:var(--busy)}
+.lib-summary .bad{color:var(--bad)}
+.lib-summary button{text-decoration:underline;text-underline-offset:3px}
+.lib-actions{display:flex;gap:8px;align-items:center;padding-bottom:4px;flex-wrap:wrap}
+.lib-btn{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border:1px solid var(--rule-ui);border-radius:3px;background:var(--sheet);color:var(--ink);font-size:13px;font-weight:500;white-space:nowrap}
+.lib-btn:hover{border-color:var(--ink)}
+.lib-btn:disabled{opacity:.6;cursor:progress}
+.lib-btn-primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.lib-btn-primary:hover{background:var(--navy-2);border-color:var(--navy-2)}
+.lib-btn-quiet{border-color:transparent;background:transparent;color:var(--ink-2);padding:0 8px}
+.lib-btn-quiet:hover{border-color:transparent;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.spin{width:12px;height:12px;border-radius:50%;border:1.5px solid currentColor;border-right-color:transparent;animation:spin .9s linear infinite;display:inline-block}
+.lib-rule{margin:22px 0;border:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule-strong);height:4px}
+
+.lib-search{position:relative;display:flex;align-items:center}
+.lib-search svg.i{position:absolute;left:14px;color:var(--ink-3);width:18px;height:18px}
+.lib-search input{width:100%;height:46px;padding:0 48px 0 44px;border:1px solid var(--rule-ui);border-radius:3px;background:var(--sheet);font:inherit;font-size:15px;color:var(--ink)}
+.lib-search input::placeholder{color:var(--ink-3)}
+.lib-search input:focus{outline:2px solid var(--navy);outline-offset:-1px;border-color:var(--navy)}
+.lib-search input::-webkit-search-cancel-button{display:none}
+.lib-search kbd{position:absolute;right:12px;font-family:var(--mono);font-size:11px;color:var(--ink-3);border:1px solid var(--rule-strong);border-radius:3px;padding:1px 6px;background:var(--paper)}
+.lib-search-hint{margin-top:7px;font-size:12px;color:var(--ink-3)}
+
+.lib-body{display:grid;grid-template-columns:220px minmax(0,1fr);gap:36px;margin-top:26px;align-items:start}
+.lib-refine{position:sticky;top:18px}
+.lib-refine-h{font-family:var(--serif);font-size:17px;font-weight:600;padding-bottom:8px;border-bottom:1px solid var(--ink);list-style:none;cursor:pointer}
+.lib-refine-h::-webkit-details-marker{display:none}
+.lib-refine-state{font-family:var(--sans);font-size:12px;font-weight:400;color:var(--ink-3);margin-left:8px}
+.lib-facet{padding:14px 0 12px;border-bottom:1px solid var(--rule)}
+.lib-facet h3{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+.lib-facet ul{list-style:none}
+.lib-facet li{display:flex;align-items:center}
+.lib-fi{flex:1;display:flex;align-items:baseline;gap:8px;padding:5px 8px 5px 10px;border-left:2px solid transparent;text-align:left;font-size:13.5px;color:var(--ink-2);min-width:0}
+.lib-fi .lbl{flex:1;min-width:0}
+.lib-fi .cnt{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.lib-fi:hover{color:var(--ink);background:var(--hover)}
+.lib-fi[aria-pressed="true"]{border-left-color:var(--navy);color:var(--ink);font-weight:600;background:var(--sheet)}
+.lib-fi:disabled{opacity:.45;cursor:default;background:none}
+.lib-fmore{width:26px;height:26px;min-width:26px;display:flex;align-items:center;justify-content:center;color:var(--ink-3);border-radius:3px;opacity:0}
+.lib-facet li:hover .lib-fmore,.lib-fmore:focus-visible,.lib-fmore[aria-expanded="true"]{opacity:1}
+.lib-fmore:hover{color:var(--ink);background:var(--rule)}
+@media (hover:none){.lib-fmore{opacity:1}}
+.lib-clear{margin-top:12px;font-size:12.5px;color:var(--navy);text-decoration:underline;text-underline-offset:3px}
+
+.lib-resultbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-bottom:10px;min-height:40px}
+.lib-count{font-size:13px;color:var(--ink-2)}
+.lib-count b{color:var(--ink)}
+.lib-filters{font-size:12.5px;color:var(--ink-3);display:flex;gap:12px;flex-wrap:wrap}
+.lib-filters button{color:var(--navy);text-decoration:underline;text-underline-offset:3px}
+.lib-sort{margin-left:auto;font-size:12.5px;color:var(--ink-3);display:flex;align-items:center;gap:8px}
+.lib-sort select{height:30px;border:1px solid var(--rule-ui);border-radius:3px;background:var(--sheet);font:inherit;font-size:13px;color:var(--ink);padding:0 8px}
+.lib-dir{height:30px;min-width:30px;border:1px solid var(--rule-ui);border-radius:3px;background:var(--sheet);color:var(--ink-2);font-size:12px;padding:0 8px}
+
+.lib-table{width:100%;border-collapse:collapse;background:var(--sheet);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.lib-table thead th{position:sticky;top:0;z-index:2;background:var(--sheet);border-bottom:1px solid var(--ink);padding:9px 12px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-2);white-space:nowrap}
+.lib-table thead th button{display:inline-flex;align-items:center;gap:4px;font-weight:600;color:inherit}
+.lib-table thead th button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.lib-table thead th .dir{font-size:10px;color:var(--navy)}
+.lib-table td{padding:13px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+.lib-table tr.lib-row{cursor:pointer}
+.lib-table tr.lib-row:hover td{background:var(--hover)}
+.lib-table tr.lib-row.is-orphan{cursor:default}
+.c-no{width:40px;text-align:right;color:var(--ink-3);font-size:12.5px;font-variant-numeric:tabular-nums}
+.c-year{width:56px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.c-n{width:72px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.lib-table th.c-n{text-align:right}
+.c-status{width:136px}
+.c-act{width:40px;text-align:right}
+.lib-rec-title{font-family:var(--serif);font-size:16px;font-weight:600;line-height:1.35;color:var(--ink);text-decoration:none}
+a.lib-rec-title:hover{color:var(--navy);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.lib-rec-meta{margin-top:3px;font-size:12.5px;color:var(--ink-2)}
+.lib-rec-meta .sep{color:var(--rule-ui);margin:0 6px}
+.lib-rec-file{margin-top:3px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3);word-break:break-all}
+.lib-rec-file .ft{font-family:var(--sans);font-size:10.5px;letter-spacing:.06em;margin-left:8px}
+.lib-rec-small{display:none;margin-top:6px;font-size:12px;color:var(--ink-2)}
+mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
+.lib-section th{padding:22px 12px 8px;text-align:left;background:var(--paper);border-bottom:1px solid var(--rule-strong);font-weight:400}
+.lib-table tbody tr.lib-section:first-child th{padding-top:14px}
+.lib-section .t{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink)}
+.lib-section .m{margin-left:10px;font-size:12.5px;color:var(--ink-3)}
+.lib-empty td{padding:52px 12px;text-align:center;color:var(--ink-2)}
+.lib-empty .t{font-family:var(--serif);font-size:19px;color:var(--ink);margin-bottom:6px}
+.lib-empty button{color:var(--navy);text-decoration:underline;text-underline-offset:3px}
+.lib-source-note{margin-top:12px;font-size:12px;color:var(--ink-3);max-width:90ch}
+
+.lib-st{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;white-space:nowrap}
+.lib-st .mk{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.st-indexed{color:var(--ok)}
+.st-queued,.st-processing,.st-removing,.st-empty{color:var(--busy)}
+.st-failed{color:var(--bad)}
+.st-not_indexed,.st-orphan{color:var(--ink-3)}
+.st-queued .mk,.st-not_indexed .mk{background:transparent;border:1.5px solid currentColor}
+.st-orphan .mk{background:transparent;border:1.5px dashed currentColor}
+.st-processing .mk,.st-removing .mk{background:transparent;border:1.5px solid currentColor;border-right-color:transparent;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.st-processing .mk,.st-removing .mk,.spin{animation:none}}
+.lib-st-note{display:block;margin-top:3px;font-size:11.5px;color:var(--ink-3);white-space:normal;max-width:22ch}
+.lib-retry{display:inline-block;margin-top:4px;font-size:12px;color:var(--navy);text-decoration:underline;text-underline-offset:3px}
+.lib-more{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:3px;color:var(--ink-3)}
+.lib-more:hover,.lib-more[aria-expanded="true"]{color:var(--ink);background:var(--rule)}
+
+.lib-menu{position:fixed;z-index:50;min-width:230px;background:var(--sheet);border:1px solid var(--rule-strong);border-radius:3px;box-shadow:0 6px 24px rgba(31,36,48,.12);padding:6px 0}
+.lib-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;font-size:13px;color:var(--ink);text-align:left}
+.lib-menu button svg.i{color:var(--ink-3)}
+.lib-menu button:hover,.lib-menu button:focus-visible{background:var(--paper);outline:none}
+.lib-menu .danger,.lib-menu .danger svg.i{color:var(--bad)}
+.lib-menu hr{border:0;border-top:1px solid var(--rule);margin:6px 0}
+
+/* ── Toast ───────────────────────────────────────────────────── */
+.toast-wrap{position:fixed;right:24px;bottom:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{max-width:380px;background:var(--ink);color:#fff;padding:10px 14px 10px 12px;border-left:3px solid #9DB4D8;border-radius:3px;font-size:13px;box-shadow:0 6px 24px rgba(31,36,48,.18);animation:fade .15s ease-out;transition:opacity .25s}
+.toast.success{border-left-color:#7BC47F}
+.toast.error{border-left-color:#E08A8A}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── "Add documents" modal (same flow, new skin) ─────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(31,36,48,.45);z-index:9998;display:flex;align-items:center;justify-content:center}
+.hidden{display:none!important}
+.modal{background:var(--sheet);width:92%;max-width:880px;max-height:88vh;display:flex;flex-direction:column;border-radius:4px;border-top:3px solid var(--navy);box-shadow:0 20px 60px rgba(31,36,48,.25)}
+.modal-head{padding:18px 24px 14px;border-bottom:1px solid var(--rule);display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.modal-head h3{font-family:var(--serif);font-size:21px;font-weight:600}
+.up-steps{margin-left:auto;display:flex;gap:14px;font-size:12.5px;color:var(--ink-3);list-style:none}
+.up-step.active{color:var(--ink);font-weight:600}
+.up-step .n{margin-right:5px;font-variant-numeric:tabular-nums}
+.modal-body{padding:18px 24px;overflow-y:auto}
+.dropzone{border:1px dashed var(--rule-ui);border-radius:3px;background:var(--paper);padding:26px 20px;text-align:center}
+.dropzone svg.i{width:26px;height:26px;color:var(--ink-3);margin-bottom:6px}
+.dropzone-text{font-weight:600}
+.dropzone-sub{font-size:12px;color:var(--ink-3);margin-top:2px}
+.up-label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin:16px 0 6px}
+.up-select,.up-input{width:100%;height:36px;border:1px solid var(--rule-ui);border-radius:3px;padding:0 10px;font:inherit;font-size:13.5px;background:var(--sheet);color:var(--ink)}
+.up-help{margin-top:12px;font-size:12.5px;color:var(--ink-2);line-height:1.6;display:flex;gap:8px}
+.up-help svg.i{margin-top:3px;color:var(--ink-3)}
+.up-list-title{margin:18px 0 4px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.modal-file{display:flex;align-items:center;gap:12px;padding:8px 2px;border-bottom:1px solid var(--rule)}
+.modal-file .fname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.modal-file .fsize{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.fremove{color:var(--ink-3);width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:3px}
+.fremove:hover{color:var(--bad);background:var(--paper)}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--rule);display:flex;justify-content:flex-end;gap:8px}
+.up-progress{height:3px;background:var(--rule);margin:2px 0 8px}
+.up-progress .bar{height:100%;background:var(--navy);width:100%}
+.up-progress-lbl{font-size:12.5px;color:var(--ink-2);margin-bottom:12px}
+.up-row{padding:10px 12px;border-left:3px solid var(--ok);border-bottom:1px solid var(--rule)}
+.up-row.warn{border-left-color:var(--busy)}
+.up-row.rejected{border-left-color:var(--bad)}
+.up-row-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.up-row-head .ic{display:flex;color:var(--ok)}
+.up-row.warn .ic{color:var(--busy)}
+.up-row.rejected .ic{color:var(--bad)}
+.up-row-head .nm{flex:1;min-width:180px;font-weight:600;font-size:13px;word-break:break-all}
+.up-row-head .meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.up-row-head select{height:30px;border:1px solid var(--rule-ui);border-radius:3px;background:var(--sheet);font:inherit;font-size:12.5px;padding:0 6px}
+.up-msg{font-size:12px;color:var(--ink-2);margin-top:5px}
+.up-msg.warn{color:var(--busy)}
+.up-msg.err{color:var(--bad)}
+.up-meta-toggle{display:inline-block;font-size:12px;color:var(--navy);margin-top:6px;text-decoration:underline;text-underline-offset:3px}
+
+/* ── Mockup-only controls ────────────────────────────────────── */
+.mock-panel{position:fixed;left:252px;bottom:14px;z-index:60;display:flex;gap:6px;align-items:center;background:#FFFDF5;border:1px dashed var(--rule-ui);padding:6px 8px;border-radius:3px;font-size:11.5px;color:var(--ink-2)}
+.mock-panel button{border:1px solid var(--rule-ui);border-radius:3px;padding:3px 8px;background:#fff;font-size:11.5px}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width:1279px){
+  .lib-body{grid-template-columns:1fr;gap:18px}
+  .lib-refine{position:static}
+  #refine-box[open]{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));column-gap:28px}
+  .lib-refine-h,.lib-clear{grid-column:1/-1}
+  .lib-refine-h::after{content:' +';font-family:var(--sans);color:var(--ink-3)}
+  #refine-box[open] .lib-refine-h::after{content:' −'}
+}
+@media (max-width:900px){
+  #sidebar{width:var(--sidebar-c);min-width:var(--sidebar-c)}
+  .sb-logo-text,.sb-label,.sb-count,.sb-footer span{display:none}
+  .sb-logo{padding:18px 14px}
+  .lib-page{padding:22px 18px 48px}
+  .c-passages{display:none}
+  .mock-panel{left:78px}
+}
+@media (max-width:640px){
+  .lib-h1{font-size:27px}
+  .lib-table thead,.c-no,.c-year,.c-n,.c-status{display:none}
+  .lib-rec-small{display:block}
+  .lib-table td{padding:12px 6px}
+}
+</style>
+</head>
+<body>
+
+<aside id="sidebar" aria-label="Main navigation">
+  <div class="sb-logo">
+    <div class="sb-logo-icon"><img src="../../img/Logo-HCMIU.svg" alt="HCMIU" onerror="if(!this.dataset.retry){this.dataset.retry=1;this.src='../../img/Logo-HCMIU.svg.png'}else{this.replaceWith(Object.assign(document.createElement('span'),{className:'sb-mono',textContent:'IU'}))}"></div>
+    <div class="sb-logo-text"><div class="brand">ARRS</div><div class="sub">IU Academic Assistant</div></div>
+  </div>
+  <nav class="sb-nav">
+    <button class="sb-item" data-screen="chat" title="Chat"><span id="ic-chat"></span><span class="sb-label">Chat</span></button>
+    <button class="sb-item active" data-screen="documents" title="Library" aria-current="page"><span id="ic-book"></span><span class="sb-label">Library</span><span class="sb-count" id="sb-doc-count">34</span></button>
+  </nav>
+  <div class="sb-footer"><div class="status-dot"></div><span>System online</span></div>
+</aside>
+
+<main id="main">
+  <div class="lib-scroll" id="lib-scroll">
+    <div class="lib-page">
+      <header class="lib-masthead">
+        <div class="lib-mast-text">
+          <p class="lib-kicker">International University · VNU-HCM</p>
+          <h1 class="lib-h1">Regulation Library</h1>
+          <p class="lib-lede">Laws, circulars, decisions and university rules that the assistant searches and cites when it answers questions.</p>
+          <p class="lib-summary" id="lib-summary"></p>
+        </div>
+        <div class="lib-actions" role="toolbar" aria-label="Manage the library">
+          <button class="lib-btn lib-btn-primary" id="reindex-docs"></button>
+          <button class="lib-btn" id="sync-index" title="Re-read every document and bring the search index up to date. Chat keeps working."></button>
+          <button class="lib-btn lib-btn-quiet" id="refresh-docs" title="Reload the list"></button>
+        </div>
+      </header>
+      <hr class="lib-rule">
+
+      <div class="lib-search" role="search">
+        <label for="doc-search" class="sr-only">Search the library</label>
+        <span id="ic-search"></span>
+        <input id="doc-search" type="search" autocomplete="off" placeholder="Search by title, number, issuing body or file name">
+        <kbd aria-hidden="true">/</kbd>
+      </div>
+      <p class="lib-search-hint">Accents are optional: <i>hoc bong</i> finds <i>học bổng</i>.</p>
+
+      <div class="lib-body">
+        <nav class="lib-refine" aria-label="Refine the list">
+          <details id="refine-box" open><summary class="lib-refine-h">Refine <span class="lib-refine-state" id="refine-state"></span></summary>
+          <section class="lib-facet"><h3 id="fh-collection">Collection</h3><ul id="facet-collection" aria-labelledby="fh-collection"></ul></section>
+          <section class="lib-facet"><h3 id="fh-issuer">Issued by</h3><ul id="facet-issuer" aria-labelledby="fh-issuer"></ul></section>
+          <section class="lib-facet"><h3 id="fh-type">Document type</h3><ul id="facet-type" aria-labelledby="fh-type"></ul></section>
+          <section class="lib-facet" id="facet-status-wrap"><h3 id="fh-status">Availability</h3><ul id="facet-status" aria-labelledby="fh-status"></ul></section>
+          <button class="lib-clear hidden" id="facet-clear">Clear all filters</button>
+          </details>
+        </nav>
+
+        <section class="lib-register" aria-labelledby="reg-h">
+          <h2 id="reg-h" class="sr-only">Register of documents</h2>
+          <div class="lib-resultbar">
+            <p class="lib-count" id="lib-count" aria-live="polite"></p>
+            <p class="lib-filters" id="lib-filters"></p>
+            <label class="lib-sort">Order
+              <select id="lib-sort">
+                <option value="collection">By collection (hierarchy)</option>
+                <option value="title">Title</option>
+                <option value="year">Year</option>
+                <option value="number">Number</option>
+                <option value="issuer">Issued by</option>
+                <option value="type">Document type</option>
+                <option value="pages">Pages</option>
+                <option value="passages">Passages</option>
+                <option value="status">Status</option>
+                <option value="file">File name</option>
+              </select>
+              <button class="lib-dir hidden" id="lib-dir" aria-label="Reverse the order"></button>
+            </label>
+          </div>
+          <table class="lib-table" id="doc-table">
+            <thead>
+              <tr>
+                <th class="c-no" scope="col">No.</th>
+                <th class="c-rec" scope="col" data-col="title"><button>Title</button></th>
+                <th class="c-year" scope="col" data-col="year"><button>Year</button></th>
+                <th class="c-n" scope="col" data-col="pages"><button>Pages</button></th>
+                <th class="c-n c-passages" scope="col" data-col="passages"><button title="Indexed text passages the search engine can return">Passages</button></th>
+                <th class="c-status" scope="col" data-col="status"><button>Status</button></th>
+                <th class="c-act" scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="doc-tbody"></tbody>
+          </table>
+          <p class="lib-source-note">Titles, numbers and years come from the library catalogue (<code>data/catalog.json</code>) and from the details given at upload; a document with neither is listed under a name derived from its file name. This mockup uses the catalogue as of 27 September 2026.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="upload-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="up-title">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="up-title">Add documents to the library</h3>
+      <ol class="up-steps">
+        <li class="up-step active" data-step="1"><span class="n">1</span>Select files</li>
+        <li class="up-step" data-step="2"><span class="n">2</span>Check</li>
+        <li class="up-step" data-step="3"><span class="n">3</span>Index</li>
+      </ol>
+    </div>
+    <div class="modal-body">
+      <div id="up-step1">
+        <div class="dropzone" id="upload-dropzone">
+          <div id="ic-upload"></div>
+          <div class="dropzone-text">Drag PDF or DOCX files here</div>
+          <div class="dropzone-sub">Files from this computer only · up to 20 files, 50 MB each</div>
+        </div>
+        <label class="up-label" for="upload-group-select">Collection for these files</label>
+        <select class="up-select" id="upload-group-select"></select>
+        <p class="up-help"><span id="ic-info"></span><span>The collection sets the document type and issuing body used for these files — nothing is guessed from their content. <b>Check files</b> reads every file and reports problems before anything is stored.</span></p>
+        <div class="up-list-title">Selected files</div>
+        <div id="upload-file-list">
+          <div class="modal-file"><span class="fname">Quy-dinh-cong-tac-phi.docx</span><span class="fsize">184.2 KB</span><button class="fremove" aria-label="Remove Quy-dinh-cong-tac-phi.docx"></button></div>
+          <div class="modal-file"><span class="fname">Employee-Handbook.pdf</span><span class="fsize">3.10 MB</span><button class="fremove" aria-label="Remove Employee-Handbook.pdf"></button></div>
+          <div class="modal-file"><span class="fname">Bao-cao-tai-chinh.pdf</span><span class="fsize">512.0 KB</span><button class="fremove" aria-label="Remove Bao-cao-tai-chinh.pdf"></button></div>
+        </div>
+      </div>
+      <div id="up-step2" class="hidden">
+        <div class="up-progress"><div class="bar"></div></div>
+        <div class="up-progress-lbl">Checked 3 files: 2 accepted, 1 rejected. Review them, then confirm.</div>
+        <div id="up-report"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="lib-btn" id="upload-cancel">Cancel</button>
+      <button class="lib-btn hidden" id="upload-back">Back</button>
+      <button class="lib-btn lib-btn-primary" id="upload-confirm">Check files</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
+
+<div class="mock-panel" aria-label="Mockup controls">
+  <span>Mockup</span>
+  <button id="mock-states">Show sample states</button>
+</div>
+
+<script>
+// ── Icons: plain strokes on a 24-unit grid, drawn for this design ──
+const ICON = {
+  search: '<svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>',
+  plus: '<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  sync: '<svg class="i" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 0 1-13.4 4.6"/><path d="M4.5 12a7.5 7.5 0 0 1 13.4-4.6"/><path d="M18.5 3.8v3.9h-3.9"/><path d="M5.5 20.2v-3.9h3.9"/></svg>',
+  reload: '<svg class="i" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4h-4"/></svg>',
+  more: '<svg class="i" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>',
+  book: '<svg class="i" viewBox="0 0 24 24"><path d="M12 6.5C10.5 5.2 8.3 4.5 5 4.5v13c3.3 0 5.5.7 7 2 1.5-1.3 3.7-2 7-2v-13c-3.3 0-5.5.7-7 2z"/><path d="M12 6.5v13"/></svg>',
+  chat: '<svg class="i" viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3.5V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>',
+  open: '<svg class="i" viewBox="0 0 24 24"><path d="M14 5h5v5"/><path d="M19 5l-8 8"/><path d="M17 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h4"/></svg>',
+  trash: '<svg class="i" viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M10 4h4"/><path d="M7 7l1 12h8l1-12"/></svg>',
+  upload: '<svg class="i" viewBox="0 0 24 24"><path d="M12 16V5"/><path d="M7.5 9.5L12 5l4.5 4.5"/><path d="M5 19h14"/></svg>',
+  info: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>',
+  x: '<svg class="i" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>',
+  check: '<svg class="i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  warn: '<svg class="i" viewBox="0 0 24 24"><path d="M12 4.5l8.5 15h-17z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>',
+};
+const setIcon = (id, name) => { const el = document.getElementById(id); if (el) el.outerHTML = ICON[name]; };
+
+// ── Data: GET /groups + GET /documents (2026-09-27) ──
+const GROUPS = {
+  'Luat-quoc-gia': { label: 'Luật quốc gia', doc_type: 'law', issuing_body: 'Quốc hội' },
+  'Thong-tu-quy-che-cap-bo-gddt': { label: 'Thông tư Bộ GD&ĐT', doc_type: 'circular', issuing_body: 'Bộ Giáo dục và Đào tạo' },
+  'Quyet-dinh-quy-che-cap-dhqg-hcm': { label: 'Quyết định ĐHQG-HCM', doc_type: 'university_decision', issuing_body: 'ĐHQG-HCM' },
+  'Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt': { label: 'Quy chế trường ĐHQT', doc_type: 'school_decision_full', issuing_body: 'Trường Đại học Quốc tế' },
+  'Quyet-dinh-ngan-noi-quy-cua-truong-dhqt': { label: 'Nội quy / quyết định ngắn ĐHQT', doc_type: 'school_decision_brief', issuing_body: 'Trường Đại học Quốc tế' },
+  'Phu-luc': { label: 'Phụ lục', doc_type: 'appendix', issuing_body: '' },
+  'Thong-bao': { label: 'Thông báo', doc_type: 'announcement', issuing_body: 'Phòng Công tác sinh viên' },
+};
+const G = { LQG: 'Luat-quoc-gia', TT: 'Thong-tu-quy-che-cap-bo-gddt', DHQG: 'Quyet-dinh-quy-che-cap-dhqg-hcm', QC: 'Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt', NQ: 'Quyet-dinh-ngan-noi-quy-cua-truong-dhqt', PL: 'Phu-luc', TB: 'Thong-bao' };
+// [source, group, doc_number as extracted today, chunk_count, max_page]
+const RAW = [
+  ['26.Luat-BHYT-2008.pdf', G.LQG, '25/2008/QH12', 211, 21],
+  ['27.Luat-Giao-duc-dai-hoc-2012.pdf', G.LQG, '08/2012/QH13', 311, 36],
+  ['28.Luat-SDBS-cua-Luat-BHYT_2014.pdf', G.LQG, '', 96, 14],
+  ['29.Luat-Nghia-vu-quan-su-2015-QH13.pdf', G.LQG, '78/2015/QH13', 175, 23],
+  ['30.Luat-An-ninh-mang-2018.pdf', G.LQG, '24/2018/QH14', 198, 30],
+  ['31.Luat-Giao-duc-dai-hoc-sua-doi-bo-sung-2018.pdf', G.LQG, '34/2018/QH14', 235, 31],
+  ['32.Luat-Giao-duc-2019.pdf', G.LQG, '43/2019/QH14', 362, 45],
+  ['33.Luat-Thanh-nien-2020.pdf', G.LQG, '', 87, 15],
+  ['34.Luat-Cu-tru-2020.pdf', G.LQG, '', 145, 23],
+  ['19.-2016-Quy-che-CTSV-Bo-GD-DT.pdf', G.TT, '', 126, 19],
+  ['21.-2015-Quy-che-DGKQRL-Bo-GD-DT.pdf', G.TT, '16/2015/TT-BGDĐT', 61, 9],
+  ['24.-2013-Quy-che-CTSV-noi-tru.pdf', G.TT, '', 106, 12],
+  ['20.-2019-Quy-che-CTSV-DHQG-HCM.pdf', G.DHQG, '953/QD-DHQG', 138, 19],
+  ['22.-2019-Quy-che-DGKQRL-DHQG-HCM.pdf', G.DHQG, '4/QĐÐ-ĐHQG', 65, 9],
+  ['23.-QD1133_22815_VNU_ban-hanh-Quy-dinh-khen-thuong-HSSV-1.pdf', G.DHQG, '', 74, 10],
+  ['25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf', G.DHQG, '1524/QĐÐ-ĐHQG', 289, 43],
+  ['11.QD-586-QD-DHQT-_-Quy-tac-ung-xu-nguoi-hoc.pdf', G.QC, '586 /QĐ-ĐHQT', 54, 7],
+  ['12.Quy-che-to-chuc-hoat-dong-cua-P.CTSV-theo-QD-515-ngay-8.9.2022.pdf', G.QC, '', 71, 13],
+  ['13.-Quy-dinh-chinh-sach-ho-tro-nguoi-hoc-khuyet-tat.-Signed-4.pdf', G.QC, '51/2010/QH12', 62, 11],
+  ['14.-Quy-dinh-doi-voi-Ban-can-su-lop-nam-2025-final-Signed-4.pdf', G.QC, '', 143, 23],
+  ['15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf', G.QC, '', 179, 24],
+  ['16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf', G.QC, '', 78, 14],
+  ['17.-Quy-che_To-chuc-thi-HK_Tr-Tiep.ban-hanh_05.01.25-Signed-8.pdf', G.QC, '', 233, 34],
+  ['18.-QD-ban-hanh-Quy-dinh-Co-van-hoc-tap.signed.signed.signed.signed.signed.pdf', G.QC, '', 83, 10],
+  ['5.-Quyet-dinh-ban-hanh-_-Quy-dinh-cong-tac-khen-thuong-sinh-vien-truong-DHQT-Signed-4.pdf', G.QC, '', 50, 9],
+  ['9.-QD688-MGHP-2024.pdf', G.QC, '', 110, 23],
+  ['Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf', G.QC, '', 260, 35],
+  ['10.-Noi-Quy-SV-truong-DHQT-cap-nhat-08-2009.pdf', G.NQ, '', 12, 2],
+  ['2.-Quyet-dinh-dieu-chinh-Quy-che-CTSV-09_1_25-Signed-4.pdf', G.NQ, '', 10, 2],
+  ['272-Phu-luc-Quy-dinh-doi-voi-BCSL.pdf', G.NQ, '', 18, 4],
+  ['6.-QD-191_2011_Quy-dinh-che-do-chinh-sach.pdf', G.NQ, '491/ QĐ-ĐHQT', 23, 6],
+  ['3.-Phu-luc-1-30122022-Signed-2.pdf', G.PL, '', 58, 7],
+  ['4.-Phu-luc-II-Tieu-chi-va-Khung-DRL-Signed-3.pdf', G.PL, '', 79, 3],
+  ['7.-TB.486-MGHP-04112014-thong-bao-P.CTSV_.pdf', G.TB, '', 22, 5],
+];
+// Library catalogue: the values of data/catalog.json (read on page 1 of each PDF, 2026-09-27).
+const CATALOG = {
+  "26.Luat-BHYT-2008.pdf": {"title": "Luật Bảo hiểm y tế", "doc_number": "25/2008/QH12", "year": 2008},
+  "27.Luat-Giao-duc-dai-hoc-2012.pdf": {"title": "Luật Giáo dục đại học", "doc_number": "08/2012/QH13", "year": 2012},
+  "28.Luat-SDBS-cua-Luat-BHYT_2014.pdf": {"title": "Luật sửa đổi, bổ sung một số điều của Luật Bảo hiểm y tế", "doc_number": "46/2014/QH13", "year": 2014},
+  "29.Luat-Nghia-vu-quan-su-2015-QH13.pdf": {"title": "Luật Nghĩa vụ quân sự", "doc_number": "78/2015/QH13", "year": 2015},
+  "30.Luat-An-ninh-mang-2018.pdf": {"title": "Luật An ninh mạng", "doc_number": "24/2018/QH14", "year": 2018},
+  "31.Luat-Giao-duc-dai-hoc-sua-doi-bo-sung-2018.pdf": {"title": "Luật sửa đổi, bổ sung một số điều của Luật Giáo dục đại học", "doc_number": "34/2018/QH14", "year": 2018},
+  "32.Luat-Giao-duc-2019.pdf": {"title": "Luật Giáo dục", "doc_number": "43/2019/QH14", "year": 2019},
+  "33.Luat-Thanh-nien-2020.pdf": {"title": "Luật Thanh niên", "doc_number": "57/2020/QH14", "year": 2020},
+  "34.Luat-Cu-tru-2020.pdf": {"title": "Luật Cư trú", "doc_number": "68/2020/QH14", "year": 2020},
+  "19.-2016-Quy-che-CTSV-Bo-GD-DT.pdf": {"title": "Quy chế công tác sinh viên đối với chương trình đào tạo đại học hệ chính quy", "doc_number": "10/2016/TT-BGDĐT", "year": 2016},
+  "21.-2015-Quy-che-DGKQRL-Bo-GD-DT.pdf": {"title": "Quy chế đánh giá kết quả rèn luyện của người học được đào tạo trình độ đại học hệ chính quy", "doc_number": "16/2015/TT-BGDĐT", "year": 2015},
+  "24.-2013-Quy-che-CTSV-noi-tru.pdf": {"title": "Quy chế công tác sinh viên nội trú", "doc_number": "1178/QĐ-ĐHQG-CTSV", "year": 2013},
+  "20.-2019-Quy-che-CTSV-DHQG-HCM.pdf": {"title": "Quy chế công tác sinh viên", "doc_number": "953/QĐ-ĐHQG", "year": 2019},
+  "22.-2019-Quy-che-DGKQRL-DHQG-HCM.pdf": {"title": "Quy chế đánh giá kết quả rèn luyện sinh viên tại Đại học Quốc gia Thành phố Hồ Chí Minh", "doc_number": "964/QĐ-ĐHQG", "year": 2019},
+  "23.-QD1133_22815_VNU_ban-hanh-Quy-dinh-khen-thuong-HSSV-1.pdf": {"title": "Quy định công tác khen thưởng học sinh, sinh viên tại Đại học Quốc gia Thành phố Hồ Chí Minh", "doc_number": "1133/QĐ-ĐHQG", "year": 2022},
+  "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf": {"title": "Quy chế đào tạo trình độ đại học", "doc_number": "1342/QĐ-ĐHQG", "year": 2022},
+  "11.QD-586-QD-DHQT-_-Quy-tac-ung-xu-nguoi-hoc.pdf": {"title": "Quy tắc ứng xử của người học tại Trường Đại học Quốc tế", "doc_number": "586/QĐ-ĐHQT", "year": 2019},
+  "12.Quy-che-to-chuc-hoat-dong-cua-P.CTSV-theo-QD-515-ngay-8.9.2022.pdf": {"title": "Quy chế tổ chức và hoạt động của Phòng Công tác Sinh viên Trường Đại học Quốc tế", "doc_number": "515/QĐ-ĐHQT", "year": 2022},
+  "13.-Quy-dinh-chinh-sach-ho-tro-nguoi-hoc-khuyet-tat.-Signed-4.pdf": {"title": "Quy định chính sách hỗ trợ người học khuyết tật tại Trường Đại học Quốc tế", "doc_number": "912/QĐ-ĐHQT", "year": 2024},
+  "14.-Quy-dinh-doi-voi-Ban-can-su-lop-nam-2025-final-Signed-4.pdf": {"title": "Quy định đối với Ban cán sự lớp tại Trường Đại học Quốc tế", "doc_number": "151/QĐ-ĐHQT", "year": 2025},
+  "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf": {"title": "Quy chế đào tạo trình độ đại học theo hệ thống tín chỉ tại Trường Đại học Quốc tế", "doc_number": "719/QĐ-ĐHQT", "year": 2021},
+  "16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf": {"title": "Quy định xét cấp học bổng khuyến khích học tập cho sinh viên trình độ đại học tại Trường Đại học Quốc tế", "doc_number": "884/QĐ-ĐHQT", "year": 2024},
+  "17.-Quy-che_To-chuc-thi-HK_Tr-Tiep.ban-hanh_05.01.25-Signed-8.pdf": {"title": "Quy chế tổ chức thi học kỳ trình độ đại học tại Trường Đại học Quốc tế", "doc_number": "07/QĐ-ĐHQT", "year": 2025},
+  "18.-QD-ban-hanh-Quy-dinh-Co-van-hoc-tap.signed.signed.signed.signed.signed.pdf": {"title": "Quy định công tác cố vấn học tập tại Trường Đại học Quốc tế", "doc_number": "748/QĐ-ĐHQT", "year": 2022},
+  "5.-Quyet-dinh-ban-hanh-_-Quy-dinh-cong-tac-khen-thuong-sinh-vien-truong-DHQT-Signed-4.pdf": {"title": "Quy định công tác khen thưởng sinh viên tại Trường Đại học Quốc tế", "doc_number": "808/QĐ-ĐHQT", "year": 2024},
+  "9.-QD688-MGHP-2024.pdf": {"title": "Quy định chế độ chính sách miễn, giảm học phí", "doc_number": "668/QĐ-ĐHQT", "year": 2024},
+  "Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf": {"title": "Quy chế công tác sinh viên Trường Đại học Quốc tế", "doc_number": "967/QĐ-ĐHQT", "year": 2022},
+  "10.-Noi-Quy-SV-truong-DHQT-cap-nhat-08-2009.pdf": {"title": "Nội quy sinh viên", "doc_number": "276/QĐ-ĐHQT/ĐT", "year": 2008},
+  "2.-Quyet-dinh-dieu-chinh-Quy-che-CTSV-09_1_25-Signed-4.pdf": {"title": "Sửa đổi, bổ sung Quy chế công tác sinh viên Trường Đại học Quốc tế", "doc_number": "41/QĐ-ĐHQT", "year": 2025},
+  "272-Phu-luc-Quy-dinh-doi-voi-BCSL.pdf": {"title": "Bổ sung Quy định đối với Ban cán sự lớp tại Trường Đại học Quốc tế", "doc_number": "272/QĐ-ĐHQT", "year": 2025},
+  "6.-QD-191_2011_Quy-dinh-che-do-chinh-sach.pdf": {"title": "Quy định chế độ chính sách", "doc_number": "191/QĐ-ĐHQT-CTSV", "year": 2011},
+  "3.-Phu-luc-1-30122022-Signed-2.pdf": {"title": "Phụ lục I — Một số nội dung vi phạm và khung xử lý kỷ luật sinh viên", "doc_number": "967/QĐ-ĐHQT", "year": 2022, "issuing_body": "Trường Đại học Quốc tế"},
+  "4.-Phu-luc-II-Tieu-chi-va-Khung-DRL-Signed-3.pdf": {"title": "Phụ lục II — Tiêu chí và khung điểm đánh giá kết quả rèn luyện sinh viên", "doc_number": "41/QĐ-ĐHQT", "year": 2025, "issuing_body": "Trường Đại học Quốc tế"},
+  "7.-TB.486-MGHP-04112014-thong-bao-P.CTSV_.pdf": {"title": "Hướng dẫn thực hiện chính sách miễn, giảm học phí mới áp dụng từ học kỳ II năm học 2014–2015", "doc_number": "486-TB/ĐHQT-CTSV", "year": 2014},
+};
+const TYPE_OF = { [G.LQG]: 'law', [G.TT]: 'circular', [G.DHQG]: 'university_decision', [G.QC]: 'school_decision_full', [G.NQ]: 'school_decision_brief', [G.PL]: 'appendix', [G.TB]: 'announcement' };
+let DOCS = RAW.map(([source, group, doc_number, chunk_count, max_page]) => ({
+  source, group, doc_number, chunk_count, max_page, file_type: 'pdf', language: '', title: '',
+  doc_type: TYPE_OF[group], issuing_body: GROUPS[group].issuing_body, status: 'indexed', status_detail: {},
+  catalog: CATALOG[source] || null,
+}));
+
+// ── Display rules (section 7.3 of the design) ──
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fold = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+const has = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k);
+const cat = d => d.catalog || {};
+const gkey = d => d.group || 'Khác';
+const groupLabel = g => g === 'Khác' ? 'Other' : ((GROUPS[g] || {}).label || g);
+const prettyName = src => String(src).replace(/\.(pdf|docx)$/i, '').replace(/^\d+[.\-_ ]*/, '').replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+const recTitle = d => d.title || cat(d).title || prettyName(d.source);
+const recNumber = d => has(cat(d), 'doc_number') ? cat(d).doc_number : (d.doc_number || '');
+const recIssuer = d => has(cat(d), 'issuing_body') ? cat(d).issuing_body : (d.issuing_body || '');
+function recYear(d) {
+  if (cat(d).year) return String(cat(d).year);
+  const m = /\/((?:19|20)\d{2})\//.exec(recNumber(d));
+  return m ? m[1] : '';
+}
+const TYPE_EN = { law: 'Law', decree: 'Decree', circular: 'Circular', university_decision: 'Decision', school_decision: 'Decision',
+  school_decision_full: 'Decision', school_decision_brief: 'Decision (short form)', regulation: 'Regulation', guideline: 'Guideline',
+  notice: 'Notice', announcement: 'Notice', dispatch: 'Official letter', appendix: 'Appendix' };
+const TYPE_VI_EN = [['luật', 'Law'], ['nghị định', 'Decree'], ['thông tư', 'Circular'], ['quyết định', 'Decision'], ['quy chế', 'Regulation'],
+  ['quy định', 'Regulation'], ['hướng dẫn', 'Guideline'], ['thông báo', 'Notice'], ['công văn', 'Official letter'], ['phụ lục', 'Appendix'],
+  ['chính sách', 'Policy'], ['hợp đồng', 'Contract'], ['báo cáo', 'Report'], ['tài liệu kỹ thuật', 'Technical document'], ['khác', 'Other']];
+function typeEn(t) {
+  if (!t) return '';
+  const k = String(t).toLowerCase();
+  if (TYPE_EN[k]) return TYPE_EN[k];
+  const hit = TYPE_VI_EN.find(([vi]) => k.includes(vi));
+  return hit ? hit[1] : String(t);
+}
+const RANK_BY_CODE = { law: 1, decree: 2, circular: 3, university_decision: 4, school_decision_full: 5, school_decision: 5, regulation: 5,
+  school_decision_brief: 6, guideline: 7, dispatch: 7, appendix: 8, announcement: 9, notice: 9 };
+const RANK_BY_TYPE = { Law: 1, Decree: 2, Circular: 3, Decision: 5, Regulation: 5, Guideline: 7, 'Official letter': 7, Appendix: 8, Notice: 9 };
+function groupRank(g) {
+  const code = String((GROUPS[g] || {}).doc_type || '').toLowerCase();
+  return RANK_BY_CODE[code] || RANK_BY_TYPE[typeEn(code)] || 10;
+}
+const ST_LABEL = { indexed: 'Available', queued: 'Queued', processing: 'Processing', removing: 'Removing', failed: 'Failed',
+  empty: 'No text found', not_indexed: 'Not indexed', orphan: 'Index leftovers' };
+const ST_ORDER = ['indexed', 'queued', 'processing', 'removing', 'failed', 'empty', 'not_indexed', 'orphan'];
+const STEP_LABELS = { parse: 'Reading', embed: 'Embedding', bm25: 'Indexing', cleanup: 'Finishing', qdrant: 'Removing vectors', chunks: 'Removing passages', queued: 'Waiting' };
+
+// ── State and filtering ──
+const S = { q: '', collection: 'all', issuer: 'all', type: 'all', status: 'all', sort: 'collection', asc: true };
+const DEFAULT_DESC = new Set(['year', 'pages', 'passages']);
+const terms = () => fold(S.q).split(/\s+/).filter(Boolean);
+const haystack = d => fold([recTitle(d), d.source, recNumber(d), d.doc_number, recIssuer(d), groupLabel(gkey(d)),
+  typeEn(d.doc_type), recYear(d), d.original_filename || ''].join(' | '));
+const facetValue = { collection: gkey, issuer: d => recIssuer(d), type: d => typeEn(d.doc_type), status: d => d.status };
+function matches(d, except) {
+  const t = terms();
+  if (t.length) { const h = haystack(d); if (!t.every(x => h.includes(x))) return false; }
+  for (const f of ['collection', 'issuer', 'type', 'status']) {
+    if (f === except || S[f] === 'all') continue;
+    if (String(facetValue[f](d)) !== S[f]) return false;
+  }
+  return true;
+}
+function highlight(text, tt) {
+  if (!tt.length) return esc(text);
+  const chars = [...String(text ?? '')]; let folded = ''; const map = [];
+  chars.forEach((c, i) => { for (const x of fold(c)) { folded += x; map.push(i); } });
+  const on = new Array(chars.length).fill(false);
+  tt.forEach(t => { let from = 0, k; while ((k = folded.indexOf(t, from)) >= 0) { for (let j = k; j < k + t.length; j++) on[map[j]] = true; from = k + t.length; } });
+  let out = '', open = false;
+  chars.forEach((c, i) => { if (on[i] && !open) { out += '<mark>'; open = true; } if (!on[i] && open) { out += '</mark>'; open = false; } out += esc(c); });
+  return out + (open ? '</mark>' : '');
+}
+
+// ── Rendering ──
+function renderSummary() {
+  const live = DOCS.filter(d => d.status !== 'orphan');
+  const total = live.length, indexed = live.filter(d => d.status === 'indexed').length;
+  const busy = live.filter(d => ['queued', 'processing', 'removing'].includes(d.status)).length;
+  const failed = live.filter(d => ['failed', 'empty'].includes(d.status)).length;
+  const groups = new Set(live.map(gkey)).size;
+  const passages = live.reduce((a, d) => a + d.chunk_count, 0);
+  let html = `<b id="stat-docs">${total}</b> documents in <b id="stat-groups">${groups}</b> collections · ` +
+    `<b id="stat-chunks">${passages.toLocaleString('en-US')}</b> indexed passages · ` +
+    `<span id="stat-indexed">${indexed === total ? `all ${total}` : `${indexed} of ${total}`}</span> available in Chat`;
+  if (busy) html += ` · <button class="warn" data-status="processing">${busy} in progress</button>`;
+  if (failed) html += ` · <button class="bad" data-status="failed">${failed} need attention</button>`;
+  const el = document.getElementById('lib-summary');
+  el.innerHTML = html;
+  el.querySelectorAll('button[data-status]').forEach(b => b.onclick = () => {
+    S.status = DOCS.some(d => d.status === b.dataset.status) ? b.dataset.status : 'all'; render();
+  });
+  document.getElementById('sb-doc-count').textContent = total;
+}
+
+function facetEntries(f) {
+  const all = new Map();
+  DOCS.forEach(d => { const v = String(facetValue[f](d) ?? ''); if (!all.has(v)) all.set(v, { v, n: 0, rank: 99 }); });
+  DOCS.filter(d => matches(d, f)).forEach(d => all.get(String(facetValue[f](d) ?? '')).n++);
+  DOCS.forEach(d => { const e = all.get(String(facetValue[f](d) ?? '')); e.rank = Math.min(e.rank, groupRank(gkey(d))); });
+  const list = [...all.values()];
+  if (f === 'status') return list.sort((a, b) => ST_ORDER.indexOf(a.v) - ST_ORDER.indexOf(b.v));
+  if (f === 'collection') return list.sort((a, b) => groupRank(a.v) - groupRank(b.v) || groupLabel(a.v).localeCompare(groupLabel(b.v), 'vi'));
+  return list.sort((a, b) => (a.v === '') - (b.v === '') || a.rank - b.rank || a.v.localeCompare(b.v, 'vi'));
+}
+function renderFacet(f, ulId, labelOf) {
+  const entries = facetEntries(f);
+  const allCount = DOCS.filter(d => matches(d, f)).length;
+  let html = `<li><button class="lib-fi" aria-pressed="${S[f] === 'all'}" data-f="${f}" data-v="all"><span class="lbl">All</span><span class="cnt">${allCount}</span></button></li>`;
+  html += entries.map(e => {
+    const more = (f === 'collection' && e.v !== 'Khác')
+      ? `<button class="lib-fmore" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for the collection ${esc(groupLabel(e.v))}" data-group="${esc(e.v)}">${ICON.more}</button>` : '';
+    return `<li><button class="lib-fi" aria-pressed="${S[f] === e.v}" data-f="${f}" data-v="${esc(e.v)}" ${e.n || S[f] === e.v ? '' : 'disabled'}>` +
+      `<span class="lbl">${esc(labelOf(e.v))}</span><span class="cnt">${e.n}</span></button>${more}</li>`;
+  }).join('');
+  document.getElementById(ulId).innerHTML = html;
+}
+function renderFacets() {
+  renderFacet('collection', 'facet-collection', groupLabel);
+  renderFacet('issuer', 'facet-issuer', v => v || 'Not specified');
+  renderFacet('type', 'facet-type', v => v || 'Not specified');
+  const statuses = new Set(DOCS.map(d => d.status));
+  document.getElementById('facet-status-wrap').classList.toggle('hidden', statuses.size < 2 && S.status === 'all');
+  renderFacet('status', 'facet-status', v => ST_LABEL[v] || v);
+  const active = ['collection', 'issuer', 'type', 'status'].filter(f => S[f] !== 'all').length;
+  document.getElementById('facet-clear').classList.toggle('hidden', !active);
+  document.getElementById('refine-state').textContent = active ? `${active} filter${active === 1 ? '' : 's'} on` : '';
+}
+
+const SORT_KEY = {
+  title: d => fold(recTitle(d)), year: d => Number(recYear(d)) || 0, number: d => recNumber(d), issuer: d => recIssuer(d),
+  type: d => typeEn(d.doc_type), pages: d => d.max_page || 0, passages: d => d.chunk_count || 0,
+  status: d => ST_ORDER.indexOf(d.status), file: d => d.source,
+};
+function cmp(a, b, key, asc) {
+  const x = SORT_KEY[key](a), y = SORT_KEY[key](b);
+  const r = (typeof x === 'number') ? x - y : String(x).localeCompare(String(y), 'vi');
+  return asc ? r : -r;
+}
+const byYearThenTitle = (a, b) => (Number(recYear(b)) || 0) - (Number(recYear(a)) || 0) || recTitle(a).localeCompare(recTitle(b), 'vi');
+
+function statusCell(d) {
+  const s = d.status || 'not_indexed';
+  const det = d.status_detail || {};
+  let label = ST_LABEL[s] || s;
+  if (s === 'processing' && det.step) label += ` · ${STEP_LABELS[det.step] || det.step}`;
+  let tip = det.message || '';
+  if (!tip && s === 'orphan') tip = 'The file is gone but its passages are still in the index. Use the ⋯ menu to remove them.';
+  if (!tip && s === 'empty') tip = 'No text could be extracted from this document.';
+  if (!tip && s === 'indexed') tip = 'Searchable and citable in Chat.';
+  const note = (s === 'failed' || s === 'empty') && det.message ? `<span class="lib-st-note">${esc(det.message)}</span>` : '';
+  const retry = ['failed', 'empty', 'not_indexed'].includes(s) ? `<button class="lib-retry" data-retry="${esc(d.source)}">Retry indexing</button>` : '';
+  return `<span class="lib-st st-${esc(s)}" title="${esc(tip)}"><i class="mk" aria-hidden="true"></i>${esc(label)}</span>${note}${retry}`;
+}
+function rowHtml(d, n, tt) {
+  const orphan = d.status === 'orphan';
+  const title = recTitle(d), num = recNumber(d), iss = recIssuer(d), ty = typeEn(d.doc_type), y = recYear(d);
+  const meta = [ty && esc(ty), num && `No. ${highlight(num, tt)}`, iss && highlight(iss, tt)].filter(Boolean).join('<span class="sep">·</span>');
+  const titleHtml = orphan ? `<span class="lib-rec-title">${highlight(title, tt)}</span>`
+    : `<a class="lib-rec-title" href="#" data-open="${esc(d.source)}">${highlight(title, tt)}</a>`;
+  const lang = d.language === 'en' ? ' · EN' : '';
+  const small = [y, d.max_page ? `${d.max_page} pp` : '', ST_LABEL[d.status]].filter(Boolean).join(' · ');
+  const act = d.status === 'removing' ? '' :
+    `<button class="lib-more" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${esc(title)}" data-menu="${esc(d.source)}">${ICON.more}</button>`;
+  return `<tr class="lib-row${orphan ? ' is-orphan' : ''}" data-source="${esc(d.source)}">
+    <td class="c-no">${n}</td>
+    <td class="c-rec">${titleHtml}
+      ${meta ? `<div class="lib-rec-meta">${meta}</div>` : ''}
+      <div class="lib-rec-file">${highlight(d.source, tt)}<span class="ft">${esc((d.file_type || '').toUpperCase())}${lang}</span></div>
+      <div class="lib-rec-small">${esc(small)}</div></td>
+    <td class="c-year">${y ? esc(y) : '—'}</td>
+    <td class="c-n">${d.max_page || '—'}</td>
+    <td class="c-n c-passages">${(d.chunk_count || 0).toLocaleString('en-US')}</td>
+    <td class="c-status">${statusCell(d)}</td>
+    <td class="c-act">${act}</td>
+  </tr>`;
+}
+function renderTable() {
+  const tbody = document.getElementById('doc-tbody');
+  const tt = terms().filter(t => t.length >= 2);
+  const rows = DOCS.filter(d => matches(d));
+  const docsShown = rows.filter(d => d.status !== 'orphan').length, left = rows.length - docsShown;
+  document.getElementById('lib-count').innerHTML = `Showing <b>${docsShown}</b> of ${DOCS.filter(d => d.status !== 'orphan').length} documents` +
+    (left ? ` · ${left} index leftover${left === 1 ? '' : 's'}` : '');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr class="lib-empty"><td colspan="7"><div class="t">No documents match${S.q ? ` “${esc(S.q)}”` : ' these filters'}.</div>` +
+      `<button id="empty-reset">Clear the search and filters</button></td></tr>`;
+    document.getElementById('empty-reset').onclick = resetAll;
+    return;
+  }
+  let html = '', n = 0;
+  if (S.sort === 'collection') {
+    const byGroup = new Map();
+    rows.forEach(d => { const k = gkey(d); if (!byGroup.has(k)) byGroup.set(k, []); byGroup.get(k).push(d); });
+    const keys = [...byGroup.keys()].sort((a, b) => groupRank(a) - groupRank(b) || groupLabel(a).localeCompare(groupLabel(b), 'vi'));
+    const single = keys.length === 1 && S.collection !== 'all';
+    keys.forEach(k => {
+      const list = byGroup.get(k).sort(byYearThenTitle);
+      if (!single) {
+        const body = (GROUPS[k] || {}).issuing_body;
+        html += `<tr class="lib-section"><th colspan="7" scope="rowgroup"><span class="t">${esc(groupLabel(k))}</span>` +
+          `<span class="m">${body ? esc(body) + ' · ' : ''}${list.length} document${list.length === 1 ? '' : 's'}</span></th></tr>`;
+      }
+      list.forEach(d => { html += rowHtml(d, ++n, tt); });
+    });
+  } else {
+    rows.sort((a, b) => cmp(a, b, S.sort, S.asc) || byYearThenTitle(a, b)).forEach(d => { html += rowHtml(d, ++n, tt); });
+  }
+  tbody.innerHTML = html;
+}
+function renderSortUi() {
+  document.getElementById('lib-sort').value = S.sort;
+  const dir = document.getElementById('lib-dir');
+  dir.classList.toggle('hidden', S.sort === 'collection');
+  dir.textContent = S.asc ? '↑ Ascending' : '↓ Descending';
+  document.querySelectorAll('#doc-table thead th[data-col]').forEach(th => {
+    const on = th.dataset.col === S.sort;
+    th.setAttribute('aria-sort', on ? (S.asc ? 'ascending' : 'descending') : 'none');
+    const b = th.querySelector('button');
+    b.querySelector('.dir')?.remove();
+    if (on) b.insertAdjacentHTML('beforeend', `<span class="dir" aria-hidden="true">${S.asc ? '▲' : '▼'}</span>`);
+  });
+}
+function renderFilters() {
+  const names = { collection: 'Collection', issuer: 'Issued by', type: 'Type', status: 'Availability' };
+  const labelOf = { collection: groupLabel, issuer: v => v || 'Not specified', type: v => v || 'Not specified', status: v => ST_LABEL[v] || v };
+  const parts = ['collection', 'issuer', 'type', 'status'].filter(f => S[f] !== 'all')
+    .map(f => `${names[f]}: <b>${esc(labelOf[f](S[f]))}</b> <button data-unset="${f}" aria-label="Remove the ${names[f]} filter">remove</button>`);
+  const el = document.getElementById('lib-filters');
+  el.innerHTML = parts.join('<span aria-hidden="true">·</span>');
+  el.querySelectorAll('[data-unset]').forEach(b => b.onclick = () => { S[b.dataset.unset] = 'all'; render(); });
+}
+function render() { renderSummary(); renderFacets(); renderFilters(); renderSortUi(); renderTable(); }
+function resetAll() { S.q = ''; document.getElementById('doc-search').value = ''; ['collection', 'issuer', 'type', 'status'].forEach(f => S[f] = 'all'); render(); }
+
+// ── Menus (row ⋯ and collection ⋯) ──
+let openMenu = null;
+function closeMenu() {
+  if (!openMenu) return;
+  openMenu.btn.setAttribute('aria-expanded', 'false');
+  openMenu.el.remove(); openMenu = null;
+}
+function showMenu(btn, items) {
+  closeMenu();
+  const el = document.createElement('div');
+  el.className = 'lib-menu'; el.setAttribute('role', 'menu');
+  items.forEach(it => {
+    if (it === '-') { el.appendChild(document.createElement('hr')); return; }
+    const b = document.createElement('button');
+    b.setAttribute('role', 'menuitem'); if (it.danger) b.className = 'danger';
+    b.innerHTML = (ICON[it.icon] || '') + `<span>${esc(it.label)}</span>`;
+    b.onclick = () => { closeMenu(); it.run(); };
+    el.appendChild(b);
+  });
+  document.body.appendChild(el);
+  const r = btn.getBoundingClientRect();
+  let top = r.bottom + 4, left = Math.max(8, r.right - el.offsetWidth);
+  if (top + el.offsetHeight > innerHeight - 8) top = r.top - el.offsetHeight - 4;
+  if (left + el.offsetWidth > innerWidth - 8) left = innerWidth - el.offsetWidth - 8;
+  el.style.top = top + 'px'; el.style.left = left + 'px';
+  btn.setAttribute('aria-expanded', 'true');
+  openMenu = { el, btn };
+  el.addEventListener('keydown', e => {
+    const bs = [...el.querySelectorAll('button')]; const i = bs.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); bs[(i + 1) % bs.length].focus(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); bs[(i - 1 + bs.length) % bs.length].focus(); }
+    if (e.key === 'Escape') { e.preventDefault(); closeMenu(); btn.focus(); }
+    if (e.key === 'Tab') closeMenu();
+  });
+  el.querySelector('button').focus();
+}
+function rowMenu(btn, d) {
+  const items = [];
+  if (d.status !== 'orphan') items.push({ icon: 'open', label: d.file_type === 'docx' ? 'Download the original (.docx)' : 'Open the PDF', run: () => openDoc(d) });
+  if (['failed', 'empty', 'not_indexed'].includes(d.status)) items.push({ icon: 'reload', label: 'Retry indexing', run: () => retryDoc(d.source) });
+  if (items.length) items.push('-');
+  items.push(d.status === 'orphan'
+    ? { icon: 'trash', label: 'Remove index leftovers…', danger: true, run: () => deleteDoc(d.source) }
+    : { icon: 'trash', label: 'Delete document…', danger: true, run: () => deleteDoc(d.source) });
+  showMenu(btn, items);
+}
+
+// ── Actions: the live page keeps calling the existing functions; this mockup only simulates them ──
+const NL = String.fromCharCode(10);
+function toast(msg, type = 'info', timeout = 3500) {
+  const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+  document.getElementById('toast-wrap').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; }, timeout); setTimeout(() => t.remove(), timeout + 300);
+}
+function openDoc(d) { toast(`Opens ${d.source} in a new tab.`, 'info'); }
+function retryDoc(name) {
+  const d = DOCS.find(x => x.source === name); if (!d) return;
+  d.status = 'queued'; d.status_detail = {}; render(); toast(`“${name}” is queued for indexing.`, 'info');
+  setTimeout(() => { d.status = 'processing'; d.status_detail = { step: 'embed' }; render(); }, 1200);
+  setTimeout(() => { d.status = 'indexed'; d.status_detail = {}; render(); toast('Indexed 1 document — you can ask about it in Chat now.', 'success', 5000); }, 3200);
+}
+function deleteDoc(name) {
+  const d = DOCS.find(x => x.source === name); if (!d) return;
+  const orphan = d.status === 'orphan';
+  const msg = orphan ? `Remove the leftover index data of “${name}”?`
+    : `Delete “${name}”?${NL}The file and all of its index data will be removed.`;
+  if (!confirm(msg)) return;
+  d.status = 'removing'; d.status_detail = { step: 'qdrant' }; render();
+  toast(orphan ? `Removing “${name}” from the index…` : `Deleted “${name}” — updating the index…`, 'success');
+  setTimeout(() => { DOCS = DOCS.filter(x => x !== d); render(); toast('The index is up to date after the deletion.', 'success', 4500); }, 1800);
+}
+function deleteGroup(id) {
+  const label = groupLabel(id);
+  if (!confirm(`Delete the collection “${label}” and ALL documents in it?${NL}The files and their index data will be removed. This cannot be undone.`)) return;
+  const n = DOCS.filter(d => d.group === id).length;
+  DOCS.filter(d => d.group === id).forEach(d => { d.status = 'removing'; });
+  S.collection = 'all'; render();
+  toast(`Deleted the collection “${label}” (${n} files) — updating the index…`, 'success', 4000);
+  setTimeout(() => { DOCS = DOCS.filter(d => d.group !== id); render(); }, 1800);
+}
+
+// ── Wiring ──
+setIcon('ic-chat', 'chat'); setIcon('ic-book', 'book'); setIcon('ic-search', 'search'); setIcon('ic-upload', 'upload'); setIcon('ic-info', 'info');
+const UPLOAD_BTN_LABEL = ICON.plus + '<span>Add documents</span>';
+const SYNC_BTN_LABEL = ICON.sync + '<span>Sync index</span>';
+document.getElementById('reindex-docs').innerHTML = UPLOAD_BTN_LABEL;
+document.getElementById('sync-index').innerHTML = SYNC_BTN_LABEL;
+document.getElementById('refresh-docs').innerHTML = ICON.reload + '<span>Reload</span>';
+document.querySelectorAll('.fremove').forEach(b => { b.innerHTML = ICON.x; });
+
+document.getElementById('doc-search').addEventListener('input', e => { S.q = e.target.value; render(); });
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) { e.preventDefault(); document.getElementById('doc-search').focus(); }
+});
+document.getElementById('lib-sort').addEventListener('change', e => { S.sort = e.target.value; S.asc = !DEFAULT_DESC.has(S.sort); render(); });
+document.getElementById('lib-dir').addEventListener('click', e => { e.preventDefault(); S.asc = !S.asc; render(); });
+document.querySelectorAll('#doc-table thead th[data-col] button').forEach(b => b.addEventListener('click', () => {
+  const col = b.closest('th').dataset.col;
+  if (S.sort === col) S.asc = !S.asc; else { S.sort = col; S.asc = !DEFAULT_DESC.has(col); }
+  render();
+}));
+document.getElementById('facet-clear').addEventListener('click', () => { ['collection', 'issuer', 'type', 'status'].forEach(f => S[f] = 'all'); render(); });
+document.querySelector('.lib-refine').addEventListener('click', e => {
+  const more = e.target.closest('.lib-fmore');
+  if (more) { e.stopPropagation(); const id = more.dataset.group; showMenu(more, [{ icon: 'trash', label: 'Delete collection…', danger: true, run: () => deleteGroup(id) }]); return; }
+  const fi = e.target.closest('.lib-fi');
+  if (fi && !fi.disabled) { S[fi.dataset.f] = fi.dataset.v; render(); }
+});
+document.getElementById('doc-tbody').addEventListener('click', e => {
+  const m = e.target.closest('[data-menu]');
+  if (m) { e.stopPropagation(); const d = DOCS.find(x => x.source === m.dataset.menu); if (d) rowMenu(m, d); return; }
+  const r = e.target.closest('[data-retry]');
+  if (r) { e.stopPropagation(); retryDoc(r.dataset.retry); return; }
+  if (e.target.closest('[data-open]')) e.preventDefault();
+  const row = e.target.closest('tr.lib-row');
+  if (row && !row.classList.contains('is-orphan')) { const d = DOCS.find(x => x.source === row.dataset.source); if (d) openDoc(d); }
+});
+document.addEventListener('click', e => { if (openMenu && !openMenu.el.contains(e.target) && !openMenu.btn.contains(e.target)) closeMenu(); });
+document.getElementById('lib-scroll').addEventListener('scroll', closeMenu, { passive: true });
+
+document.getElementById('refresh-docs').addEventListener('click', () => { render(); toast('Reloading the list…', 'info'); });
+document.getElementById('sync-index').addEventListener('click', () => {
+  if (!confirm(`Sync the whole index?${NL}${NL}Every document is read again and the index is updated in place — Chat keeps working meanwhile.${NL}The first run can take 10–15 minutes because every document is embedded again.`)) return;
+  const btn = document.getElementById('sync-index'); btn.disabled = true;
+  let done = 0; const timer = setInterval(() => {
+    done += 7; btn.innerHTML = `<span class="spin" aria-hidden="true"></span><span>Reading ${Math.min(done, 34)}/34…</span>`;
+    if (done >= 34) { clearInterval(timer); btn.disabled = false; btn.innerHTML = SYNC_BTN_LABEL; toast('Index sync complete.', 'success', 4500); }
+  }, 600);
+  toast('Syncing the index in the background. Chat keeps working.', 'info', 4500);
+});
+
+// Upload modal: the same two steps as today; only the skin and the wording change.
+const modal = document.getElementById('upload-modal');
+function setStep(n) {
+  document.querySelectorAll('.up-step').forEach(s => s.classList.toggle('active', Number(s.dataset.step) === n));
+  document.getElementById('up-step1').classList.toggle('hidden', n !== 1);
+  document.getElementById('up-step2').classList.toggle('hidden', n !== 2);
+  document.getElementById('upload-back').classList.toggle('hidden', n !== 2);
+  document.getElementById('upload-confirm').textContent = n === 1 ? 'Check files' : 'Upload & index 2 files';
+}
+document.getElementById('reindex-docs').addEventListener('click', () => {
+  const sel = document.getElementById('upload-group-select');
+  sel.innerHTML = Object.keys(GROUPS).sort((a, b) => GROUPS[a].label.localeCompare(GROUPS[b].label, 'vi'))
+    .map(k => `<option value="${esc(k)}">${esc(GROUPS[k].label)} (${DOCS.filter(d => d.group === k).length})</option>`).join('') +
+    '<option value="__new__">New collection…</option>';
+  sel.value = G.QC;
+  setStep(1); modal.classList.remove('hidden');
+});
+document.getElementById('upload-cancel').addEventListener('click', () => modal.classList.add('hidden'));
+document.getElementById('upload-back').addEventListener('click', () => setStep(1));
+document.getElementById('upload-confirm').addEventListener('click', () => {
+  if (!document.getElementById('up-step2').classList.contains('hidden')) {
+    modal.classList.add('hidden');
+    const src = 'Quy-dinh-cong-tac-phi.docx';
+    if (!DOCS.some(d => d.source === src)) {
+      DOCS.push({ source: src, group: G.QC, doc_number: '', chunk_count: 0, max_page: 12, file_type: 'docx', language: 'vi', title: 'Quy định công tác phí',
+        doc_type: 'school_decision_full', issuing_body: 'Trường Đại học Quốc tế', status: 'queued', status_detail: {}, catalog: null });
+    }
+    render(); toast('Saved 2 files in “Quy chế trường ĐHQT” — indexing…', 'success', 4500);
+    return;
+  }
+  setStep(2);
+  document.getElementById('up-report').innerHTML = `
+    <div class="up-row"><div class="up-row-head"><span class="ic">${ICON.check}</span><span class="nm">Quy-dinh-cong-tac-phi.docx</span>
+      <span class="meta">DOCX · 12 pp · 184.2 KB</span><select aria-label="Document language"><option>Vietnamese</option><option>English</option></select></div>
+      <button class="up-meta-toggle">Edit record details (title · number · type · issuing body)</button></div>
+    <div class="up-row warn"><div class="up-row-head"><span class="ic">${ICON.warn}</span><span class="nm">Employee-Handbook.pdf</span>
+      <span class="meta">PDF · 88 pp · 3.10 MB</span><select aria-label="Document language"><option>Vietnamese</option><option selected>English</option></select></div>
+      <div class="up-msg warn">3 pages are scanned and need OCR (about 5 seconds).</div>
+      <div class="up-msg">Suggested language: English (you can change it).</div>
+      <button class="up-meta-toggle">Edit record details (title · number · type · issuing body)</button></div>
+    <div class="up-row rejected"><div class="up-row-head"><span class="ic">${ICON.x}</span><span class="nm">Bao-cao-tai-chinh.pdf</span><span class="meta">512.0 KB</span></div>
+      <div class="up-msg err">File có mật khẩu — hãy gỡ mật khẩu rồi tải lại. <span style="color:var(--ink-3)">(server message, shown as sent)</span></div></div>`;
+});
+
+// Mockup only: show the rarer states the live page can display.
+document.getElementById('mock-states').addEventListener('click', e => {
+  const set = (src, status, detail) => { const d = DOCS.find(x => x.source === src); if (d) { d.status = status; d.status_detail = detail || {}; } };
+  set('16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf', 'processing', { step: 'embed' });
+  set('9.-QD688-MGHP-2024.pdf', 'failed', { message: '(server message) Không đọc được trang 3 — file có thể bị hỏng.' });
+  if (!DOCS.some(d => d.status === 'orphan')) {
+    DOCS.push({ source: 'Quy-dinh-hoc-phi-2023.pdf', group: G.QC, doc_number: '', chunk_count: 41, max_page: 9, file_type: 'pdf', language: '', title: '',
+      doc_type: 'school_decision_full', issuing_body: 'Trường Đại học Quốc tế', status: 'orphan', status_detail: {}, catalog: null });
+  }
+  e.target.disabled = true; render();
+});
+
+// Below 1280 px the Refine panel sits above the register and starts closed;
+// on wider screens it is a fixed rail that cannot be collapsed.
+const narrow = matchMedia('(max-width:1279px)');
+const refineBox = document.getElementById('refine-box');
+const syncRefine = () => { refineBox.open = !narrow.matches; };
+narrow.addEventListener('change', syncRefine);
+refineBox.querySelector('summary').addEventListener('click', e => { if (!narrow.matches) e.preventDefault(); });
+syncRefine();
+render();
+</script>
+</body>
+</html>
