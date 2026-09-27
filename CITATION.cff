@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software or its test collection, please cite the paper below."
 type: software
 title: "Developing an Efficient Vector Database System for Academic Regulation Retrieval System"
-version: "2.1.0"
+version: "2.2.0"
 license: MIT
 repository-code: "https://github.com/Hoangnam25012004/Developing-an-Efficient-Vector-Database-System-for-Academic-Regulation-Retrival-System"
 authors:

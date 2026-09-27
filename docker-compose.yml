@@ -14,7 +14,7 @@ services:
     # No published port: only the app reaches Qdrant, over the compose network.
 
   app:
-    image: ghcr.io/hoangnam25012004/developing-an-efficient-vector-database-system-for-academic-regulation-retrival-system:${ARRS_VERSION:-v2.1.0}
+    image: ghcr.io/hoangnam25012004/developing-an-efficient-vector-database-system-for-academic-regulation-retrival-system:${ARRS_VERSION:-v2.2.0}
     build: .
     restart: unless-stopped
     depends_on:

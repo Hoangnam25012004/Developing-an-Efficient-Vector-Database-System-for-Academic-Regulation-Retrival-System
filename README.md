@@ -504,12 +504,14 @@ curl -X POST http://localhost:8000/chat \
       "source": "3.-Phu-luc-1-30122022-Signed-2.pdf",
       "page": 2,
       "text": "Điều 5. Hình thức kỷ luật...",
-      "rrf_score": 0.0312,
-      "rerank_score": 4.87
+      "score_rrf": 0.0312,
+      "score_rerank": 0.97
     }
   ]
 }
 ```
+
+`score_rerank` là điểm cross-encoder (0–1), trang Ask hiện nó dưới dạng *rerank 0.97*; `score_rrf` là điểm hợp nhất RRF. Từ bản 2.2.0 hai trường này có giá trị trong `/chat` (trước đó luôn là `null`).
 
 ---
 
@@ -580,7 +582,7 @@ curl http://localhost:8000/health
 | `POST /documents/{tên}/retry` | Index lại một tài liệu |
 | `DELETE /documents/{tên}` · `DELETE /groups/{nhóm}` | Xoá file và xoá khỏi mọi chỉ mục |
 | `GET /jobs/{id}` · `GET /jobs?active=1` | Tiến độ job index |
-| `POST /reindex` | Đồng bộ toàn bộ (`{"mode": "sync"}` mặc định, Chat vẫn chạy; `"rebuild"` tạo lại collection) |
+| `POST /reindex` | Đồng bộ toàn bộ (`{"mode": "sync"}` mặc định, `/chat` vẫn trả lời; `"rebuild"` tạo lại collection) |
 | `GET /index/health` | So số chunk theo tài liệu giữa JSONL, Qdrant và BM25 |
 | `POST /upload-docs` | Endpoint cũ, giữ để tương thích (không còn ghi đè im lặng) |
 
@@ -590,11 +592,14 @@ curl http://localhost:8000/health
 
 Truy cập `http://localhost:8000` để mở UI. UI là HTML/CSS/JS tĩnh, được FastAPI serve từ `ui/index.html`. Các view chính:
 
-### 1. Chat
+### 1. Ask (màn hình Chat)
 
-- Gõ câu hỏi bằng tiếng Việt
-- Nhận câu trả lời Markdown kèm nguồn tài liệu (clickable PDF)
-- Hiển thị metadata Điều / Khoản / số trang cho mỗi nguồn
+- Đặt câu hỏi bằng tiếng Việt: các văn bản đều ban hành bằng tiếng Việt nên câu hỏi tiếng Anh cho kết quả kém chính xác (giao diện vẫn bằng tiếng Anh)
+- Câu trả lời trích nguyên văn Điều, Khoản của văn bản kèm số trang, không do mô hình sinh ra
+- *Sources* dưới mỗi câu trả lời: văn bản được trích (*Cited in the answer*) với tên, loại, số hiệu, năm như trang Library, bấm để mở PDF đúng trang; văn bản khác mà bộ tìm kiếm tìm thấy nằm trong *Also found by the search*
+- *Passages consulted*: các đoạn đã tra cứu kèm điểm rerank (chữ nhỏ, màu xám); *Copy answer* chép câu trả lời; *New enquiry* xoá các lượt hỏi và trở về màn hình đầu
+- Màn hình đầu có phạm vi tra cứu (số văn bản, số collection) và danh sách *Common questions*
+- Thiết kế: [`docs/design/chat-ask-redesign.md`](docs/design/chat-ask-redesign.md)
 
 ### 2. Library (màn hình Documents)
 
@@ -756,8 +761,8 @@ Sửa các giá trị `top_k_dense`, `top_k_sparse`, `top_k_fusion`, `reranking.
 kéo thả file PDF/DOCX, chọn nhóm, bấm *Check files*. Hệ thống đọc thử từng file
 (loại file thật, mật khẩu, trùng tên/trùng nội dung, gợi ý ngôn ngữ Việt/Anh),
 bạn xác nhận rồi file được index ở chế độ nền — chỉ tài liệu mới được xử lý,
-Chat vẫn hoạt động, thường xong sau vài chục giây. Cột *Status* cho biết
-file nào đã tìm được trong Chat, đang xử lý hay bị lỗi (kèm lý do và nút *Retry indexing*).
+trang Ask vẫn trả lời, thường xong sau vài chục giây. Cột *Status* cho biết
+file nào đã tra cứu được trong Ask, đang xử lý hay bị lỗi (kèm lý do và nút *Retry indexing*).
 Xoá tài liệu/nhóm cũng tự xoá khỏi chỉ mục. Thiết kế chi tiết:
 [`docs/design/upload-documents-v2.md`](docs/design/upload-documents-v2.md).
 
@@ -781,7 +786,7 @@ tải trang sau, không cần khởi động lại server. Mỗi mục có khoá
 - Các khoá đều không bắt buộc: `title`, `title_en`, `doc_number`, `year`, `issued` (`YYYY-MM-DD`), `issuing_body`, `size`, `note`.
 - Tiêu đề nhập khi upload được ưu tiên hơn catalog. `doc_number` hoặc `issuing_body` có mặt trong mục thì luôn được dùng, kể cả chuỗi rỗng (để ẩn một số hiệu trích sai).
 - `size` là kích thước (byte) của file mà mục mô tả; nếu file bị thay bằng bản khác cùng tên, mục bị bỏ qua.
-- Chỉ trang Library dùng file này. Chat, chỉ mục và các endpoint khác không đọc nó.
+- Trang Library và trang Ask (tên, số hiệu văn bản trong *Sources*) đọc file này qua `GET /documents`. Chỉ mục, `/chat` và các endpoint khác không đọc nó.
 
 **Cách thủ công** (tái lập đúng pipeline offline của paper):
 1. Đặt file PDF/DOCX vào `data/<nhóm>/`
