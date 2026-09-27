@@ -87,79 +87,116 @@ code{font-family:'JetBrains Mono',monospace;background:var(--bg);padding:1px 5px
 .screen{display:none;flex:1;overflow:hidden;flex-direction:column}
 .screen.active{display:flex}
 
-/* CHAT */
-#screen-chat{flex-direction:row}
-#screen-chat > .topbar{display:none!important}
-.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative;width:100%}
-.chat-history{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px}
-.chat-welcome{margin:auto;text-align:center;max-width:520px;padding:40px 20px}
-.chat-welcome .logo-big{font-size:56px;margin-bottom:16px}
-.chat-welcome h2{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
-.chat-welcome p{color:var(--text-2);font-size:14px;line-height:1.7;margin-bottom:28px}
-.sq-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left}
-.sq-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;cursor:pointer;transition:all var(--ease)}
-.sq-card:hover{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(59,130,246,.1);transform:translateY(-1px)}
-.sq-card .sq-icon{font-size:18px;margin-bottom:6px}
-.sq-card .sq-text{font-size:12.5px;color:var(--text-2);line-height:1.5}
-
-.msg{display:flex;gap:12px;align-items:flex-start}
-.msg.user{flex-direction:row-reverse}
-.avatar{width:36px;height:36px;min-width:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
-.avatar.ai{background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff}
-.avatar.user{background:linear-gradient(135deg,var(--teal),#22D3EE);color:#fff}
-.bubble{max-width:72%;padding:12px 16px;border-radius:var(--r-lg);font-size:13.5px;line-height:1.7;position:relative;word-wrap:break-word;overflow-wrap:anywhere}
-.msg.ai .bubble{background:var(--surface);border:1px solid var(--border);border-top-left-radius:4px;color:var(--text)}
-.msg.user .bubble{background:var(--blue);color:#fff;border-top-right-radius:4px}
-.msg.ai .bubble p{margin:0 0 8px 0}
-.msg.ai .bubble p:last-child{margin-bottom:0}
-.msg.ai .bubble a.pdf-link{color:var(--blue);text-decoration:underline;text-underline-offset:2px;cursor:pointer;word-break:break-all}
-.msg.ai .bubble a.pdf-link:hover{color:var(--blue-light);text-decoration-thickness:2px}
-.msg.ai .bubble ul,.msg.ai .bubble ol{margin:8px 0 8px 20px}
-.msg.ai .bubble li{margin:4px 0}
-.msg.ai .bubble strong{color:var(--navy);font-weight:700}
-.msg.ai .bubble code{background:var(--bg);color:var(--blue);padding:1px 6px;border-radius:4px;font-size:12px}
-.bubble.error{background:#FEF2F2;border-color:#FECACA;color:var(--red)}
-.bubble-meta{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
-.bubble-time{font-size:11px;color:var(--text-3)}
-.bubble-elapsed{font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:3px}
-.copy-btn{font-size:11px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;transition:all var(--ease);display:flex;align-items:center;gap:4px;font-family:inherit}
-.copy-btn:hover{background:var(--bg);color:var(--text-2)}
-
-.source-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.src-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:500;background:rgba(37,99,235,.08);color:var(--blue);border:1px solid rgba(37,99,235,.18);cursor:pointer;transition:all var(--ease)}
-.src-chip:hover{background:rgba(37,99,235,.15)}
-.src-chip .page{color:var(--text-3);font-weight:400}
-
-.typing-bubble{display:flex;gap:5px;align-items:center;padding:14px 16px}
-.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text-3);animation:bounce .9s infinite}
-.typing-dot:nth-child(2){animation-delay:.15s}
-.typing-dot:nth-child(3){animation-delay:.3s}
-@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
-
-.source-panel{width:320px;min-width:320px;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden;transition:width var(--ease),min-width var(--ease),opacity var(--ease)}
-.source-panel.hidden{width:0;min-width:0;opacity:0;pointer-events:none}
-.sp-header{padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
-.sp-body{overflow-y:auto;flex:1;padding:12px}
-.sp-empty{padding:32px 16px;text-align:center;color:var(--text-3);font-size:13px}
-.sp-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:all var(--ease)}
-.sp-card:hover{border-color:var(--blue-light);box-shadow:var(--shadow-xs)}
-.sp-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
-.sp-card-file{font-size:12px;font-weight:600;color:var(--text);word-break:break-all;flex:1}
-.sp-score{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap;background:rgba(22,163,74,.12);color:var(--green)}
-.sp-card-text{font-size:12px;color:var(--text-2);line-height:1.6;max-height:120px;overflow-y:auto}
-.sp-card-footer{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
-.sp-tag{font-size:11px;color:var(--text-3);background:var(--border);padding:2px 8px;border-radius:99px}
-
-.chat-input-bar{padding:0!important;margin:0!important;background:var(--surface);border-top:1px solid var(--border);width:100%!important;box-sizing:border-box!important;display:block!important}
-.chat-input-bar > .chat-input-row{display:flex!important;gap:10px;align-items:center;background:var(--surface)!important;border:none!important;border-radius:0!important;padding:14px 0 14px 20px!important;transition:none;width:100%!important;box-sizing:border-box!important;margin:0!important}
-.chat-input-row:focus-within{background:var(--surface)!important;box-shadow:none}
-#chat-input{flex:1;border:none;background:transparent;resize:none;font-family:inherit;font-size:14px;color:var(--text);outline:none;min-height:22px;max-height:120px;line-height:1.6}
-#chat-input::placeholder{color:var(--text-3)}
-.send-btn{width:36px;height:36px;min-width:36px;border-radius:var(--r-sm);background:var(--blue);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background var(--ease),transform var(--ease)}
-.send-btn:hover:not(:disabled){background:#1d4ed8;transform:scale(1.05)}
-.send-btn:disabled{background:var(--border-2);cursor:not-allowed}
-.chat-hint{font-size:11.5px;color:var(--text-3);padding:8px 16px 10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--surface)}
-
+/* ASK — the Chat screen (design: docs/design/chat-ask-redesign.md). Uses the Library's
+   tokens (--lib-*) and components (lib-kicker, lib-h1, lib-lede, lib-summary, lib-btn…). */
+#screen-chat{flex-direction:column;background:var(--lib-paper);color:var(--lib-ink)}
+#screen-chat :focus-visible{outline:2px solid var(--lib-navy);outline-offset:2px}
+.ask-scroll{flex:1;overflow-y:auto}
+.ask-page{max-width:1280px;margin:0 auto;padding:30px 40px 40px}
+.ask-grid{display:grid;grid-template-columns:minmax(0,760px) 360px;gap:40px;align-items:start}
+.ask-col{min-width:0}
+.ask-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--lib-ink-3)}
+.ask-label.bad{color:var(--lib-bad)}
+.ask-common{list-style:none;border-top:1px solid var(--lib-ink);margin-top:8px}
+.ask-common li{border-bottom:1px solid var(--lib-rule)}
+.ask-common button{display:flex;align-items:center;gap:16px;width:100%;padding:13px 10px 13px 2px;border:0;background:none;font-family:var(--lib-serif);font-size:16px;line-height:1.4;color:var(--lib-ink);text-align:left;cursor:pointer}
+.ask-common button:hover{background:var(--lib-hover)}
+.ask-common button:hover .sq-text{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.ask-common .lib-i{margin-left:auto;color:var(--lib-ink-3)}
+.ask-common button:hover .lib-i{color:var(--lib-navy)}
+.ask-covers{margin-top:28px}
+.ask-covers p{margin-top:6px;font-size:13px;color:var(--lib-ink-2)}
+.ask-covers .sep{color:var(--lib-rule-ui);margin:0 7px}
+.ask-entry{padding-bottom:30px;border-bottom:1px solid var(--lib-rule-strong);margin-bottom:30px;scroll-margin-top:24px}
+.ask-q{font-family:var(--lib-serif);font-size:20px;font-weight:600;line-height:1.35;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ask-answer{margin-top:20px}
+.ask-status{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--lib-busy)}
+.ask-status .mk{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;border-right-color:transparent;animation:spin .9s linear infinite}
+.ask-status .t{color:var(--lib-ink-3);font-variant-numeric:tabular-nums}
+.ask-body{margin-top:8px;font-size:15px;line-height:1.7;color:var(--lib-ink);overflow-wrap:anywhere}
+.ask-body p{margin:10px 0}
+.ask-body ul,.ask-body ol{margin:8px 0 8px 1.4em}
+.ask-body .ask-loc{font-size:14.5px;font-weight:600;line-height:1.45;margin:22px 0 6px}
+.ask-body .ask-loc:first-child{margin-top:4px}
+.ask-body .ask-loc strong{font-weight:600}
+.ask-body .ask-file{display:block;font-family:var(--lib-mono);font-size:11.5px;font-weight:400;color:var(--lib-ink-3);margin-top:1px}
+.ask-body .ask-clause{font-size:12.5px;font-weight:600;color:var(--lib-ink-2);margin:14px 0 4px}
+.ask-body .ask-clause em,.ask-body .ask-clause strong{font-style:normal;font-weight:600}
+.ask-body blockquote{margin:6px 0 14px;padding:1px 0 1px 16px;border-left:2px solid var(--lib-rule-ui);font-family:var(--lib-serif);font-size:16px;line-height:1.65}
+.ask-body blockquote p{margin:6px 0}
+.ask-body blockquote ol,.ask-body blockquote ul{margin:6px 0;padding-left:1.7em}
+.ask-body blockquote strong{font-weight:inherit;background:var(--lib-hl);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 2px}
+.ask-body .ask-note{font-size:12.5px;color:var(--lib-ink-3)}
+.ask-body code{font-family:var(--lib-mono);font-size:12.5px;background:none;color:var(--lib-ink-2);padding:0}
+.ask-body a.pdf-link{color:var(--lib-navy);text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.ask-cite{font-size:13px;font-weight:500;color:var(--lib-navy);text-decoration:none;margin-left:3px;white-space:nowrap}
+.ask-cite:hover{text-decoration:underline;text-underline-offset:2px}
+.ask-nf{font-family:var(--lib-serif);font-size:16px;line-height:1.6;color:var(--lib-ink-2);margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ask-nf-help{font-size:13px;color:var(--lib-ink-3);margin-top:6px}
+.ask-sources{margin-top:22px;border-top:1px solid var(--lib-rule-strong);padding-top:12px}
+.ask-sub{font-size:12.5px;font-weight:600;color:var(--lib-ink-2);margin-top:8px}
+.ask-srcs{list-style:none;margin-top:4px}
+.ask-src{display:grid;grid-template-columns:34px minmax(0,1fr);padding:7px 6px;border-radius:3px;transition:background .6s}
+.ask-src.is-target{background:var(--lib-hl);transition:none}
+.ask-src-n{font-size:13px;color:var(--lib-navy);font-weight:500;font-variant-numeric:tabular-nums;padding-top:1px}
+.ask-src-title,.ask-pass-title{font-family:var(--lib-serif);font-size:15px;font-weight:600;line-height:1.35;color:var(--lib-ink);text-decoration:none}
+.ask-src-title:hover,.ask-pass-title:hover{color:var(--lib-navy);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.ask-src-meta{font-size:12.5px;color:var(--lib-ink-2);margin-top:2px}
+.ask-src-meta .sep,.ask-pass-meta .sep{color:var(--lib-rule-ui);margin:0 6px}
+.ask-src-file{font-family:var(--lib-mono);font-size:11.5px;color:var(--lib-ink-3);margin-top:1px;overflow-wrap:anywhere}
+.ask-src-file .ft{font-family:'Inter',system-ui,sans-serif;font-size:10.5px;letter-spacing:.06em;margin-left:8px}
+.ask-src-raw{font-family:var(--lib-mono);font-size:11.5px;color:var(--lib-ink-3);padding:4px 6px 4px 40px;overflow-wrap:anywhere}
+.ask-more{margin-top:4px}
+.ask-more>summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--lib-ink-2);list-style:none;padding:6px 0;width:max-content;max-width:100%}
+.ask-more>summary::-webkit-details-marker{display:none}
+.ask-more>summary::before{content:'\25B8';display:inline-block;width:14px;color:var(--lib-ink-3)}
+.ask-more[open]>summary::before{content:'\25BE'}
+.ask-more>summary:hover{color:var(--lib-ink);text-decoration:underline;text-underline-offset:3px}
+.ask-actions{display:flex;gap:4px;margin-top:14px;margin-left:-8px;flex-wrap:wrap}
+.ask-actions .lib-btn[aria-expanded="true"]{color:var(--lib-ink);text-decoration:underline;text-underline-offset:3px}
+.ask-actions.err{margin-left:0}
+.ask-err{font-size:14px;color:var(--lib-bad);margin-top:8px}
+.ask-err-detail{font-family:var(--lib-mono);font-size:11.5px;color:var(--lib-ink-2);background:var(--lib-sheet);border:1px solid var(--lib-rule);border-radius:3px;padding:8px 10px;margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ask-panel{position:sticky;top:18px;max-height:calc(100vh - 170px);display:flex;flex-direction:column;background:var(--lib-sheet);border:1px solid var(--lib-rule-strong);border-radius:3px;min-width:0}
+.ask-panel-h{display:flex;align-items:flex-start;gap:10px;padding:14px 12px 10px 16px;border-bottom:1px solid var(--lib-ink)}
+.ask-panel-h h2{font-family:var(--lib-serif);font-size:17px;font-weight:600;line-height:1.3}
+.ask-panel-h h2:focus{outline:none}
+.ask-panel-h p{font-size:12px;color:var(--lib-ink-3);margin-top:2px}
+.ask-x{margin-left:auto;width:30px;height:30px;min-width:30px;display:flex;align-items:center;justify-content:center;border:0;background:none;border-radius:3px;color:var(--lib-ink-3);cursor:pointer}
+.ask-x:hover{color:var(--lib-ink);background:var(--lib-rule)}
+.ask-panel-b{overflow-y:auto;padding:0 16px 12px}
+.ask-panel-empty{padding:28px 0;color:var(--lib-ink-3);font-size:13px}
+.ask-passes{list-style:none}
+.ask-pass{display:grid;grid-template-columns:26px minmax(0,1fr);padding:12px 0;border-bottom:1px solid var(--lib-rule)}
+.ask-pass:last-child{border-bottom:0}
+.ask-pass-n{font-size:12.5px;color:var(--lib-ink-3);font-variant-numeric:tabular-nums;padding-top:1px}
+.ask-pass-meta{display:flex;align-items:baseline;flex-wrap:wrap;font-size:12px;color:var(--lib-ink-2);margin-top:2px}
+.ask-score{margin-left:auto;padding-left:10px;font-family:var(--lib-mono);font-size:11px;color:var(--lib-ink-3);white-space:nowrap}
+.ask-pass-text{font-size:13px;line-height:1.6;color:var(--lib-ink-2);margin-top:6px;white-space:pre-line;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.ask-pass-text.open{display:block}
+.ask-pass-more{margin-top:3px;font-size:12px}
+.ask-composer{border-top:1px solid var(--lib-rule-strong);background:var(--lib-paper)}
+.ask-composer-in{max-width:1280px;margin:0 auto;padding:12px 40px 10px}
+.ask-box{max-width:760px;display:flex;align-items:flex-end;gap:8px;background:var(--lib-sheet);border:1px solid var(--lib-rule-ui);border-radius:3px;padding:5px 5px 5px 14px}
+.ask-box:focus-within{outline:2px solid var(--lib-navy);outline-offset:-1px;border-color:var(--lib-navy)}
+#screen-chat #chat-input:focus-visible{outline:none}
+#chat-input{flex:1;min-width:0;border:0;outline:0;resize:none;background:transparent;font:inherit;font-size:15px;line-height:1.55;color:var(--lib-ink);min-height:34px;max-height:160px;padding:6px 0}
+#chat-input::placeholder{color:var(--lib-ink-3)}
+.ask-hint{max-width:760px;margin-top:6px;font-size:12px;color:var(--lib-ink-3)}
+.ask-hint kbd{font-family:var(--lib-mono);font-size:11px;border:1px solid var(--lib-rule-strong);border-radius:3px;padding:0 5px;background:var(--lib-sheet);color:var(--lib-ink-2)}
+@media (max-width:1439px){
+  .ask-grid{grid-template-columns:minmax(0,760px)}
+  .ask-panel{position:fixed;right:0;top:0;bottom:0;width:380px;max-height:none;z-index:400;border:0;border-left:1px solid var(--lib-rule-strong);border-radius:0;box-shadow:0 6px 24px rgba(31,36,48,.12)}
+}
+@media (max-width:900px){
+  .ask-page{padding:22px 18px 32px}
+  .ask-composer-in{padding:10px 18px 8px}
+}
+@media (max-width:640px){
+  .ask-q{font-size:18px}
+  .ask-panel{width:100%}
+}
+@media (prefers-reduced-motion:reduce){.ask-status .mk{animation:none}.ask-src{transition:none}}
 /* SEARCH */
 #screen-search{flex-direction:column}
 .search-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;gap:20px}
@@ -509,11 +546,6 @@ canvas.gauge{display:block}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* RESPONSIVE — fix layout jam on resize */
-/* Source panel auto-collapse below 1100px (chat needs breathing room) */
-@media (max-width:1100px){
-  .source-panel{width:0;min-width:0;opacity:0;pointer-events:none}
-  .source-panel.force-show{width:300px;min-width:300px;opacity:1;pointer-events:auto;position:absolute;right:0;top:var(--top-h);bottom:0;z-index:50;box-shadow:-4px 0 16px rgba(0,0,0,.12)}
-}
 /* Below 900px: sidebar compact-only, search filters stack */
 @media (max-width:900px){
   #sidebar:not(.collapsed){width:var(--sidebar-c);min-width:var(--sidebar-c)}
@@ -528,11 +560,9 @@ canvas.gauge{display:block}
   .topbar-title{font-size:14px}
   .topbar-actions .btn span:not(.icon){display:none}
 }
-/* Below 640px: smaller bubble */
+/* Below 640px */
 @media (max-width:640px){
-  .bubble{max-width:88%}
-  .chat-history,.search-body{padding:14px 12px}
-  .chat-input-bar{padding:10px 12px}
+  .search-body{padding:14px 12px}
 }</style>
 </head>
 <body>
@@ -552,10 +582,9 @@ canvas.gauge{display:block}
   </div>
 
   <nav class="sb-nav">
-    <button type="button" class="sb-item active" data-screen="chat" title="Chat" aria-current="page">
-      <span class="sb-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3.5V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></span><span class="sb-label">Chat</span>
-    </button>
-    <button type="button" class="sb-item" data-screen="documents" title="Regulation Library">
+    <button type="button" class="sb-item active" data-screen="chat" title="Ask the Regulations" aria-current="page">
+      <span class="sb-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3.5V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M9.9 8.9a2.1 2.1 0 1 1 2.9 1.95c-.5.2-.8.6-.8 1.1v.25"/><path d="M12 13.9h.01"/></svg></span><span class="sb-label">Ask</span>
+    </button>    <button type="button" class="sb-item" data-screen="documents" title="Regulation Library">
       <span class="sb-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6.5C10.5 5.2 8.3 4.5 5 4.5v13c3.3 0 5.5.7 7 2 1.5-1.3 3.7-2 7-2v-13c-3.3 0-5.5.7-7 2z"/><path d="M12 6.5v13"/></svg></span><span class="sb-label">Library</span>
       <span class="sb-count" id="sb-doc-count">–</span>
     </button>
@@ -570,68 +599,67 @@ canvas.gauge{display:block}
 </aside>
 <div id="main">
 
-  <!-- CHAT -->
-  <div class="screen active" id="screen-chat">
-    <div class="topbar">
-      <div class="topbar-title"><span class="icon">💬</span> Chat</div>
-      <div class="topbar-actions">
-        <span class="pill blue" id="chat-model-pill">Hybrid RRF + Rerank</span>
-        <button class="btn-icon" id="toggle-sources" title="Show/hide sources">📋</button>
-        <button class="btn-icon" id="clear-chat" title="Clear conversation">🗑️</button>
-      </div>
-    </div>
-
-    <div class="chat-main">
-      <div class="chat-history" id="chat-history">
-        <div class="chat-welcome" id="chat-welcome">
-          <div class="logo-big">🎓</div>
-          <h2>Welcome to ARRS</h2>
-          <p>Academic Regulation Retrieval System for International University&nbsp;–&nbsp;VNU-HCMC students. Ask any question about admissions, scholarships, credits, discipline, examinations…</p>
-          <div class="sq-grid">
-            <div class="sq-card" onclick="sendSuggest(this)">
-              <div class="sq-icon">🎓</div>
-              <div class="sq-text">Điều kiện xét học bổng khuyến khích học tập là gì?</div>
-            </div>
-            <div class="sq-card" onclick="sendSuggest(this)">
-              <div class="sq-icon">📋</div>
-              <div class="sq-text">Sinh viên vi phạm thi hộ lần đầu bị xử lý như thế nào?</div>
-            </div>
-            <div class="sq-card" onclick="sendSuggest(this)">
-              <div class="sq-icon">⏱️</div>
-              <div class="sq-text">Thời gian tối đa hoàn thành chương trình đại học là bao lâu?</div>
-            </div>
-            <div class="sq-card" onclick="sendSuggest(this)">
-              <div class="sq-icon">📝</div>
-              <div class="sq-text">Điều kiện để được xét tốt nghiệp sớm?</div>
-            </div>
+  <!-- ASK (the Chat screen; design: docs/design/chat-ask-redesign.md) -->
+  <div class="screen active" id="screen-chat" aria-label="Ask the Regulations">
+    <div class="ask-scroll" id="chat-history">
+      <div class="ask-page">
+        <header class="lib-masthead">
+          <div class="lib-mast-text">
+            <p class="lib-kicker">International University · VNU-HCM</p>
+            <h1 class="lib-h1">Ask the Regulations</h1>
+            <p class="lib-lede">Ask in Vietnamese. Each answer quotes the articles and clauses of the regulations in the Library, with the page they come from. Answers are quoted from the regulations, not generated.</p>
+            <p class="lib-summary" id="ask-scope"><button type="button" class="lib-link" data-ask-library>Browse the Library</button></p>
           </div>
-        </div>
+          <div class="lib-actions">
+            <button type="button" class="lib-btn hidden" id="clear-chat"></button>
+          </div>
+        </header>
+        <hr class="lib-rule">
 
-        <div id="chat-messages"></div>
-      </div>
+        <div class="ask-grid">
+          <div class="ask-col">
+            <div id="chat-welcome">
+              <h2 class="ask-label" id="ask-common-h">Common questions</h2>
+              <ul class="ask-common" aria-labelledby="ask-common-h">
+                <li><button type="button" onclick="sendSuggest(this)"><span class="sq-text">Điều kiện xét học bổng khuyến khích học tập là gì?</span><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" onclick="sendSuggest(this)"><span class="sq-text">Sinh viên vi phạm thi hộ lần đầu bị xử lý như thế nào?</span><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" onclick="sendSuggest(this)"><span class="sq-text">Thời gian tối đa hoàn thành chương trình đại học là bao lâu?</span><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" onclick="sendSuggest(this)"><span class="sq-text">Điều kiện để được xét tốt nghiệp sớm?</span><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button></li>
+              </ul>
+              <div class="ask-covers hidden" id="ask-covers">
+                <h2 class="ask-label">The search covers</h2>
+                <p id="ask-covers-list"></p>
+              </div>
+            </div>
+            <div id="chat-messages"></div>
+          </div>
 
-      <div class="chat-input-bar">
-        <div class="chat-input-row">
-          <textarea id="chat-input" rows="1" placeholder="Ask a question about IU academic regulations…"></textarea>
-          <button class="send-btn" id="chat-send" title="Send">➤</button>
-        </div>
-        <div class="chat-hint">
-          <span><kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</span>
+          <aside class="ask-panel hidden" id="source-panel" aria-labelledby="sp-title">
+            <div class="ask-panel-h">
+              <div>
+                <h2 id="sp-title" tabindex="-1">Passages consulted</h2>
+                <p id="sp-sub"></p>
+              </div>
+              <button type="button" class="ask-x" id="sp-close" aria-label="Close"><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+            </div>
+            <div class="ask-panel-b" id="sp-body"><p class="ask-panel-empty">Ask a question to see the passages consulted.</p></div>
+          </aside>
         </div>
       </div>
     </div>
 
-    <div class="source-panel hidden" id="source-panel">
-      <div class="sp-header">
-        <span id="sp-title">📋 References</span>
-        <button class="btn-icon" style="border:none;font-size:13px" onclick="document.getElementById('source-panel').classList.add('hidden')">✕</button>
-      </div>
-      <div class="sp-body" id="sp-body">
-        <div class="sp-empty">Send a question to see source documents.</div>
+    <div class="ask-composer">
+      <div class="ask-composer-in">
+        <label for="chat-input" class="lib-sr">Your question</label>
+        <div class="ask-box">
+          <textarea id="chat-input" rows="1" placeholder="Ask about any IU or MOET regulation…"></textarea>
+          <button type="button" class="lib-btn lib-btn-primary" id="chat-send"></button>
+        </div>
+        <p class="ask-hint"><kbd>Enter</kbd> to ask · <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line · Answers are quoted from the regulations, not generated.</p>
       </div>
     </div>
+    <div id="ask-live" class="lib-sr" aria-live="polite"></div>
   </div>
-
   <!-- LIBRARY (the Documents screen) -->
   <div class="screen" id="screen-documents">
     <div class="lib-scroll" id="lib-scroll">
@@ -645,7 +673,7 @@ canvas.gauge{display:block}
           </div>
           <div class="lib-actions" role="toolbar" aria-label="Manage the library">
             <button type="button" class="lib-btn lib-btn-primary" id="reindex-docs" title="Upload PDF or DOCX files and index them"></button>
-            <button type="button" class="lib-btn" id="sync-index" title="Re-read every document and bring the index up to date (Chat keeps working)"></button>
+            <button type="button" class="lib-btn" id="sync-index" title="Re-read every document and bring the index up to date (Ask keeps working)"></button>
             <button type="button" class="lib-btn lib-btn-quiet" id="refresh-docs" title="Reload the list"></button>
           </div>
         </header>
@@ -972,44 +1000,43 @@ async function checkHealth() {
 }
 
 // ═══════════════════════════════════════════════════
-//  CHAT
+//  ASK (the Chat screen)
+//  Design: docs/design/chat-ask-redesign.md
 // ═══════════════════════════════════════════════════
 const chatInput = document.getElementById('chat-input');
 const chatWelcome = document.getElementById('chat-welcome');
 const chatMessages = document.getElementById('chat-messages');
 const chatSend = document.getElementById('chat-send');
+const chatClear = document.getElementById('clear-chat');
 const spPanel = document.getElementById('source-panel');
 const spBody = document.getElementById('sp-body');
 const spTitle = document.getElementById('sp-title');
-let lastChatSources = [];
+const spSub = document.getElementById('sp-sub');
 
-chatInput.addEventListener('input', () => {
-  chatInput.style.height = 'auto';
-  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
-});
-chatInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
-});
-chatSend.addEventListener('click', sendChat);
-
-document.getElementById('clear-chat').addEventListener('click', () => {
-  chatMessages.innerHTML = '';
-  chatWelcome.classList.remove('hidden');
-  lastChatSources = [];
-  spBody.innerHTML = '<div class="sp-empty">Send a question to see source documents.</div>';
-  spTitle.textContent = '📋 References';
-});
-
-document.getElementById('toggle-sources').addEventListener('click', () => {
-  spPanel.classList.toggle('hidden');
-});
-
-window.sendSuggest = function (card) {
-  const t = card.querySelector('.sq-text').textContent.trim();
-  chatInput.value = t;
-  sendChat();
+const ASK_ICONS = {
+  plus: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  arrow: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>',
+  copy: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="1"/><path d="M15.5 8.5v-3a1 1 0 0 0-1-1h-9a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3"/></svg>',
+  check: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  passages: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>',
 };
+const ASK_PANEL_EMPTY = '<p class="ask-panel-empty">Ask a question to see the passages consulted.</p>';
+const ASK_FOOTER = '\n---\n**Tài liệu đính kèm:**\n';
+const ASK_TIMEOUT_MS = 180000;
+const askDrawer = window.matchMedia('(max-width:1439px)');
+const askReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const askEntries = [];
+let askCount = 0;           // enquiries on screen ("Enquiry N")
+let askPending = null;      // { entry, controller } while a question waits for its answer
+let askPanelOwner = null;   // { entry, btn } whose passages the panel shows
+let askDocs = null;         // source file → GET /documents row (registry + library catalogue)
+let askSummary = null;
+let askDocsLoading = null;
 
+chatSend.innerHTML = '<span>Ask</span>' + ASK_ICONS.arrow;
+chatClear.innerHTML = ASK_ICONS.plus + '<span>New enquiry</span>';
+
+// ─── Markdown and document links: the Chat's helpers, unchanged ─────────
 let __markedFootnoteRegistered = false;
 function renderMarkdown(md) {
   try {
@@ -1068,129 +1095,392 @@ function linkifyFootnotePdfs(rootEl) {
   });
 }
 
-function appendMessage(role, content, meta) {
-  const msg = document.createElement('div');
-  msg.className = 'msg ' + role;
-  const av = document.createElement('div');
-  av.className = 'avatar ' + role;
-  av.textContent = role === 'user' ? 'SV' : 'AI';
-
-  const wrap = document.createElement('div');
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble' + (meta && meta.error ? ' error' : '');
-  if (role === 'ai' && !meta?.error) {
-    bubble.innerHTML = renderMarkdown(content);
-    linkifyFootnotePdfs(bubble);
-  } else {
-    bubble.textContent = content;
-  }
-  wrap.appendChild(bubble);
-
-  if (role === 'ai' && !meta?.error) {
-    const mbar = document.createElement('div');
-    mbar.className = 'bubble-meta';
-    const time = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-    mbar.innerHTML = `<span class="bubble-time">${time}</span>` +
-      (meta?.elapsed ? `<span class="bubble-elapsed">⏱ ${fmtTime(meta.elapsed)}</span>` : '') +
-      `<button class="copy-btn">📋 Copy</button>`;
-    mbar.querySelector('.copy-btn').onclick = (e) => {
-      navigator.clipboard.writeText(bubble.innerText).catch(() => {});
-      e.target.textContent = '✓ Copied';
-      setTimeout(() => e.target.textContent = '📋 Copy', 1800);
-    };
-    wrap.appendChild(mbar);
-  }
-
-  msg.appendChild(av);
-  msg.appendChild(wrap);
-  chatMessages.appendChild(msg);
-  chatMessages.scrollIntoView({ block: 'end' });
-  document.getElementById('chat-history').scrollTop = document.getElementById('chat-history').scrollHeight;
-  return msg;
+// ─── Library catalogue: titles, numbers, types (design 7.3) ──────────────
+// The Library's helpers (libTitle, libNumber…) only read the row they get.
+function askLoadCatalog(force = false) {
+  if (askDocsLoading && !force) return askDocsLoading;
+  askDocsLoading = (async () => {
+    try {
+      const [r] = await Promise.all([api('/documents'), GROUPS.length ? null : loadGroups()]);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      askDocs = new Map((d.documents || []).map(x => [x.source, { ...x, doc_group: x.group }]));   // as the Library does
+      askSummary = d.summary || null;
+    } catch {}
+    askRenderScope();
+    return askDocs;
+  })();
+  return askDocsLoading;
+}
+function askDocInfo(file, numberFromAnswer = '') {
+  const d = askDocs && askDocs.get(file);
+  if (!d) return { title: libNameFromFile(file), type: '', number: numberFromAnswer || '', issuer: '', year: '', named: false };
+  let number = libNumber(d);
+  if (!number && !libHas(d.catalog, 'doc_number')) number = numberFromAnswer || '';
+  const named = !!(d.title || (d.catalog && d.catalog.title));   // a real title, not one made from the file name
+  return { title: libTitle(d), type: libTypeLabel(d.doc_type), number, issuer: libIssuer(d), year: libYear(d), named };
+}
+function askRenderScope() {
+  const scope = document.getElementById('ask-scope');
+  const covers = document.getElementById('ask-covers');
+  const link = '<button type="button" class="lib-link" data-ask-library>Browse the Library</button>';
+  if (!askDocs) { scope.innerHTML = link; covers.classList.add('hidden'); return; }
+  const searchable = [...askDocs.values()].filter(d => d.status === 'indexed');
+  const groups = new Map();
+  searchable.forEach(d => { const g = libGroupKey(d); groups.set(g, (groups.get(g) || 0) + 1); });
+  const n = searchable.length, m = groups.size;
+  scope.innerHTML = `Searches <b>${n}</b> document${n === 1 ? '' : 's'} in <b>${m}</b> collection${m === 1 ? '' : 's'} · ${link}`;
+  const order = [...groups.entries()].sort((a, b) => (libRank(a[0]) - libRank(b[0])) || libGroupLabel(a[0]).localeCompare(libGroupLabel(b[0]), 'vi'));
+  document.getElementById('ask-covers-list').innerHTML = order.map(([g, k]) => `${escapeHtml(libGroupLabel(g))} ${k}`).join('<span class="sep">·</span>');
+  covers.classList.toggle('hidden', !order.length);
 }
 
-function showTyping() {
-  const m = document.createElement('div');
-  m.className = 'msg ai';
-  m.id = '__typing';
-  m.innerHTML = '<div class="avatar ai">AI</div><div class="bubble typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
-  chatMessages.appendChild(m);
-  document.getElementById('chat-history').scrollTop = document.getElementById('chat-history').scrollHeight;
+// ─── The server's sources block (design 7.2) ─────────────────────────────
+function askSplitFooter(md) {
+  const i = md.lastIndexOf(ASK_FOOTER);
+  if (i < 0) return { body: md, lines: [] };
+  return { body: md.slice(0, i), lines: md.slice(i + ASK_FOOTER.length).split('\n').filter(l => l.trim()) };
 }
-function removeTyping() { document.getElementById('__typing')?.remove(); }
-
-function renderSourcesPanel(sources) {
-  if (!sources || !sources.length) {
-    spBody.innerHTML = '<div class="sp-empty">No source documents.</div>';
-    spTitle.textContent = '📋 References';
-    return;
+function askParseSources(lines) {
+  const items = [], other = [];
+  for (const line of lines) {
+    const m = /^\[(\d+)\]: (.+) — trang (\S+)$/.exec(line.trim());
+    if (!m) { other.push(line); continue; }
+    const parts = m[2].split(' – ');
+    const file = parts.pop().trim();
+    items.push({ n: Number(m[1]), file, number: parts.join(' – ').trim(), page: /^\d+$/.test(m[3]) ? Number(m[3]) : null });
   }
-  spTitle.textContent = `📋 References (${sources.length})`;
-  spBody.innerHTML = sources.map((s, i) => {
-    const score = s.score_rerank ?? s.score_rrf ?? s.score_dense ?? s.score_sparse;
-    const scoreCls = score >= 0.7 ? '' : (score >= 0.4 ? 'ok' : 'low');
-    const tags = [];
-    if (s.doc_group !== null && s.doc_group !== undefined && s.doc_group !== '') tags.push(escapeHtml(groupLabel(s.doc_group)));
-    if (s.doc_type) tags.push(escapeHtml(typeLabel(s.doc_type)));
-    if (usesGenericLabels(s)) {
-      if (s.article) tags.push(escapeHtml(levelName(s, 'article', s.article)));
-      else if (s.chapter) tags.push(escapeHtml(levelName(s, 'chapter', s.chapter)));
-    } else if (s.article) tags.push(`Điều ${escapeHtml(s.article)}`);
-    else if (s.chapter) tags.push(`Chương ${escapeHtml(s.chapter)}`);
-    return `
-      <div class="sp-card" onclick="window.open('${/\.pdf$/i.test(s.source || '') || !s.source ? `${API_BASE}/pdf/${encodeURIComponent(s.source || '')}` : docUrl(s.source)}', '_blank')">
-        <div class="sp-card-header">
-          <div class="sp-card-file">${i+1}. ${escapeHtml(s.source || 'N/A')} · tr.${s.page || '?'}</div>
-          <div class="sp-score">${fmtScore(score)}</div>
-        </div>
-        <div class="sp-card-text">${escapeHtml((s.text || '').slice(0, 260))}…</div>
-        <div class="sp-card-footer">
-          ${tags.map(t => `<span class="sp-tag">${t}</span>`).join('')}
-        </div>
-      </div>
-    `;
-  }).join('');
+  return { items, other };
+}
+const askKids = el => [...el.childNodes].filter(n => !(n.nodeType === 3 && !n.textContent.trim()));
+
+// ─── Answer body: headings, clause labels, notes, citations (design 5.6) ──
+function askDecorateBody(root, entry) {
+  const nums = new Set(entry.sources.items.map(s => s.n));
+  root.querySelectorAll('p').forEach(p => {
+    const k = askKids(p);
+    if (!k.length) return;
+    if (k.length === 1 && k[0].nodeName === 'EM') {
+      const t = k[0].textContent.trim();
+      if (/^\(Trích /.test(t)) p.classList.add('ask-note');
+      else if (/:$/.test(t)) p.classList.add('ask-clause');
+      return;
+    }
+    if (k[0].nodeName !== 'STRONG' || p.closest('blockquote')) return;
+    const rest = k.slice(1).map(n => n.textContent).join('').trim();
+    if (rest && !/^(\[\d+\]\s*)+$/.test(rest)) return;
+    if (!rest && /:\s*$/.test(k[0].textContent)) { p.classList.add('ask-clause'); return; }
+    p.classList.add('ask-loc');
+    const m = /^(\d+\.\s+)?(?:(.+?) – )?(\S+\.(?:pdf|docx))$/i.exec(k[0].textContent.trim());
+    if (m) {                                   // a heading written as a file name (M4)
+      const info = askDocInfo(m[3], m[2]);
+      if (info.named) {
+        k[0].textContent = (m[1] || '') + info.title;
+        const f = document.createElement('span');
+        f.className = 'ask-file';
+        f.textContent = (m[2] ? m[2] + ' – ' : '') + m[3];
+        p.appendChild(f);
+      }
+    }
+  });
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n =>
+    n.parentNode.closest('a,code') ? NodeFilter.FILTER_REJECT : (/\[\d+\]/.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) });
+  const targets = [];
+  let node;
+  while ((node = walker.nextNode())) targets.push(node);
+  targets.forEach(tn => {
+    const text = tn.nodeValue, frag = document.createDocumentFragment(), re = /\[(\d+)\]/g;
+    let last = 0, m;
+    while ((m = re.exec(text))) {
+      const n = Number(m[1]);
+      if (!nums.has(n)) continue;
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const s = entry.sources.items.find(x => x.n === n);
+      const a = document.createElement('a');
+      a.className = 'ask-cite';
+      a.href = `#${entry.id}-src-${n}`;
+      a.dataset.n = n;
+      a.textContent = `[${n}]`;
+      a.setAttribute('aria-label', `Source ${n}: ${askDocInfo(s.file, s.number).title}`);
+      frag.appendChild(a);
+      last = m.index + m[0].length;
+    }
+    if (!last) return;
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    tn.parentNode.replaceChild(frag, tn);
+  });
 }
 
-async function sendChat() {
-  const q = chatInput.value.trim();
-  if (!q) return;
+// ─── Sources under an answer (design 5.7) ────────────────────────────────
+function askSourceItem(entry, s) {
+  const info = askDocInfo(s.file, s.number);
+  const pdf = /\.pdf$/i.test(s.file);
+  const meta = [info.type, info.number ? 'No. ' + info.number : '', info.issuer, info.year, s.page ? 'p. ' + s.page : ''].filter(Boolean);
+  const tip = pdf ? `Open ${s.file} at page ${s.page ?? '?'}` : `Download ${s.file}`;
+  return `<li class="ask-src" id="${entry.id}-src-${s.n}" tabindex="-1"><span class="ask-src-n">[${s.n}]</span><div>` +
+    `<a class="ask-src-title" href="${escapeHtml(docUrl(s.file, s.page))}" target="_blank" rel="noopener" title="${escapeHtml(tip)}">${escapeHtml(info.title)}</a>` +
+    `<p class="ask-src-meta">${meta.map(escapeHtml).join('<span class="sep">·</span>')}</p>` +
+    `<p class="ask-src-file">${escapeHtml(s.file)}<span class="ft">${pdf ? 'PDF' : 'DOCX'}</span></p></div></li>`;
+}
+function askSourcesHtml(entry) {
+  const { items, other } = entry.sources;
+  if (!items.length && !other.length) return '';
+  const cited = items.filter(s => entry.cited.has(s.n));
+  const more = items.filter(s => !entry.cited.has(s.n));
+  let h = `<section class="ask-sources" aria-labelledby="${entry.id}-src-h"><h3 class="ask-label" id="${entry.id}-src-h">Sources</h3>`;
+  if (cited.length) h += `<p class="ask-sub">Cited in the answer</p><ol class="ask-srcs">${cited.map(s => askSourceItem(entry, s)).join('')}</ol>`;
+  if (more.length) h += `<details class="ask-more"${cited.length ? '' : ' open'}><summary>Also found by the search (${more.length})</summary><ol class="ask-srcs">${more.map(s => askSourceItem(entry, s)).join('')}</ol></details>`;
+  other.forEach(l => { h += `<p class="ask-src-raw">${escapeHtml(l)}</p>`; });
+  return h + '</section>';
+}
+
+// ─── Enquiry records (design 5.5) ────────────────────────────────────────
+function askLive(msg) {
+  const l = document.getElementById('ask-live');
+  l.textContent = '';
+  setTimeout(() => { l.textContent = msg; }, 50);
+}
+function askAddEntry(question) {
+  const i = ++askCount, id = 'enq-' + i;
+  const time = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  const el = document.createElement('article');
+  el.className = 'ask-entry';
+  el.id = id;
+  el.setAttribute('aria-labelledby', id + '-q');
+  el.innerHTML = `<p class="ask-label">Enquiry ${i} · ${time}</p><h2 class="ask-q" id="${id}-q">${escapeHtml(question)}</h2><div class="ask-answer"></div>`;
+  chatMessages.appendChild(el);
   chatWelcome.classList.add('hidden');
-  chatInput.value = '';
-  chatInput.style.height = 'auto';
+  chatClear.classList.remove('hidden');
+  const entry = { i, id, el, question, timer: null };
+  askEntries.push(entry);
+  return entry;
+}
+function askSetWaiting(entry) {
+  const box = entry.el.querySelector('.ask-answer');
+  entry.el.setAttribute('aria-busy', 'true');
+  box.innerHTML = '<p class="ask-status"><span class="mk" aria-hidden="true"></span>Searching the regulations… <span class="t">0 s</span></p>';
+  const t0 = Date.now(), t = box.querySelector('.t');
+  clearInterval(entry.timer);
+  entry.timer = setInterval(() => { t.textContent = Math.round((Date.now() - t0) / 1000) + ' s'; }, 1000);
+  askLive('Searching the regulations…');
+}
+function askRenderAnswer(entry, data) {
+  clearInterval(entry.timer);
+  entry.el.removeAttribute('aria-busy');
+  entry.data = data;
+  const answer = data.answer || '';
+  const { body, lines } = askSplitFooter(answer);
+  entry.sources = askParseSources(lines);
+  const bodyMd = entry.sources.items.length ? body : answer;      // nothing parsed: show the answer as it is (R1)
+  const nums = new Set(entry.sources.items.map(s => s.n));
+  entry.cited = new Set([...bodyMd.matchAll(/\[(\d+)\]/g)].map(m => Number(m[1])).filter(n => nums.has(n)));
+  const n = entry.sources.items.length, c = entry.cited.size;
+  const notice = !n && !/\[\d+\]/.test(bodyMd) && !/^\s*>/m.test(bodyMd);   // R10
+  const what = !n ? 'no provision matched' : c === n ? `quoted from ${n} document${n === 1 ? '' : 's'}`
+    : c ? `quoted from ${c} of ${n} documents found` : `${n} document${n === 1 ? '' : 's'} found`;
+  let h = `<p class="ask-label">Answer · ${what} · ${Number(data.elapsed || 0).toFixed(1)} s</p>`;
+  if (notice) {
+    h += `<p class="ask-nf">${escapeHtml(bodyMd.trim())}</p><p class="ask-nf-help">Try other words — the name of the regulation or an article number — or <button type="button" class="lib-link" data-ask-library>browse the Library</button>.</p>`;
+  } else {
+    h += `<div class="ask-body">${renderMarkdown(bodyMd)}</div>`;
+  }
+  h += askSourcesHtml(entry);
+  h += `<div class="ask-actions"><button type="button" class="lib-btn lib-btn-quiet" data-copy>${ASK_ICONS.copy}<span>Copy answer</span></button>`;
+  const passages = (data.sources || []).length;
+  if (passages) h += `<button type="button" class="lib-btn lib-btn-quiet" data-passages aria-controls="source-panel" aria-expanded="false">${ASK_ICONS.passages}<span>Passages consulted (${passages})</span></button>`;
+  h += '</div>';
+  const box = entry.el.querySelector('.ask-answer');
+  box.innerHTML = h;
+  const bodyEl = box.querySelector('.ask-body');
+  if (bodyEl) { askDecorateBody(bodyEl, entry); linkifyFootnotePdfs(bodyEl); }
+  askLive(notice || !n ? 'No provision matched.' : `Answer ready: quoted from ${c || n} document${(c || n) === 1 ? '' : 's'}.`);
+}
+function askRenderError(entry, err) {
+  clearInterval(entry.timer);
+  entry.el.removeAttribute('aria-busy');
+  entry.el.querySelector('.ask-answer').innerHTML = `<p class="ask-label bad">No answer</p><p class="ask-err">${escapeHtml(err.message)}</p>` +
+    (err.detail ? `<pre class="ask-err-detail">${escapeHtml(String(err.detail).slice(0, 600))}</pre>` : '') +
+    '<div class="ask-actions err"><button type="button" class="lib-btn" data-retry>Try again</button></div>';
+  askLive('No answer.');
+}
+
+// ─── Passages consulted (design 5.8) ─────────────────────────────────────
+function askLocator(s) {
+  const generic = usesGenericLabels(s);
+  return [
+    s.article ? (generic ? levelName(s, 'article', s.article) : 'Điều ' + s.article) : '',
+    s.khoan ? (generic ? levelName(s, 'khoan', s.khoan) : 'Khoản ' + s.khoan) : '',
+  ].filter(Boolean).join(', ');
+}
+function askOpenPassages(entry, btn) {
+  const sources = (entry.data && entry.data.sources) || [];
+  const byFile = new Map(entry.sources.items.map(s => [s.file, s.n]));
+  askPanelOwner = { entry, btn };
+  spSub.textContent = `Enquiry ${entry.i} · ${sources.length} passage${sources.length === 1 ? '' : 's'}, as ranked by the search`;
+  spBody.innerHTML = '<ol class="ask-passes">' + sources.map((s, k) => {
+    const info = askDocInfo(s.source);
+    const meta = [info.type, info.number ? 'No. ' + info.number : '', askLocator(s), s.page ? 'p. ' + s.page : '',
+      byFile.has(s.source) ? `[${byFile.get(s.source)}]` : ''].filter(Boolean);
+    const score = typeof s.score_rerank === 'number'
+      ? `<span class="ask-score" title="Cross-encoder relevance score">rerank ${s.score_rerank.toFixed(2)}</span>` : '';
+    return `<li class="ask-pass"><span class="ask-pass-n">${k + 1}</span><div>` +
+      `<a class="ask-pass-title" href="${escapeHtml(docUrl(s.source, s.page))}" target="_blank" rel="noopener">${escapeHtml(info.title)}</a>` +
+      `<p class="ask-pass-meta"><span>${meta.map(escapeHtml).join('<span class="sep">·</span>')}</span>${score}</p>` +
+      `<p class="ask-pass-text">${escapeHtml(s.text || '')}</p><button type="button" class="lib-link ask-pass-more hidden">Show full passage</button></div></li>`;
+  }).join('') + '</ol>';
+  spPanel.classList.remove('hidden');
+  if (askDrawer.matches) { spPanel.setAttribute('role', 'dialog'); spPanel.setAttribute('aria-modal', 'false'); }
+  else { spPanel.removeAttribute('role'); spPanel.removeAttribute('aria-modal'); }
+  spBody.querySelectorAll('.ask-pass-text').forEach(p => {
+    if (p.scrollHeight > p.clientHeight + 2) p.nextElementSibling.classList.remove('hidden');
+  });
+  document.querySelectorAll('#chat-messages [data-passages]').forEach(b => b.setAttribute('aria-expanded', b === btn ? 'true' : 'false'));
+  spBody.scrollTop = 0;
+  spTitle.focus({ preventScroll: true });
+}
+function askClosePassages(returnFocus = true) {
+  if (spPanel.classList.contains('hidden')) return;
+  spPanel.classList.add('hidden');
+  document.querySelectorAll('#chat-messages [data-passages]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+  if (returnFocus && askPanelOwner && askPanelOwner.btn.isConnected) askPanelOwner.btn.focus();
+}
+
+// ─── Copy, citations ─────────────────────────────────────────────────────
+function askCopyText(entry) {
+  const main = entry.el.querySelector('.ask-body') || entry.el.querySelector('.ask-nf');
+  const body = main ? main.innerText.trim() : '';
+  const src = entry.sources.items.map(s => {
+    const info = askDocInfo(s.file, s.number);
+    return `[${s.n}] ${info.title}` + [info.type, info.number ? 'No. ' + info.number : '', info.issuer, info.year]
+      .filter(Boolean).map(x => ', ' + x).join('') + ` — ${s.file}` + (s.page ? `, p. ${s.page}` : '');
+  });
+  return body + (src.length ? '\n\nSources\n' + src.join('\n') : '');
+}
+function askJump(entry, n) {
+  const li = document.getElementById(`${entry.id}-src-${n}`);
+  if (!li) return;
+  li.scrollIntoView({ block: 'center', behavior: askReduceMotion.matches ? 'auto' : 'smooth' });
+  li.classList.add('is-target');
+  li.focus({ preventScroll: true });
+  setTimeout(() => li.classList.remove('is-target'), 2000);
+}
+
+// ─── Asking: POST /chat, one question at a time (M16) ────────────────────
+async function askFetch(entry) {
+  const controller = new AbortController();
+  let timedOut = false, reached = false, data = null, failure = null;
+  const timer = setTimeout(() => { timedOut = true; controller.abort(); }, ASK_TIMEOUT_MS);
+  askPending = { entry, controller };
   chatSend.disabled = true;
-
-  appendMessage('user', q);
-  showTyping();
-
+  askSetWaiting(entry);
+  const t0 = Date.now();
   try {
-    const t0 = Date.now();
     const r = await api('/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: q }),
-      signal: AbortSignal.timeout(180000),
+      body: JSON.stringify({ question: entry.question }),
+      signal: controller.signal,
     });
-    removeTyping();
-    if (!r.ok) {
-      const errTxt = await r.text();
-      appendMessage('ai', `API error (${r.status}): ${errTxt}`, { error: true });
-      return;
-    }
-    const data = await r.json();
-    const elapsed = data.elapsed ?? ((Date.now() - t0) / 1000);
-    lastChatSources = data.sources || [];
-    appendMessage('ai', data.answer || '(không có câu trả lời)', { elapsed, sources: lastChatSources });
-    renderSourcesPanel(lastChatSources);
+    reached = true;
+    if (r.ok) data = await r.json();
+    else failure = { message: `The server returned an error (HTTP ${r.status}).`, detail: await r.text().catch(() => '') };
   } catch (e) {
-    removeTyping();
-    appendMessage('ai', `Connection error: ${e.message || e}`, { error: true });
+    const detail = e && e.message ? e.message : String(e);
+    failure = timedOut ? { message: 'No answer after 3 minutes.' }
+      : reached ? { message: "The server's answer could not be read.", detail } : { message: 'Could not reach the server.', detail };
+  }
+  clearTimeout(timer);
+  try {
+    if (!entry.el.isConnected) return;       // cleared by "New enquiry"
+    if (failure) { askRenderError(entry, failure); return; }
+    if (data.elapsed === null || data.elapsed === undefined) data.elapsed = (Date.now() - t0) / 1000;
+    const files = new Set((data.sources || []).map(s => s.source));
+    askParseSources(askSplitFooter(data.answer || '').lines).items.forEach(s => files.add(s.file));
+    if (!askDocs || [...files].some(f => f && !askDocs.has(f))) await askLoadCatalog(true);
+    if (entry.el.isConnected) askRenderAnswer(entry, data);
+  } catch (e) {
+    if (entry.el.isConnected) askRenderError(entry, { message: 'The answer could not be displayed.', detail: e && e.message ? e.message : String(e) });
   } finally {
-    chatSend.disabled = false;
-    chatInput.focus();
+    if (askPending && askPending.entry === entry) { askPending = null; chatSend.disabled = false; }
+    if (document.getElementById('screen-chat').classList.contains('active')) chatInput.focus();
   }
 }
+function sendChat() {
+  const q = chatInput.value.trim();
+  if (!q || askPending) return;
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  const entry = askAddEntry(q);
+  askFetch(entry);
+  entry.el.scrollIntoView({ block: 'start', behavior: askReduceMotion.matches ? 'auto' : 'smooth' });   // M11
+}
+window.sendSuggest = function (btn) {
+  chatInput.value = btn.querySelector('.sq-text').textContent.trim();
+  sendChat();
+};
+function askClear() {
+  if (askPending) { askPending.controller.abort(); askPending = null; chatSend.disabled = false; }
+  askEntries.forEach(e => clearInterval(e.timer));
+  askEntries.length = 0;
+  askCount = 0;
+  chatMessages.innerHTML = '';
+  chatWelcome.classList.remove('hidden');
+  chatClear.classList.add('hidden');
+  askClosePassages(false);
+  askPanelOwner = null;
+  spBody.innerHTML = ASK_PANEL_EMPTY;
+  spSub.textContent = '';
+}
 
+chatInput.addEventListener('input', () => {
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 160) + 'px';
+});
+chatInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendChat(); }
+});
+chatSend.addEventListener('click', sendChat);
+chatClear.addEventListener('click', () => { askClear(); chatInput.focus(); });
+document.getElementById('sp-close').addEventListener('click', () => askClosePassages());
+document.getElementById('screen-chat').addEventListener('click', e => {
+  if (e.target.closest('[data-ask-library]')) { showScreen('documents'); return; }
+  const art = e.target.closest('.ask-entry');
+  const entry = art && askEntries.find(x => x.el === art);
+  if (!entry) return;
+  const cite = e.target.closest('.ask-cite');
+  if (cite) { e.preventDefault(); askJump(entry, Number(cite.dataset.n)); return; }
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.hasAttribute('data-passages')) askOpenPassages(entry, b);
+  else if (b.hasAttribute('data-retry')) { if (!askPending) askFetch(entry); }
+  else if (b.hasAttribute('data-copy')) {
+    navigator.clipboard.writeText(askCopyText(entry)).catch(() => {});
+    b.innerHTML = ASK_ICONS.check + '<span>Copied</span>';
+    setTimeout(() => { b.innerHTML = ASK_ICONS.copy + '<span>Copy answer</span>'; }, 1800);
+  }
+});
+spBody.addEventListener('click', e => {
+  const b = e.target.closest('.ask-pass-more');
+  if (!b) return;
+  const open = b.previousElementSibling.classList.toggle('open');
+  b.textContent = open ? 'Show less' : 'Show full passage';
+});
+// "/" jumps to the question box and Esc closes the passages while Ask is on screen.
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('screen-chat').classList.contains('active')) return;
+  if (e.key === 'Escape' && !spPanel.classList.contains('hidden')) { askClosePassages(); return; }
+  if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (!document.getElementById('upload-modal').classList.contains('hidden')) return;
+  const a = document.activeElement;
+  if (a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable)) return;
+  e.preventDefault();
+  chatInput.focus();
+});
+document.addEventListener('mousedown', e => {
+  if (spPanel.classList.contains('hidden') || !askDrawer.matches) return;
+  if (spPanel.contains(e.target) || e.target.closest('[data-passages]')) return;
+  askClosePassages(false);
+});
 // ═══════════════════════════════════════════════════
 //  LIBRARY (the Documents screen)
 //  Design: docs/design/documents-library-redesign.md
@@ -1230,8 +1520,8 @@ const STEP_LABELS = { parse: 'Reading', embed: 'Embedding', bm25: 'Indexing', cl
                       qdrant: 'Removing vectors', chunks: 'Removing passages', queued: 'Waiting',
                       running: 'Syncing' };
 
-// Document types in English for this page only: DOC_TYPE_LABELS above feeds
-// the Chat's References panel and stays as it is.
+// Document types in English, used by this page and by the Ask page's sources;
+// DOC_TYPE_LABELS above (Vietnamese) is no longer shown.
 const LIB_TYPE_LABELS = {
   law: 'Law', decree: 'Decree', circular: 'Circular',
   university_decision: 'Decision', school_decision: 'Decision', school_decision_full: 'Decision',
@@ -1336,7 +1626,7 @@ function statusBadge(d) {
   let tip = det.message || '';
   if (!tip && s === 'orphan') tip = 'The file is gone but its passages are still in the index. Use the ⋯ menu to remove them.';
   if (!tip && s === 'empty') tip = 'No text could be extracted from this document.';
-  if (!tip && s === 'indexed') tip = 'Searchable and citable in Chat.';
+  if (!tip && s === 'indexed') tip = 'Searchable and citable in Ask.';
   const note = (s === 'failed' || s === 'empty') && det.message ? `<span class="lib-st-note">${escapeHtml(det.message)}</span>` : '';
   const retry = ['failed', 'empty', 'not_indexed'].includes(s)
     ? `<button type="button" class="lib-link lib-retry" data-retry="${escapeHtml(d.source || '')}">Retry indexing</button>` : '';
@@ -1394,7 +1684,7 @@ function renderLibSummary() {
   const groups = new Set(live.map(d => d.doc_group || 'Khác')).size;
   let html = `<b id="stat-docs">${total}</b> document${total === 1 ? '' : 's'} in <b id="stat-groups">${groups}</b> ` +
     `collection${groups === 1 ? '' : 's'} · <b id="stat-chunks">${Number(docChunkTotal).toLocaleString('en-US')}</b> indexed passages · ` +
-    `<span id="stat-indexed">${total && indexed === total ? `all ${total}` : `${indexed} of ${total}`}</span> available in Chat`;
+    `<span id="stat-indexed">${total && indexed === total ? `all ${total}` : `${indexed} of ${total}`}</span> available in Ask`;
   if (s.processing) html += ` · <button type="button" class="warn" data-lib-status="busy">${s.processing} in progress</button>`;
   if (s.failed) html += ` · <button type="button" class="bad" data-lib-status="failed">${s.failed} need${s.failed === 1 ? 's' : ''} attention</button>`;
   document.getElementById('lib-summary').innerHTML = html;
@@ -1773,7 +2063,7 @@ function trackJob(jobId, what = 'index') {
       const bad = results.filter(x => x.status === 'failed' || x.status === 'empty');
       if (job.status === 'succeeded') {
         toast(what === 'remove' ? 'The index is up to date after the deletion.'
-          : `Indexed ${ok} document${ok === 1 ? '' : 's'} — you can ask about ${ok === 1 ? 'it' : 'them'} in Chat now.`, 'success', 5000);
+          : `Indexed ${ok} document${ok === 1 ? '' : 's'} — you can ask about ${ok === 1 ? 'it' : 'them'} on the Ask page now.`, 'success', 5000);
       } else {
         const first = bad[0] || {};
         const msg = (job.error && job.error.message) || first.message || 'unknown error';
@@ -1875,7 +2165,7 @@ function pollReindexStatus(btn, label = SYNC_BTN_LABEL) {
 document.getElementById('sync-index').addEventListener('click', async () => {
   const ok = confirm(
     'Sync the whole index?\n\n' +
-    'Every document is read again and the index is updated in place — Chat keeps working meanwhile.\n' +
+    'Every document is read again and the index is updated in place — Ask keeps working meanwhile.\n' +
     'The first run can take 10–15 minutes because every document is embedded again.'
   );
   if (!ok) return;
@@ -1890,7 +2180,7 @@ document.getElementById('sync-index').addEventListener('click', async () => {
       const body = await r.json().catch(() => ({}));
       throw new Error(errDetail(body) || ('HTTP ' + r.status));
     }
-    toast('Syncing the index in the background. Chat keeps working.', 'info', 4500);
+    toast('Syncing the index in the background. Ask keeps working.', 'info', 4500);
     _reindexPoll = setInterval(() => pollReindexStatus(btn), 2500);
   } catch (e) {
     btn.disabled = false;
@@ -2313,6 +2603,7 @@ document.getElementById('upload-confirm').addEventListener('click', async () => 
 (async () => {
   await checkHealth();
   setInterval(checkHealth, 30000);
+  askLoadCatalog();
 
   // Preload corpus stats (sidebar badge only)
   try {
