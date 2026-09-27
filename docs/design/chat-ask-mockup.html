@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask the Regulations — design mockup</title>
+<!-- Design mockup for docs/design/chat-ask-redesign.md.
+     Static: it makes no API calls. Data = real answers of POST /chat recorded on 2026-09-27,
+     rerank scores from POST /retrieve for the same questions, titles from data/catalog.json.
+     Document links point to a local server on 127.0.0.1:8000 (they work while it runs). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked-footnote/dist/index.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --lib-paper:#F7F5F0;--lib-sheet:#FFFFFF;--lib-hover:#FBFAF6;
+  --lib-ink:#1F2430;--lib-ink-2:#4A5060;--lib-ink-3:#6A6F78;
+  --lib-rule:#E4DED2;--lib-rule-strong:#CFC7B8;--lib-rule-ui:#8C8579;
+  --lib-navy:#1B3A6B;--lib-navy-2:#13294D;--lib-gold:#C8A24A;
+  --lib-ok:#2F6B3B;--lib-busy:#8A5A00;--lib-bad:#A12A2A;--lib-hl:#FFF1B8;
+  --lib-serif:'Source Serif 4','Noto Serif','Times New Roman',serif;
+  --lib-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.6;color:var(--lib-ink);background:var(--lib-paper);display:flex}
+button{font:inherit}
+.hidden{display:none!important}
+.lib-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.lib-i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* Sidebar: the application's shared sidebar, with the Ask item (D2) */
+#sidebar{width:240px;min-width:240px;background:#1B3A6B;display:flex;flex-direction:column;height:100vh}
+.sb-logo{padding:22px 18px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.14);white-space:nowrap;overflow:hidden}
+.sb-logo-icon{width:40px;height:40px;min-width:40px;border-radius:3px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:3px}
+.sb-logo-icon img{width:100%;height:100%;object-fit:contain}
+.sb-mono{font-family:var(--lib-serif);font-weight:700;font-size:15px;color:#1B3A6B}
+.sb-logo-text .brand{font-family:var(--lib-serif);font-size:21px;font-weight:600;color:#fff;letter-spacing:.02em;line-height:1.1}
+.sb-logo-text .sub{font-size:10.5px;color:rgba(255,255,255,.66);letter-spacing:.09em;text-transform:uppercase;margin-top:3px}
+.sb-nav{padding:14px 0;display:flex;flex-direction:column}
+.sb-item{display:flex;align-items:center;gap:12px;width:100%;padding:10px 20px 10px 18px;border:0;border-left:2px solid transparent;background:none;text-align:left;cursor:pointer;white-space:nowrap;color:rgba(255,255,255,.74);font-size:14px;font-weight:500}
+.sb-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.sb-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--lib-gold)}
+.sb-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;display:block}
+.sb-count{margin-left:auto;font-size:12px;color:rgba(255,255,255,.62)}
+.sb-footer{margin-top:auto;padding:14px 20px;border-top:1px solid rgba(255,255,255,.14);display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.66);font-size:11.5px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#7BC47F}
+
+/* Library components reused as they are */
+.lib-masthead{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap}
+.lib-mast-text{flex:1;min-width:320px}
+.lib-kicker{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--lib-ink-3)}
+.lib-h1{font-family:var(--lib-serif);font-size:34px;line-height:1.15;font-weight:600;letter-spacing:-.005em;margin-top:6px}
+.lib-lede{max-width:64ch;color:var(--lib-ink-2);margin-top:8px;font-size:15px}
+.lib-summary{margin-top:12px;font-size:13px;color:var(--lib-ink-2);font-variant-numeric:tabular-nums}
+.lib-summary b{color:var(--lib-ink);font-weight:600}
+.lib-actions{display:flex;gap:8px;align-items:center;padding-bottom:4px}
+.lib-btn{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border:1px solid var(--lib-rule-ui);border-radius:3px;background:var(--lib-sheet);color:var(--lib-ink);font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer}
+.lib-btn:hover{border-color:var(--lib-ink)}
+.lib-btn:disabled{opacity:.65;cursor:progress}
+.lib-btn-primary{background:var(--lib-navy);border-color:var(--lib-navy);color:#fff}
+.lib-btn-primary:hover{background:var(--lib-navy-2);border-color:var(--lib-navy-2)}
+.lib-btn-quiet{border-color:transparent;background:transparent;color:var(--lib-ink-2);padding:0 8px}
+.lib-btn-quiet:hover{border-color:transparent;color:var(--lib-ink);text-decoration:underline;text-underline-offset:3px}
+.lib-rule{margin:22px 0 26px;border:0;border-top:1px solid var(--lib-ink);border-bottom:1px solid var(--lib-rule-strong);height:4px}
+.lib-link{background:none;border:0;padding:0;font:inherit;color:var(--lib-navy);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+/* ASK — the Chat screen */
+#main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+#screen-chat{flex:1;display:flex;flex-direction:column;min-height:0;background:var(--lib-paper);color:var(--lib-ink)}
+#screen-chat :focus-visible{outline:2px solid var(--lib-navy);outline-offset:2px}
+.ask-scroll{flex:1;overflow-y:auto}
+.ask-page{max-width:1280px;margin:0 auto;padding:30px 40px 40px}
+.ask-grid{display:grid;grid-template-columns:minmax(0,760px) 360px;gap:40px;align-items:start}
+.ask-col{min-width:0}
+.ask-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--lib-ink-3)}
+.ask-label.bad{color:var(--lib-bad)}
+.ask-common{list-style:none;border-top:1px solid var(--lib-ink);margin-top:8px}
+.ask-common li{border-bottom:1px solid var(--lib-rule)}
+.ask-common button{display:flex;align-items:center;gap:16px;width:100%;padding:13px 10px 13px 2px;border:0;background:none;font-family:var(--lib-serif);font-size:16px;line-height:1.4;color:var(--lib-ink);text-align:left;cursor:pointer}
+.ask-common button:hover{background:var(--lib-hover)}
+.ask-common button:hover span{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.ask-common .lib-i{margin-left:auto;color:var(--lib-ink-3)}
+.ask-common button:hover .lib-i{color:var(--lib-navy)}
+.ask-covers{margin-top:28px}
+.ask-covers p{margin-top:6px;font-size:13px;color:var(--lib-ink-2)}
+.ask-covers .sep{color:var(--lib-rule-ui);margin:0 7px}
+.ask-entry{padding-bottom:30px;border-bottom:1px solid var(--lib-rule-strong);margin-bottom:30px;scroll-margin-top:24px}
+.ask-q{font-family:var(--lib-serif);font-size:20px;font-weight:600;line-height:1.35;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ask-answer{margin-top:20px}
+.ask-status{display:flex;align-items:center;gap:9px;margin-top:20px;font-size:14px;color:var(--lib-busy)}
+.ask-status .mk{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;border-right-color:transparent;animation:spin .9s linear infinite}
+.ask-status .t{color:var(--lib-ink-3);font-variant-numeric:tabular-nums}
+.ask-body{margin-top:8px;font-size:15px;line-height:1.7;color:var(--lib-ink);overflow-wrap:anywhere}
+.ask-body p{margin:10px 0}
+.ask-body ul,.ask-body ol{margin:8px 0 8px 1.4em}
+.ask-body .ask-loc{font-size:14.5px;font-weight:600;line-height:1.45;margin:22px 0 6px}
+.ask-body .ask-loc:first-child{margin-top:4px}
+.ask-body .ask-loc strong{font-weight:600}
+.ask-body .ask-file{display:block;font-family:var(--lib-mono);font-size:11.5px;font-weight:400;color:var(--lib-ink-3);margin-top:1px}
+.ask-body .ask-clause{font-size:12.5px;font-weight:600;color:var(--lib-ink-2);margin:14px 0 4px}
+.ask-body .ask-clause em,.ask-body .ask-clause strong{font-style:normal;font-weight:600}
+.ask-body blockquote{margin:6px 0 14px;padding:1px 0 1px 16px;border-left:2px solid var(--lib-rule-ui);font-family:var(--lib-serif);font-size:16px;line-height:1.65}
+.ask-body blockquote p{margin:6px 0}
+.ask-body blockquote ol,.ask-body blockquote ul{margin:6px 0;padding-left:1.7em}
+.ask-body blockquote strong{font-weight:inherit;background:var(--lib-hl);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 2px}
+.ask-body .ask-note{font-size:12.5px;color:var(--lib-ink-3)}
+.ask-body a.pdf-link{color:var(--lib-navy);text-decoration:underline;text-underline-offset:2px}
+.ask-cite{font-size:13px;font-weight:500;color:var(--lib-navy);text-decoration:none;margin-left:3px;white-space:nowrap}
+.ask-cite:hover{text-decoration:underline;text-underline-offset:2px}
+.ask-nf{font-family:var(--lib-serif);font-size:16px;line-height:1.6;color:var(--lib-ink-2);margin-top:8px}
+.ask-nf-help{font-size:13px;color:var(--lib-ink-3);margin-top:6px}
+.ask-sources{margin-top:22px;border-top:1px solid var(--lib-rule-strong);padding-top:12px}
+.ask-sub{font-size:12.5px;font-weight:600;color:var(--lib-ink-2);margin-top:8px}
+.ask-srcs{list-style:none;margin-top:4px}
+.ask-src{display:grid;grid-template-columns:34px minmax(0,1fr);padding:7px 6px;border-radius:3px;transition:background .6s}
+.ask-src.is-target{background:var(--lib-hl);transition:none}
+.ask-src-n{font-size:13px;color:var(--lib-navy);font-weight:500;font-variant-numeric:tabular-nums;padding-top:1px}
+.ask-src-title{font-family:var(--lib-serif);font-size:15px;font-weight:600;line-height:1.35;color:var(--lib-ink);text-decoration:none}
+.ask-src-title:hover{color:var(--lib-navy);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.ask-src-meta{font-size:12.5px;color:var(--lib-ink-2);margin-top:2px}
+.ask-src-meta .sep,.ask-pass-meta .sep{color:var(--lib-rule-ui);margin:0 6px}
+.ask-src-file{font-family:var(--lib-mono);font-size:11.5px;color:var(--lib-ink-3);margin-top:1px;overflow-wrap:anywhere}
+.ask-src-file .ft{font-family:'Inter',system-ui,sans-serif;font-size:10.5px;letter-spacing:.06em;margin-left:8px}
+.ask-src-raw{font-family:var(--lib-mono);font-size:11.5px;color:var(--lib-ink-3);padding:4px 6px 4px 40px}
+.ask-more{margin-top:4px}
+.ask-more>summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--lib-ink-2);list-style:none;padding:6px 0;width:max-content}
+.ask-more>summary::-webkit-details-marker{display:none}
+.ask-more>summary::before{content:'\25B8';display:inline-block;width:14px;color:var(--lib-ink-3)}
+.ask-more[open]>summary::before{content:'\25BE'}
+.ask-more>summary:hover{color:var(--lib-ink);text-decoration:underline;text-underline-offset:3px}
+.ask-actions{display:flex;gap:4px;margin-top:14px;margin-left:-8px;flex-wrap:wrap}
+.ask-actions .lib-btn[aria-expanded="true"]{color:var(--lib-ink);text-decoration:underline;text-underline-offset:3px}
+.ask-err{font-size:14px;color:var(--lib-bad);margin-top:8px}
+.ask-err-detail{font-family:var(--lib-mono);font-size:11.5px;color:var(--lib-ink-2);background:var(--lib-sheet);border:1px solid var(--lib-rule);border-radius:3px;padding:8px 10px;margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ask-panel{position:sticky;top:18px;max-height:calc(100vh - 170px);display:flex;flex-direction:column;background:var(--lib-sheet);border:1px solid var(--lib-rule-strong);border-radius:3px;min-width:0}
+.ask-panel-h{display:flex;align-items:flex-start;gap:10px;padding:14px 12px 10px 16px;border-bottom:1px solid var(--lib-ink)}
+.ask-panel-h h2{font-family:var(--lib-serif);font-size:17px;font-weight:600;line-height:1.3}
+.ask-panel-h h2:focus{outline:none}
+.ask-panel-h p{font-size:12px;color:var(--lib-ink-3);margin-top:2px}
+.ask-x{margin-left:auto;width:30px;height:30px;min-width:30px;display:flex;align-items:center;justify-content:center;border:0;background:none;border-radius:3px;color:var(--lib-ink-3);cursor:pointer}
+.ask-x:hover{color:var(--lib-ink);background:var(--lib-rule)}
+.ask-panel-b{overflow-y:auto;padding:0 16px 12px}
+.ask-panel-empty{padding:28px 0;color:var(--lib-ink-3);font-size:13px}
+.ask-pass{display:grid;grid-template-columns:26px minmax(0,1fr);padding:12px 0;border-bottom:1px solid var(--lib-rule)}
+.ask-pass:last-child{border-bottom:0}
+.ask-pass-n{font-size:12.5px;color:var(--lib-ink-3);font-variant-numeric:tabular-nums;padding-top:1px}
+.ask-pass-title{font-family:var(--lib-serif);font-size:15px;font-weight:600;line-height:1.35;color:var(--lib-ink);text-decoration:none}
+.ask-pass-title:hover{color:var(--lib-navy);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.ask-pass-meta{display:flex;align-items:baseline;flex-wrap:wrap;font-size:12px;color:var(--lib-ink-2);margin-top:2px}
+.ask-score{margin-left:auto;padding-left:10px;font-family:var(--lib-mono);font-size:11px;color:var(--lib-ink-3);white-space:nowrap}
+.ask-pass-text{font-size:13px;line-height:1.6;color:var(--lib-ink-2);margin-top:6px;white-space:pre-line;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.ask-pass-text.open{display:block}
+.ask-pass-more{margin-top:3px;font-size:12px}
+.ask-composer{border-top:1px solid var(--lib-rule-strong);background:var(--lib-paper)}
+.ask-composer-in{max-width:1280px;margin:0 auto;padding:12px 40px 10px}
+.ask-box{max-width:760px;display:flex;align-items:flex-end;gap:8px;background:var(--lib-sheet);border:1px solid var(--lib-rule-ui);border-radius:3px;padding:5px 5px 5px 14px}
+.ask-box:focus-within{outline:2px solid var(--lib-navy);outline-offset:-1px;border-color:var(--lib-navy)}
+#chat-input{flex:1;border:0;outline:0;resize:none;background:transparent;font:inherit;font-size:15px;line-height:1.55;color:var(--lib-ink);min-height:34px;max-height:160px;padding:6px 0}
+#chat-input::placeholder{color:var(--lib-ink-3)}
+.ask-hint{max-width:760px;margin-top:6px;font-size:12px;color:var(--lib-ink-3)}
+.ask-hint kbd{font-family:var(--lib-mono);font-size:11px;border:1px solid var(--lib-rule-strong);border-radius:3px;padding:0 5px;background:var(--lib-sheet);color:var(--lib-ink-2)}
+.mock-bar{position:fixed;bottom:104px;right:14px;z-index:900;display:flex;align-items:center;gap:6px;background:var(--lib-sheet);border:1px solid var(--lib-rule-strong);border-radius:3px;padding:5px 8px;font-size:12px;color:var(--lib-ink-3);box-shadow:0 2px 10px rgba(31,36,48,.08)}
+.mock-bar button{border:1px solid var(--lib-rule-strong);background:var(--lib-paper);border-radius:3px;padding:2px 8px;font-size:12px;color:var(--lib-ink-2);cursor:pointer}
+.mock-bar button[aria-pressed="true"]{background:var(--lib-navy);border-color:var(--lib-navy);color:#fff}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:1439px){
+  .ask-grid{grid-template-columns:minmax(0,760px)}
+  .ask-panel{position:fixed;right:0;top:0;bottom:0;width:380px;max-height:none;z-index:400;border:0;border-left:1px solid var(--lib-rule-strong);border-radius:0;box-shadow:0 6px 24px rgba(31,36,48,.12)}
+}
+@media (max-width:900px){
+  #sidebar{width:68px;min-width:68px}
+  .sb-logo{padding:18px 14px}
+  .sb-logo-text,.sb-label,.sb-count,.sb-footer span{display:none}
+  .ask-page{padding:22px 18px 32px}
+  .ask-composer-in{padding:10px 18px 8px}
+}
+@media (max-width:640px){
+  .lib-h1{font-size:27px}
+  .lib-mast-text{min-width:0}
+  .ask-q{font-size:18px}
+  .ask-panel{width:100%}
+  .mock-bar{bottom:128px}
+}
+@media (prefers-reduced-motion:reduce){.ask-status .mk{animation:none}.ask-src{transition:none}}
+</style>
+</head><body>
+<div class="mock-bar" role="group" aria-label="Mockup states">
+  <span>Mockup:</span>
+  <button type="button" data-state="empty">Empty</button>
+  <button type="button" data-state="conversation" aria-pressed="true">Conversation</button>
+  <button type="button" data-state="waiting">Waiting</button>
+  <button type="button" data-state="error">Error</button>
+</div>
+
+<aside id="sidebar" aria-label="Main navigation">
+  <div class="sb-logo">
+    <div class="sb-logo-icon"><img src="../../img/Logo-HCMIU.svg" alt="HCMIU" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'sb-mono',textContent:'IU'}))"></div>
+    <div class="sb-logo-text"><div class="brand">ARRS</div><div class="sub">IU Academic Assistant</div></div>
+  </div>
+  <nav class="sb-nav">
+    <button type="button" class="sb-item active" title="Ask the Regulations" aria-current="page">
+      <span class="sb-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3.5V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M9.9 8.9a2.1 2.1 0 1 1 2.9 1.95c-.5.2-.8.6-.8 1.1v.25"/><path d="M12 13.9h.01"/></svg></span><span class="sb-label">Ask</span>
+    </button>
+    <button type="button" class="sb-item" title="Regulation Library">
+      <span class="sb-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6.5C10.5 5.2 8.3 4.5 5 4.5v13c3.3 0 5.5.7 7 2 1.5-1.3 3.7-2 7-2v-13c-3.3 0-5.5.7-7 2z"/><path d="M12 6.5v13"/></svg></span><span class="sb-label">Library</span><span class="sb-count">34</span>
+    </button>
+  </nav>
+  <div class="sb-footer"><div class="status-dot"></div><span>System online</span></div>
+</aside>
+
+<div id="main">
+  <section class="screen active" id="screen-chat" aria-label="Ask the Regulations">
+    <div class="ask-scroll" id="chat-history">
+      <div class="ask-page">
+        <header class="lib-masthead">
+          <div class="lib-mast-text">
+            <p class="lib-kicker">International University · VNU-HCM</p>
+            <h1 class="lib-h1">Ask the Regulations</h1>
+            <p class="lib-lede">Ask in Vietnamese. Each answer quotes the articles and clauses of the regulations in the Library, with the page they come from. Answers are quoted from the regulations, not generated.</p>
+            <p class="lib-summary" id="ask-scope"></p>
+          </div>
+          <div class="lib-actions">
+            <button type="button" class="lib-btn hidden" id="clear-chat"></button>
+          </div>
+        </header>
+        <hr class="lib-rule">
+
+        <div class="ask-grid">
+          <div class="ask-col">
+            <div id="chat-welcome">
+              <h2 class="ask-label" id="ask-common-h">Common questions</h2>
+              <ul class="ask-common" aria-labelledby="ask-common-h">
+                <li><button type="button" onclick="sendSuggest(this)"><span class="sq-text">Điều kiện xét học bổng khuyến khích học tập là gì?</span><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" onclick="sendSuggest(this)"><span class="sq-text">Sinh viên vi phạm thi hộ lần đầu bị xử lý như thế nào?</span><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" onclick="sendSuggest(this)"><span class="sq-text">Thời gian tối đa hoàn thành chương trình đại học là bao lâu?</span><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button></li>
+                <li><button type="button" onclick="sendSuggest(this)"><span class="sq-text">Điều kiện để được xét tốt nghiệp sớm?</span><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button></li>
+              </ul>
+              <div class="ask-covers" id="ask-covers">
+                <h2 class="ask-label">The search covers</h2>
+                <p id="ask-covers-list"></p>
+              </div>
+            </div>
+            <div id="chat-messages"></div>
+          </div>
+
+          <aside class="ask-panel hidden" id="source-panel" aria-labelledby="sp-title">
+            <div class="ask-panel-h">
+              <div>
+                <h2 id="sp-title" tabindex="-1">Passages consulted</h2>
+                <p id="sp-sub"></p>
+              </div>
+              <button type="button" class="ask-x" id="sp-close" aria-label="Close"><svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+            </div>
+            <div class="ask-panel-b" id="sp-body"><p class="ask-panel-empty">Ask a question to see the passages consulted.</p></div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <div class="ask-composer">
+      <div class="ask-composer-in">
+        <label for="chat-input" class="lib-sr">Your question</label>
+        <div class="ask-box">
+          <textarea id="chat-input" rows="1" placeholder="Ask about any IU or MOET regulation…"></textarea>
+          <button type="button" class="lib-btn lib-btn-primary" id="chat-send"></button>
+        </div>
+        <p class="ask-hint"><kbd>Enter</kbd> to ask · <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line · Answers are quoted from the regulations, not generated.</p>
+      </div>
+    </div>
+  </section>
+</div>
+<div id="ask-live" class="lib-sr" aria-live="polite"></div><script type="application/json" id="mock-data">{"entries": [{"question": "Điều kiện xét học bổng khuyến khích học tập là gì?", "answer": "**Điều 29, Khoản 6 – Sử dụng kết quả rèn luyện** [1]\n\n> 6. Để xét cấp học bổng tài trợ của các tổ chức và doanh nghiệp và xét học bổng khuyến khích học kỳ sinh viên phải đạt ĐRL từ mức Tốt 80 điểm trở lên.\n\n---\n**Tài liệu đính kèm:**\n[1]: Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf — trang 26\n[2]: 16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf — trang 1\n[3]: 43/2019/QH14 – 32.Luat-Giao-duc-2019.pdf — trang 33\n[4]: 953/QD-DHQG – 20.-2019-Quy-che-CTSV-DHQG-HCM.pdf — trang 7\n[5]: 9.-QD688-MGHP-2024.pdf — trang 8", "elapsed": 12.887, "sources": [{"chunk_id": "7f495cfd8b1d4275", "source": "Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf", "page": 26, "text": "6. Để xét cấp học bổng tài trợ của các tổ chức và doanh nghiệp và xét học bổng \nkhuyến khích học kỳ sinh viên phải đạt ĐRL từ mức Tốt 80 điểm trở lên.", "article": "29", "khoan": "6", "level_labels": null, "language": null, "score_rerank": 0.7703770399093628}, {"chunk_id": "27fe6c0a540ac86b", "source": "16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf", "page": 1, "text": "Điều 14. Căn cứ, thời điểm và số lần xét cấp HBTS\n1. Căn cứ để xét duy trì HBTS \na) Căn cứ điểm trung bình học tập và xếp loại điểm rèn luyện học kỳ I để xét duy \ntrì học bổng cho học kỳ II. \nb) Căn cứ điểm trung bình học tập và xếp loại điểm rèn luyện học kỳ II để xét duy \ntrì học bổng cho học kỳ I năm kế tiếp. \nc) Căn cứ điểm trung bình học tập học kỳ III để xét duy trì học bổng cho chính \nhọc kỳ III. Điểm trung bình của học kỳ II được tách riêng với điểm trung bình học kỳ \nIII. Học kỳ III không xét điểm rèn luyện.", "article": "14", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.08017294108867645}, {"chunk_id": "af95102fc156c1b8", "source": "16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf", "page": 3, "text": "2. Sinh viên thuộc diện hưởng học bổng chính sách, trợ cấp xã hội, chính sách ưu \nđãi theo quy định hiện hành nếu đạt kết quả học tập, rèn luyện đủ điều kiện được xét, \ncấp học bổng khuyến khích học tập tại quy định này thì được xét, cấp học bổng khuyến \nkhích học tập như những sinh viên khác.", "article": "2", "khoan": "2", "level_labels": null, "language": null, "score_rerank": 0.0769314095377922}, {"chunk_id": "11318540d05ecf0f", "source": "32.Luat-Giao-duc-2019.pdf", "page": 33, "text": "Điều 85. Học bỗng, trợ cấp xã hội, miễn, giảm học phí, hỗ trợ tiền đóng\nhọc phí và chi phí sinh hoạt\n1. Nhà nước có chính sách cấp học bổng khuyến khích học tập cho học sinh\nđạt kết quả học tập xuất sắc ở trường chuyền, trường năng khiêu quy định tại Điêu\n62 của Luật này và người học có kết quả học tập, rèn luyện từ loại khá trở lên ở\ncơ sở giáo dục nghê nghiệp, cơ sở giáo dục đại học; cap học bông chính sách cho\nsinh viên hệ cử tuyên, học sinh trường dự bị đại học, trường phô thông dân tộc nội\ntrú, người học trong cơ sở giáo dục nghệ nghiệp dành cho thương binh, người\nkhuyết tật.\n\n_ 2. Nhà nước có chính sách trợ cấp và miễn, giảm học phí cho người học là\ndoi tượng được hưởng chính sách xã hội, người dân tộc thiêu sô ở vùng có điêu\nkiện kinh tê - xã hội đặc biệt khó khăn, trẻ mô côi, trẻ e", "article": "85", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.06588456779718399}, {"chunk_id": "2776d4793cff081e", "source": "16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf", "page": 4, "text": "Điều 4. Quỹ học bổng khuyến khích học tập \nQuỹ học bổng khuyến khích học tập được bố trí tối thiểu bằng 8% nguồn thu học \nphí hệ giáo dục chính quy của nhà trường.", "article": "4", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.05128130316734314}, {"chunk_id": "df4aa6cdde9f7ee6", "source": "16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf", "page": 10, "text": "Phần III \nHỌC BỔNG TUYỂN SINH \nChương I \nĐIỀU KIỆN, SỐ LẦN XÉT CẤP HỌC BỔNG TUYỂN SINH", "article": "", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.049847833812236786}, {"chunk_id": "651f5c357890ca13", "source": "16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf", "page": 1, "text": "Điều 5. Hội đồng xét cấp học bổng khuyến khích học tập:\n1. Thẩm quyền thành lập: \na) Nhà trường ban hành Quyết định thành lập Hội đồng xét cấp HBKKHT và chấm \ndứt hoạt động khi Hiệu trưởng ban hành Quyết định công nhận kết quả HBKKHT. \nb) Hội đồng xét cấp HBKKHT do Hiệu trưởng hoặc Phó Hiệu trưởng được Hiệu \ntrưởng ủy quyền ký Quyết định thành lập.", "article": "5", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.028863059356808662}, {"chunk_id": "f7c55fe2c449bb00", "source": "20.-2019-Quy-che-CTSV-DHQG-HCM.pdf", "page": 7, "text": "4. Được hưởng các chế độ, chính sách, được xét nhận học bổng khuyến khích\nhọc tập, học bổng do các tổ chức, cá nhân trong và ngoài nước tài trợ theo quy định\nhiện hành.", "article": "7", "khoan": "4", "level_labels": null, "language": null, "score_rerank": 0.009263111278414726}, {"chunk_id": "efaea96dac21312a", "source": "9.-QD688-MGHP-2024.pdf", "page": 8, "text": "Điều 8. Thời gian xét miễn, giảm học phí \n1. Thời gian xét MGHP cho sinh viên thực hiện theo thời gian thiết kế chương trình đào \ntạo của Quy chế đề án tuyển sinh. 2. Thời gian giải quyết xét và chi trả kết quả MGHP diễn ra trong vòng 10 ngày làm \nviệc tính từ thời gian sau khi nhận được đơn đề nghị MGHP và sau nhận được kết quả học \nbổng khuyến khích học tập và học bổng tuyển sinh từ Phòng ĐTĐH.", "article": "8", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.00629218528047204}, {"chunk_id": "3ca11a80930c8d1d", "source": "32.Luat-Giao-duc-2019.pdf", "page": 33, "text": "4. Học sinh, sinh viên sư phạm được hỗ trợ tiền đóng học phí và chỉ phí\nsinh hoạt trong toàn khóa học. Người được hỗ trợ tiên đóng học phí và chi phí\nsinh hoạt sau 02 năm kê từ khi tốt nghiệp nêu không công tác trong ngành giáo\ndục hoặc công tác không đủ thời gian quy định thì phải bôi hoàn khoản kinh phí\nmà Nhà nước đã hỗ trợ. Thời hạn hoàn trả tôi đa băng thời gian đào tạo.\n\n|\n\nHọc sinh, sinh viên sư phạm được hưởng các chính sách học bổng khuyến\nkhích học tập, trợ cap xã hội, miễn, giảm học phí quy định tại khoản 1 và khoản 2\nĐiêu này.", "article": "85", "khoan": "4", "level_labels": null, "language": null, "score_rerank": 0.0011480230605229735}]}, {"question": "Sinh viên vi phạm thi hộ lần đầu bị xử lý như thế nào?", "answer": "**1. 3.-Phu-luc-1-30122022-Signed-2.pdf** [1]\n> Thời hạn đình chỉ học tập đươc quy định tùy theo mức độ của hành vi vi phạm. **Riêng đối với hành vi thi hộ, học hộ (thi thay, học thay) sinh viên bị kỷ luật ở mức đình chỉ học tập 01 năm đối với trường hợp vi phạm lần thứ nhất và buộc thôi học đối với trường hợp vi phạm lần thứ hai.**\n\n**2. Điều 28 – Xử lý sinh viên vi phạm quy chế tổ chức thi** [2]\n\n*Khoản 1:*\n> 1.2  Cảnh cáo Áp dụng đối với những SV vi phạm một trong các lỗi sau đây: - Đã bị khiến trách một lần nhưng trong giờ thi học phần đó vẫn tiếp tục vi phạm quy định về tổ chức thi; - Trao đổi tài liệu, bài làm hoặc giấy nháp với người khác; - Chép bài của người khác hoặc để người khác chép bài của mình.\n 1.3 Đình chỉ thi - Đã bị cảnh cáo một lần trong giờ thi học phần đó nhưng vẫn tiếp tục vi phạm quy định; - Khi vào phòng thi mang theo tài liệu, phương tiện bị cấm được quy định tại Khoản 3, 4, 5 Điều 15 của Quy chế này; - Đưa đề thi ra ngoài phòng thi hoặc nhận bài giải từ ngoài vào phòng thi; - Viết vẽ những nội dung không liên quan đến bài thi; - Có hành động gây rối, có lời nói, cử chỉ đe dọa, xúc phạm CBCT hoặc đe dọa SV khác; không chấp hành yêu cầu của CBCT liên quan đến kỷ luật phòng thi.\n 16  \n Sinh viên bị đình chỉ thi phải ra khỏi phòng thi ngay sau khi biên bản được lập; phải nộp bài làm và đề thi cho CBCT. 1.4   Trừ điểm bài thi a) Sinh viên bị xử lý khiển trách sẽ bị trừ 25% số điểm thi của học phần dự thi. b) Sinh viên bị xử lý kỷ luật cảnh cáo sẽ bị trừ 50% số điểm thi của học phần dự thi. c) Những bài thi có đánh dấu bị phát hiện trong khi chấm sẽ bị trừ 50% điểm toàn bài.\n d) Cho điểm 0 (không): - Bài thi được chép từ các tài liệu mang trái phép vào phòng thi; - Có hai bài làm trở lên đối với một bài thi; - Bài thi có chữ viết của hai người trở lên; - Những phần của bài thi viết trên giấy nháp, giấy không đúng quy định.\n **đ) Sinh viên bị đình chỉ thi sẽ bị điểm 0 (không) học phần dự thi 1.5 Xử lý sinh viên thi hộ, nhờ người khác thi hộ, dùng bài thi của người khác để nộp - Nếu vi phạm lần thứ nhất (trong toàn khóa học):** Sinh viên nhờ thi hộ: nhận điểm 0 (không) của học phần đó và bị đình chỉ học tập 01 năm kể từ ngày vi phạm; Người thi hộ: nếu là sinh viên của Trường ĐHQT, ĐHQG – HCM thì bị đình chỉ học tập 01 năm kể từ ngày vi phạm.\n Nếu người thi hộ không phải là SV của Trường, Nhà trường sẽ thông báo nội dung vi phạm về nơi học tập/cư trú của người đó. - Nếu vi phạm lần thứ hai (trong toàn khóa học): cả SV nhờ thi hộ và người thi hộ (nếu là SV của Trường ĐHQT, ĐHQG – HCM) đều bị buộc thôi học. Nếu người thi hộ không phải là SV của Trường, Nhà trường thông báo nội dung vi phạm về nơi học tập/cư trú của người đó.\n - Khi phát hiện sinh viên đi thi hộ hoặc nhờ người khác thi hộ, CBCT lập biên bản thu giữ giấy tờ tùy thân, thẻ sinh viên và yêu cầu sinh viên đến gặp Trưởng phòng BĐCLGD&KT.\n\n**3. Điều 20 – Xử lý vi phạm đối với sinh viên** [3]\n\n*Khoản 2:*\n> 2. Sinh viên thi hộ hoặc nhờ người thi hộ đều bị kỷ luật ở mức đình chỉ học tập 01 năm đối với trường hợp vi phạm lần thứ nhất và buộc thôi học đối với trường hợp vi phạm lần thứ hai.\n\n**4. Điều 41 – Xử lý vi phạm** [4]\n\n*Khoản 1:*\n> Sinh viên đi thi hộ hoặc nhờ người thi hộ đều bị kỷ luật ở mức đình chi học tập và xóa tên khỏi danh sách sinh viên.\n\n---\n**Tài liệu đính kèm:**\n[1]: 3.-Phu-luc-1-30122022-Signed-2.pdf — trang 1\n[2]: 17.-Quy-che_To-chuc-thi-HK_Tr-Tiep.ban-hanh_05.01.25-Signed-8.pdf — trang 18\n[3]: 15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf — trang 23\n[4]: 1524/QĐÐ-ĐHQG – 25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf — trang 21", "elapsed": 14.725, "sources": [{"chunk_id": "497bfabd6925e16f", "source": "3.-Phu-luc-1-30122022-Signed-2.pdf", "page": 1, "text": "Thời hạn đình chỉ học tập đươc quy định tùy theo mức độ của hành vi vi phạm. Riêng đối với hành vi thi hộ, học hộ (thi thay, học thay) sinh viên bị kỷ luật ở mức đình chỉ học tập 01 năm đối với trường hợp vi phạm lần thứ nhất và buộc thôi học đối với trường hợp vi phạm lần thứ hai.", "article": "", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.9291595816612244}, {"chunk_id": "398058a9b0738b39", "source": "17.-Quy-che_To-chuc-thi-HK_Tr-Tiep.ban-hanh_05.01.25-Signed-8.pdf", "page": 18, "text": "1.2  Cảnh cáo \nÁp dụng đối với những SV vi phạm một trong các lỗi sau đây: \n- Đã bị khiến trách một lần nhưng trong giờ thi học phần đó vẫn tiếp tục vi phạm quy \nđịnh về tổ chức thi; \n- Trao đổi tài liệu, bài làm hoặc giấy nháp với người khác; \n- Chép bài của người khác hoặc để người khác chép bài của mình.\n\n1.3 Đình chỉ thi \n- Đã bị cảnh cáo một lần trong giờ thi học phần đó nhưng vẫn tiếp tục vi phạm quy \nđịnh; \n- Khi vào phòng thi mang theo tài liệu, phương tiện bị cấm được quy định tại Khoản \n3, 4, 5 Điều 15 của Quy chế này; \n- Đưa đề thi ra ngoài phòng thi hoặc nhận bài giải từ ngoài vào phòng thi; \n- Viết vẽ những nội dung không liên quan đến bài thi; \n- Có hành động gây rối, có lời nói, cử chỉ đe dọa, xúc phạm CBCT hoặc đe dọa SV \nkhác; không chấp hành yêu cầu của CBCT liên quan đến", "article": "28", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.902572512626648}, {"chunk_id": "4391a7a18ed4c9de", "source": "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf", "page": 23, "text": "2. Sinh viên thi hộ hoặc nhờ người thi hộ đều bị kỷ luật ở mức đình chỉ học tập 01 năm đối với \ntrường hợp vi phạm lần thứ nhất và buộc thôi học đối với trường hợp vi phạm lần thứ hai.", "article": "20", "khoan": "2", "level_labels": null, "language": null, "score_rerank": 0.7778850197792053}, {"chunk_id": "6a701717d870962c", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 21, "text": "Sinh viên đi thi hộ hoặc nhờ người thi hộ đều bị kỷ luật ở mức đình\nchi học tập và xóa tên khỏi danh sách sinh viên.", "article": "41", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.36257481575012207}, {"chunk_id": "62292a963dfd3f0a", "source": "3.-Phu-luc-1-30122022-Signed-2.pdf", "page": 2, "text": "Tùy theo tính chất, mức độ hành vi vi phạm sẽ bị xem xét xử lý theo quy định về xử lý thí sinh vi phạm tại Quy chế thi tốt nghiệp Trung học phổ thông hiện hành, riêng hình thức xử lý đình chỉ học tập và buộc thôi học không áp dụng trong trường hợp này và hành vi liên quan đến việc thi hộ, học hộ bị áp dụng xử lý theo quy định tại mục 7 và 8 của Phụ lục này.", "article": "", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.1458657830953598}, {"chunk_id": "f482428eeb098939", "source": "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf", "page": 1, "text": "Điều 20. Xử lý vi phạm đối với sinh viên\n1. Sinh viên có gian lận trong thi, kiểm tra, đánh giá kết quả học tập sẽ bị xử lý kỷ luật đối với \ntừng học phần đã vi phạm theo các quy định của Quy chế thi tốt nghiệp Trung học phổ thông hiện \nhành do Bộ Giáo dục và Đào tạo ban hành, trừ trường hợp quy định tại khoản 2 Điều này.", "article": "20", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.09187769889831543}, {"chunk_id": "6d2f24e2c27ba614", "source": "17.-Quy-che_To-chuc-thi-HK_Tr-Tiep.ban-hanh_05.01.25-Signed-8.pdf", "page": 1, "text": "Điều 28. Xử lý sinh viên vi phạm quy chế tổ chức thi\n1. Hình thức xử lý SV dự thi vi phạm quy chế \n1.1  Khiển trách \nÁp dụng đối với những SV phạm một trong các lỗi sau: \n- Nhìn bài của người khác, trao đổi bài; \n- Tiếp tục làm bài sau khi đã hết thời gian làm bài.", "article": "28", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.014099049381911755}, {"chunk_id": "d3cc2ebf14fea227", "source": "3.-Phu-luc-1-30122022-Signed-2.pdf", "page": 1, "text": "MỘT SỐ NỘI DUNG VI PHẠM VÀ KHUNG XỬ LÝ KỶ LUẬT SINH VIÊN [Bảng 1 · trang 1 · dòng 7] TT: 7. Nội dung vi phạm: Đi học thay người khác hoặc nhờ người khác đi học thay; thi, kiểm tra thay người khác hoặc nhờ người khác thi, kiểm tra thay; làm thay người khác hoặc nhờ người khác làm thay đồ án, khóa luận, tiểu luận hoặc sao chép tiểu luận, đồ án, khóa luận của người khác. Số lần vi phạm và hình thức xử lý (Số lần tính trong cả khoá học) — Đình chỉ học tập có thời hạn: Lần 1 Số lần vi phạm và hình thức xử lý (Số lần tính trong cả khoá học) — Buộc thôi học: Lần 2 Ghi chú: Tuỳ theo mức độ, xử lý từ khiển trách đến buộc thôi học;", "article": "", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.0052269198931753635}, {"chunk_id": "cf9df67c64a429d6", "source": "3.-Phu-luc-1-30122022-Signed-2.pdf", "page": 6, "text": "MỘT SỐ NỘI DUNG VI PHẠM VÀ KHUNG XỬ LÝ KỶ LUẬT SINH VIÊN [Bảng 1 · trang 6 · dòng 42] TT: 42. Nội dung vi phạm — tư của người khác: Nhặt được của rơi không trả lại người bị mất, trả lại nhưng đòi tiền chuộc. Số lần vi phạm và hình thức xử lý (Số lần tính trong cả khoá học) — Cảnh cáo: l Số lần vi phạm và hình thức xử lý (Số lần tính trong cả khoá học): Tài sản ≤ 10 lần mức ương cơ sở Số lần vi phạm và hình thức xử lý (Số lần tính trong cả khoá học) — Đình chỉ học tập có thời hạn: Tài sản > 10 lần mức lương cơ sở Số lần vi phạm và hình thức xử lý (Số lần tính trong cả khoá học) — Buộc thôi học: Tài sản thuộc di tích lịch sử, văn hóa", "article": "", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.0021540431771427393}]}, {"question": "Thời gian tối đa hoàn thành chương trình đại học là bao lâu?", "answer": "**1. Điều 2 – Chương trình đào tạo và thời gian học tập** [1]\n\n*Khoản 10:*\n> 10. **Thời gian tối đa để sinh viên hoàn thành chương trình đào tạo là 1,5 lần thời gian theo kế hoạch học tập chuẩn toàn khoá.** Các trường hợp đặc biệt được kéo dài thời gian đào tạo do Hiệu trưởng xem xét quyết định, nhưng không vượt quá 02 lần thời gian theo kế hoạch học tập chuẩn toàn khoá.\n Đối với sinh viên đã tốt nghiệp một văn bằng trình độ đại học và đã được miễn trừ khối lượng tín chỉ tích lũy, thời gian tối đa để sinh viên hoàn thành khóa học được xác định trên cơ sở thời gian theo kế hoạch học tập chuẩn toàn khoá giảm tương ứng với khối lượng được miễn trừ.\n\n**2. Điều 17 – Chuyển ngành, chuyển nơi học, chuyển cơ sở đào tạo, chuyển hình thức học** [1]\n\n*Khoản 7:*\n> 7. Thời gian tối đa được phép học đối với sinh viên chuyển trường là thời gian tối đa hoàn thành khóa học được quy định tại khoản 10 Điều 2 của Quy chế này.\n\n**3. Điều 7 – Thời gian thiết kế va tong số tín chi tích lũy tối thiểu** [2]\n\n*Khoản 2:*\n> 2. **Thời gian tối đa hoàn thành chương trình đào tạo theo thiết kế là 2 lần thời gian thiết kế của chương trình đào tạo.** Đối với sinh viên học liên thông đã được miễn trừ khối lượng tín chỉ tích lũy, thời gian tối đa để sinh viên hoàn thành khóa học được xác định trên cơ sở thời gian thiết kế giảm tương ứng với khối lượng được miễn trừ.\n\n**4. Điều 17 – Học cùng lúc hai chương trình đào tạo** [2]\n\n*Khoản 3:*\n> 3. **Thời gian tối đa được phép học đối với sinh viên học cùng lúc hai chương trình là thời gian tối đa quy định cho chương trình thứ nhất, quy định tại Điều 7 của Quy chế này.** Khi học chương trình thứ hai, sinh viên được công nhận kết quả của những học - phần có nội dung và khối lượng kiến thức tương đương có trong chương trình thứ nhất.\n : 10\n\n---\n**Tài liệu đính kèm:**\n[1]: 15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf — trang 5\n[2]: 1524/QĐÐ-ĐHQG – 25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf — trang 5", "elapsed": 11.537, "sources": [{"chunk_id": "4d89428305577a6d", "source": "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf", "page": 5, "text": "10. Thời gian tối đa để sinh viên hoàn thành chương trình đào tạo là 1,5 lần thời gian theo kế \nhoạch học tập chuẩn toàn khoá. Các trường hợp đặc biệt được kéo dài thời gian đào tạo do Hiệu \ntrưởng xem xét quyết định, nhưng không vượt quá 02 lần thời gian theo kế hoạch học tập chuẩn toàn \nkhoá.\n\nĐối với sinh viên đã tốt nghiệp một văn bằng trình độ đại học và đã được miễn trừ khối lượng \ntín chỉ tích lũy, thời gian tối đa để sinh viên hoàn thành khóa học được xác định trên cơ sở thời gian \ntheo kế hoạch học tập chuẩn toàn khoá giảm tương ứng với khối lượng được miễn trừ.", "article": "2", "khoan": "10", "level_labels": null, "language": null, "score_rerank": 0.250443696975708}, {"chunk_id": "5792e5b25164008f", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 5, "text": "2. Thời gian tối đa hoàn thành chương trình đào tạo theo thiết kế là 2 lần thời gian\nthiết kế của chương trình đào tạo. Đối với sinh viên học liên thông đã được miễn trừ\nkhối lượng tín chỉ tích lũy, thời gian tối đa để sinh viên hoàn thành khóa học được xác\nđịnh trên cơ sở thời gian thiết kế giảm tương ứng với khối lượng được miễn trừ.", "article": "7", "khoan": "2", "level_labels": null, "language": null, "score_rerank": 0.16017816960811615}, {"chunk_id": "8f010b1d6932aef7", "source": "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf", "page": 22, "text": "7. Thời gian tối đa được phép học đối với sinh viên chuyển trường là thời gian tối đa hoàn thành \nkhóa học được quy định tại khoản 10 Điều 2 của Quy chế này.", "article": "17", "khoan": "7", "level_labels": null, "language": null, "score_rerank": 0.008534927852451801}, {"chunk_id": "48671e408ef3b7ca", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 10, "text": "3. Thời gian tối đa được phép học đối với sinh viên học cùng lúc hai chương trình\nlà thời gian tối đa quy định cho chương trình thứ nhất, quy định tại Điều 7 của Quy chế\nnày. Khi học chương trình thứ hai, sinh viên được công nhận kết quả của những học -\nphần có nội dung và khối lượng kiến thức tương đương có trong chương trình thứ nhất.\n\n: 10", "article": "17", "khoan": "3", "level_labels": null, "language": null, "score_rerank": 0.006192969623953104}, {"chunk_id": "e1888957fce06152", "source": "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf", "page": 21, "text": "4. Thời gian tối đa được phép học đối với sinh viên chuyển đổi ngành, chương trình đào tạo là \nthời gian tối đa hoàn thành khóa học được quy định tại khoản 10 Điều 2 của Quy chế này.", "article": "17", "khoan": "4", "level_labels": null, "language": null, "score_rerank": 0.005811602808535099}, {"chunk_id": "ef45351abb4cf6c6", "source": "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf", "page": 23, "text": "4. Thời gian tối đa được phép học đối với sinh viên học cùng lúc hai chương trình là thời gian \ntối đa quy định cho chương trình thứ nhất, quy định tại khoản 10 Điều 2 của Quy chế này. Khi học \nchương trình thứ hai, sinh viên được công nhận kết quả của những học phần có nội dung và khối \nlượng kiến thức tương đương hoặc thay thế có trong chương trình thứ nhất.", "article": "19", "khoan": "4", "level_labels": null, "language": null, "score_rerank": 0.004814667161554098}, {"chunk_id": "4cf4d97857c28079", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 18, "text": "4. Sinh viên đã hết thời gian học tập tối đa theo quy định nhưng chưa đủ điều kiện\ntốt nghiệp do chưa hoàn thành chương trình Giáo dục quốc phòng - an ninh hoặc Giáo\ndục thé chất hoặc chưa đạt chuẩn dau ra về ngoại ngữ, công nghệ thông tin, trong thời\nhạn 03 năm tính từ khi hết thời gian học tập tối đa theo quy định được hoàn thiện các\nđiều kiện còn thiếu và đề nghị xét công nhận tốt nghiệp.", "article": "33", "khoan": "4", "level_labels": null, "language": null, "score_rerank": 0.004721059463918209}, {"chunk_id": "e9c5e1dd23536156", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 19, "text": "4. Thời gian tối đa được phép học đối với sinh viên chuyển CSĐT là thời gian tối\nđa hoàn thành khóa học được quy định tại Điều 7 của Quy chế này.", "article": "34", "khoan": "4", "level_labels": null, "language": null, "score_rerank": 0.00402203481644392}, {"chunk_id": "1328034892129135", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 4, "text": "Điều 7. Thời gian thiết kế va tong số tín chi tích lũy tối thiểu\n1. Tổng số tin chỉ tích lũy tối thiểu (không tính Giáo dục quốc phòng - an ninh,\nGiáo dục thé chất) đối với các chương trình đào tạo được quy định: 7\na) Đối với chương trình đào tạo chuyên sâu đặc thù: tổng số tin chỉ tích lũy tối thiểu\ntham chiếu là 150 tín chỉ đối với người tốt nghiệp trung học phổ thông và tương đương:\nhoặc với 30 tín chỉ đối với người có trình độ đại học thuộc cùng nhóm ngành.\n\nb) Đối với chương trình đào tạo trình độ đại học nhóm ngành khác, thời gian thiết\n\n4\nkế là từ 3 đến 5 năm; tổng số tín chỉ tích lũy tối thiểu tham chiếu là từ 120 tín chỉ. c) Thời gian thiết kế đối với hình thức đào tạo vừa làm vừa học dài hơn tối thiểu\n20% so với hình thức đào tạo chính quy của cùng chương trình đào tạo.", "article": "7", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.0030419551767408848}]}, {"question": "Mục đích của quy định MGHP là gì?", "answer": "Tôi không tìm thấy thông tin này trong tài liệu hiện có.", "elapsed": 13.125, "sources": [{"chunk_id": "5a10e0dea9195acb", "source": "9.-QD688-MGHP-2024.pdf", "page": 8, "text": "3. Sinh viên được xét MGHP cho học kỳ 1 và học kỳ 2 (theo quy định của Nghị định \n81/2021/NĐ-CP hoặc các Nghị định khác của các cơ quan có thẩm quyền sửa đổi, bổ sung \nhoặc quy định mới về chính sách MGHP, hỗ trợ chi phí học tập).", "article": "8", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.0331149585545063}, {"chunk_id": "efaea96dac21312a", "source": "9.-QD688-MGHP-2024.pdf", "page": 8, "text": "Điều 8. Thời gian xét miễn, giảm học phí \n1. Thời gian xét MGHP cho sinh viên thực hiện theo thời gian thiết kế chương trình đào \ntạo của Quy chế đề án tuyển sinh. 2. Thời gian giải quyết xét và chi trả kết quả MGHP diễn ra trong vòng 10 ngày làm \nviệc tính từ thời gian sau khi nhận được đơn đề nghị MGHP và sau nhận được kết quả học \nbổng khuyến khích học tập và học bổng tuyển sinh từ Phòng ĐTĐH.", "article": "8", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.009867431595921516}, {"chunk_id": "a08570d4e017eb43", "source": "7.-TB.486-MGHP-04112014-thong-bao-P.CTSV_.pdf", "page": 1, "text": "Phòng Công tác sinh viên (CTSV) hướng dẫn việc thực hiện chính sách miễn, giảm học phí (MGHP) áp dụng kể từ học ky II năm học 2014 — 2015 như sau:", "article": "", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.006274586543440819}, {"chunk_id": "66ee13c018a7d072", "source": "9.-QD688-MGHP-2024.pdf", "page": 19, "text": "Hộ khẩu thường trú: ................................................................................................................... ………………………………………………………………………………………………… \n\nTôi thuộc diện được giảm học phí theo Chính sách MGHP của nhà trường, đối tượng cụ \n\nthể như sau: (sinh viên đánh dấu chéo (x) vào ô vuông mà mình thuộc diện được miễn giảm).", "article": "", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.0017935528885573149}, {"chunk_id": "b7aa072e00e75baf", "source": "7.-TB.486-MGHP-04112014-thong-bao-P.CTSV_.pdf", "page": 1, "text": ":\n\n> Mức MGHP: 50% học phí thực (đã bao gồm % miễn giảm theo quy định của \\\nnhà nước). N\n> Yêu cầu về hồ sơ cần chuẩn bị: Mẫu đơn MGHP của nhà trường, ban sao\ncông chứng thẻ thương binh, người hưởng chính sách như thương binh, bệnh binh; hộ\nkhẩu hoặc giấy khai sinh; Giấy xác nhận của cơ quan quản lý đối tượng người có công\n(phòng LĐTBXH) hoặc UBND xã xác nhận dành cho người hoạt động kháng chiến bị\nnhiễm chất độc hóa học, con người có công theo quy định.", "article": "", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.0015140618197619915}, {"chunk_id": "c38cba185c5131f8", "source": "7.-TB.486-MGHP-04112014-thong-bao-P.CTSV_.pdf", "page": 5, "text": "Sinh viên lưu ý download mẫu đơn xét MGHP tại trường trên đường dẫn sau:\nhttp://osa.hemiu.edu.vn/2012/04/10/cac-bieu-mau-thuong-su-dung-cua-phong-ctsv/\n(Sinh viên làm theo hướng dan tai trang 2 dé nộp mới hoặc nộp bồ sung các giấy tờ\ncan thiết theo yêu cau vào 30 ngày đâu mỗi học ky). Phòng CTSV phân công Anh Hà Xuân Quang, Cán bộ phụ trách mảng công\nviệc về chế độ MGHP trả lời tất cả các thắc mắc có liên quan (điện thoại liên hệ: (84-\n8) 37244270 — Số nội bộ: 3334).", "article": "", "khoan": "9", "level_labels": null, "language": null, "score_rerank": 0.0012581234332174063}, {"chunk_id": "715298ee88c17753", "source": "7.-TB.486-MGHP-04112014-thong-bao-P.CTSV_.pdf", "page": 2, "text": "> Mức miễn giảm: 25% học phí thực (đã bao gom % miễn giảm theo quy định\ncủa nhà nước). > Yêu cầu về hồ sơ cần chuẩn bị: Mẫu đơn MGHP của nhà trường, bản photo\ncông chứng giấy chứng nhận của Hội đồng thấm định y khoa cấp có thâm quyền; giấy\n\nZ s\n2 | AA chứng nhận hộ nghèo, hộ cận nghèo do UBND cấp xã cấp (bồ sung giấy xác nhận này\nvào dau môi năm học).", "article": "", "khoan": "4", "level_labels": null, "language": null, "score_rerank": 0.0012402778957039118}, {"chunk_id": "496826965812ca4a", "source": "7.-TB.486-MGHP-04112014-thong-bao-P.CTSV_.pdf", "page": 3, "text": "- Quyết định số 582/QD-UBDT ngày 18 tháng 12 năm 2013 của Bộ trưởng,\nChủ nhiệm Ủy ban Dân tộc phê duyệt danh sách thôn đặc biệt khó khăn vùng dân tộc\nvà miền núi vào điện đầu tư của Chương trình 135;\n\n> Mức miễn giảm: 25% học phí thực (đã bao gồm % miễn giảm theo quy định\n: của nhà nước). ¬\n`\n> Yêu cầu về hồ sơ cần chuẩn bị: Mẫu đơn MGHP của nhà trường, bản photo —\ncông chứng giấy khai sinh và hộ khẩu; Xác nhận của chính quyền địa phương. ¬", "article": "", "khoan": "5", "level_labels": null, "language": null, "score_rerank": 0.001058000372722745}, {"chunk_id": "78a07403d3ffd805", "source": "17.-Quy-che_To-chuc-thi-HK_Tr-Tiep.ban-hanh_05.01.25-Signed-8.pdf", "page": 1, "text": "Chương I \nQUY ĐỊNH CHUNG\nĐiều 1. Mục đích và yêu cầu\n1. Đảm bảo cho công tác thi được thực hiện nghiêm túc theo đúng quy định của Bộ \nGiáo dục và Đào tạo và của Đại học Quốc gia Thành phố Hồ Chí Minh; tạo sự thống nhất, \nnhanh chóng, chính xác của các đơn vị, cá nhân có liên quan;", "article": "1", "khoan": "", "level_labels": null, "language": null, "score_rerank": 0.0006468607462011278}, {"chunk_id": "5ad56e8f805f871f", "source": "5.-Quyet-dinh-ban-hanh-_-Quy-dinh-cong-tac-khen-thuong-sinh-vien-truong-DHQT-Signed-4.pdf", "page": 1, "text": "Điều 2. Mục đích, nguyên tắc của công tác khen thưởng\n1. Mục đích. \na) Nhằm tôn vinh, động viên và khuyến khích kịp thời các tập thể, cá nhân đạt thành \ntích xuất sắc, nhân rộng các gương điển hình tiên tiến trong sinh viên. \nb) Xây dựng môi trường giáo dục toàn diện. \nc) Xây dựng mẫu hình sinh viên: bản lĩnh, tự tin, năng động, sáng tạo, trách nhiệm, \nhội nhập. \nd) Tăng cường công tác giáo dục chính trị, tư tưởng, ý thức trách nhiệm cho sinh viên.", "article": "2", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.00028373912209644914}]}, {"question": "Điều kiện để được xét tốt nghiệp sớm?", "answer": "**1. Điều 33 – Công nhận tot nghiệp va cấp bằng tốt nghiệp** [1]\n\n*Khoản 1:*\n> Điều 33. Công nhận tot nghiệp va cấp bằng tốt nghiệp 1. **Sinh viên được xét và công nhận tốt nghiệp khi có đủ các điều kiện sau:**\n a) Tích lũy đủ học phan, số tín chỉ và hoàn thành các nội dung bắt buộc khác theo yêu cầu của chương trình đào tạo, đạt chuẩn đầu ra của chương trình đào tạo. c) Đạt chuẩn trình độ ngoại ngữ, hoàn thành chương trình Giáo dục quốc phòng - an ninh, Giáo dục thể chất và các học phần điều kiện theo quy định của ĐHQG-HCM và CSĐT. d) Điểm trung bình tích lũy của toàn khóa học đạt từ trung bình trở lên.\n\n**2. Điều 17 – Học cùng lúc hai chương trình đào tạo** [1]\n\n*Khoản 4:*\n> 4. Sinh viên chỉ được xét tốt nghiệp chương trình thứ hai, nếu có đủ điều kiện tốt nghiệp ở chương trình thứ nhất và đã đăng ký muộn nhất 2 năm trước thời điểm xét tốt nghiệp chương trình thứ hai.\n\n**3. Điều 15 – Công nhận tốt nghiệp và cấp bằng tốt nghiệp** [2]\n\n*Khoản 1:*\n> Điều 15. **Công nhận tốt nghiệp và cấp bằng tốt nghiệp 1.** Sinh viên được xét và công nhận tốt nghiệp khi có đủ các điều kiện sau: a) Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác theo yêu cầu của chương trình đào tạo, đạt chuẩn đầu ra của chương trình đào tạo; b) Điểm trung bình tích lũy của toàn khóa học đạt từ trung bình trở lên; c) Đạt chuẩn đầu ra ngoại ngữ, chứng chỉ GDQP-AN, GDTC và hoàn thành các học phần điều kiện theo quy định của ĐHQG-HCM và của trường ĐHQT (bao gồm các lớp chính trị, các nội dung sinh hoạt công dân); d) Tại thời điểm xét tốt nghiệp không bị truy cứu trách nhiệm hình sự hoặc không đang trong thời gian bị kỷ luật ở mức đình chỉ học tập.\n\n**4. Điều 19 – Học cùng lúc hai chương trình** [2]\n\n*Khoản 5:*\n> 5. Sinh viên chỉ được xét tốt nghiệp chương trình thứ hai, nếu có đủ điều kiện tốt nghiệp ở chương trình thứ nhất và đã đăng kí muộn nhất 02 năm trước thời điểm xét tốt nghiệp chương trình thứ hai.\n\n---\n**Tài liệu đính kèm:**\n[1]: 1524/QĐÐ-ĐHQG – 25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf — trang 1\n[2]: 15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf — trang 1", "elapsed": 12.785, "sources": [{"chunk_id": "962d075b678ee4bb", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 1, "text": "Điều 33. Công nhận tot nghiệp va cấp bằng tốt nghiệp\n1. Sinh viên được xét và công nhận tốt nghiệp khi có đủ các điều kiện sau:\n\na) Tích lũy đủ học phan, số tín chỉ và hoàn thành các nội dung bắt buộc khác theo\nyêu cầu của chương trình đào tạo, đạt chuẩn đầu ra của chương trình đào tạo. c) Đạt chuẩn trình độ ngoại ngữ, hoàn thành chương trình Giáo dục quốc phòng -\nan ninh, Giáo dục thể chất và các học phần điều kiện theo quy định của ĐHQG-HCM\nvà CSĐT. d) Điểm trung bình tích lũy của toàn khóa học đạt từ trung bình trở lên.", "article": "33", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.21842409670352936}, {"chunk_id": "30ac47f4f822eadb", "source": "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf", "page": 1, "text": "Điều 15. Công nhận tốt nghiệp và cấp bằng tốt nghiệp\n1. Sinh viên được xét và công nhận tốt nghiệp khi có đủ các điều kiện sau: \na) Tích lũy đủ học phần, số tín chỉ và hoàn thành các nội dung bắt buộc khác theo yêu cầu của \nchương trình đào tạo, đạt chuẩn đầu ra của chương trình đào tạo; \nb) Điểm trung bình tích lũy của toàn khóa học đạt từ trung bình trở lên; \nc) Đạt chuẩn đầu ra ngoại ngữ, chứng chỉ GDQP-AN, GDTC và hoàn thành các học phần điều \nkiện theo quy định của ĐHQG-HCM và của trường ĐHQT (bao gồm các lớp chính trị, các nội dung \nsinh hoạt công dân); \nd) Tại thời điểm xét tốt nghiệp không bị truy cứu trách nhiệm hình sự hoặc không đang trong \nthời gian bị kỷ luật ở mức đình chỉ học tập.", "article": "15", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.11646319180727005}, {"chunk_id": "3a3c137ffe207f8a", "source": "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf", "page": 23, "text": "5. Sinh viên chỉ được xét tốt nghiệp chương trình thứ hai, nếu có đủ điều kiện tốt nghiệp ở \nchương trình thứ nhất và đã đăng kí muộn nhất 02 năm trước thời điểm xét tốt nghiệp chương trình \nthứ hai.", "article": "19", "khoan": "5", "level_labels": null, "language": null, "score_rerank": 0.11226920783519745}, {"chunk_id": "edba4af084d8493d", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 11, "text": "4. Sinh viên chỉ được xét tốt nghiệp chương trình thứ hai, nếu có đủ điều kiện tốt\nnghiệp ở chương trình thứ nhất và đã đăng ký muộn nhất 2 năm trước thời điểm xét tốt\nnghiệp chương trình thứ hai.", "article": "17", "khoan": "4", "level_labels": null, "language": null, "score_rerank": 0.09292930364608765}, {"chunk_id": "294cc5b6b8a58732", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 7, "text": "11. Học phần điều kiện là các học phần giáo dục thé chất, giáo duc quốc phòng -\nan ninh và kỹ năng bồ trợ. Kết quả đánh giá các học phần điều kiện không tính vào điểm\ntrung bình chung học kỳ, điểm trung bình chung tích lũy, nhưng là điều kiện để xét tốt\nnghiệp.", "article": "12", "khoan": "11", "level_labels": null, "language": null, "score_rerank": 0.02157585881650448}, {"chunk_id": "9af624f7b5f4e748", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 17, "text": "đ) Tại thời điểm xét tốt nghiệp không bị truy cứu trách nhiệm hình sự hoặc không\nđang trong thời gian bị kỷ luật ở mức đình chỉ học tập.", "article": "33", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.005059666931629181}, {"chunk_id": "59ad025183626a96", "source": "19.-2016-Quy-che-CTSV-Bo-GD-DT.pdf", "page": 6, "text": "7. Sinh viên đủ điều kiện công nhận tốt nghiệp được cấp bằng tốt nghiệp, |\nchứng chi, bang điểm hoc tập và rèn luyện, các giây tờ liên quan và giải quyết |\ncác thủ tục hành chính khác.", "article": "5", "khoan": "7", "level_labels": null, "language": null, "score_rerank": 0.004047049209475517}, {"chunk_id": "86c643278f47a638", "source": "Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf", "page": 18, "text": "5. SV phải hoàn thành việc học tập Tuần SHCD trước khi tốt nghiệp. Nếu SV \nthiếu kết quả của một trong bốn đợt học tập SHCD sẽ tạm thời không được nhận bằng \ntốt nghiệp cho đến khi hoàn tất việc học tập bổ sung.", "article": "22", "khoan": "5", "level_labels": null, "language": null, "score_rerank": 0.0037792606744915247}, {"chunk_id": "4cf4d97857c28079", "source": "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf", "page": 18, "text": "4. Sinh viên đã hết thời gian học tập tối đa theo quy định nhưng chưa đủ điều kiện\ntốt nghiệp do chưa hoàn thành chương trình Giáo dục quốc phòng - an ninh hoặc Giáo\ndục thé chất hoặc chưa đạt chuẩn dau ra về ngoại ngữ, công nghệ thông tin, trong thời\nhạn 03 năm tính từ khi hết thời gian học tập tối đa theo quy định được hoàn thiện các\nđiều kiện còn thiếu và đề nghị xét công nhận tốt nghiệp.", "article": "33", "khoan": "4", "level_labels": null, "language": null, "score_rerank": 0.0036566988565027714}, {"chunk_id": "f07816f8035e4336", "source": "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf", "page": 1, "text": "Điều 13. Thực tập tốt nghiệp và luận văn tốt nghiệp\n1. Để đăng ký học phần thực tập tốt nghiệp, sinh viên cần thỏa mãn các điều kiện về học phần \ntiên quyết, học phần học trước hoặc số TC tích lũy tối thiểu theo yêu cầu đặc thù của từng ngành; \nSinh viên tham gia TTTN phải có tên trong quyết định công nhận danh sách sinh viên đi thực tập của \nNhà trường. Các điều kiện về học phần tiên quyết, học phần học trước hoặc số tín chỉ tích lũy tối \nthiểu phải được thông báo công khai trên website của khoa và bộ môn.", "article": "13", "khoan": "1", "level_labels": null, "language": null, "score_rerank": 0.002261335728690028}]}], "catalog": {"32.Luat-Giao-duc-2019.pdf": {"title": "", "doc_type": "law", "doc_number": "43/2019/QH14", "issuing_body": "Quốc hội", "group": "Luat-quoc-gia", "group_label": "Luật quốc gia", "file_type": "pdf", "catalog": {"title": "Luật Giáo dục", "doc_number": "43/2019/QH14", "year": 2019}}, "3.-Phu-luc-1-30122022-Signed-2.pdf": {"title": "", "doc_type": "appendix", "doc_number": "", "issuing_body": "", "group": "Phu-luc", "group_label": "Phụ lục", "file_type": "pdf", "catalog": {"title": "Phụ lục I — Một số nội dung vi phạm và khung xử lý kỷ luật sinh viên", "doc_number": "967/QĐ-ĐHQT", "issuing_body": "Trường Đại học Quốc tế", "year": 2022, "issued": "2022-12-26"}}, "20.-2019-Quy-che-CTSV-DHQG-HCM.pdf": {"title": "", "doc_type": "university_decision", "doc_number": "953/QD-DHQG", "issuing_body": "ĐHQG-HCM", "group": "Quyet-dinh-quy-che-cap-dhqg-hcm", "group_label": "Quyết định ĐHQG-HCM", "file_type": "pdf", "catalog": {"title": "Quy chế công tác sinh viên", "doc_number": "953/QĐ-ĐHQG", "year": 2019, "issued": "2019-07-15"}}, "25.-QD1342_220930_QD-ban-hanh-Quy-che-dao-tao-trinh-odo-DH-upload.pdf": {"title": "", "doc_type": "university_decision", "doc_number": "1524/QĐÐ-ĐHQG", "issuing_body": "ĐHQG-HCM", "group": "Quyet-dinh-quy-che-cap-dhqg-hcm", "group_label": "Quyết định ĐHQG-HCM", "file_type": "pdf", "catalog": {"title": "Quy chế đào tạo trình độ đại học", "doc_number": "1342/QĐ-ĐHQG", "year": 2022, "issued": "2022-09-30"}}, "15.-QD-719-6.12.2021_Quy-che-Hoc-vu-DH-Quoc-te-2021.signed-1.signed.signed.signed.signed-2.pdf": {"title": "", "doc_type": "school_decision_full", "doc_number": "", "issuing_body": "Trường Đại học Quốc tế", "group": "Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt", "group_label": "Quy chế trường ĐHQT", "file_type": "pdf", "catalog": {"title": "Quy chế đào tạo trình độ đại học theo hệ thống tín chỉ tại Trường Đại học Quốc tế", "doc_number": "719/QĐ-ĐHQT", "year": 2021, "issued": "2021-12-06"}}, "16.-Quy-dinh-xet-cap-hoc-bong-tai-Truong-DHQT-Signed-4.pdf": {"title": "", "doc_type": "school_decision_full", "doc_number": "", "issuing_body": "Trường Đại học Quốc tế", "group": "Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt", "group_label": "Quy chế trường ĐHQT", "file_type": "pdf", "catalog": {"title": "Quy định xét cấp học bổng khuyến khích học tập cho sinh viên trình độ đại học tại Trường Đại học Quốc tế", "doc_number": "884/QĐ-ĐHQT", "year": 2024, "issued": "2024-08-19"}}, "17.-Quy-che_To-chuc-thi-HK_Tr-Tiep.ban-hanh_05.01.25-Signed-8.pdf": {"title": "", "doc_type": "school_decision_full", "doc_number": "", "issuing_body": "Trường Đại học Quốc tế", "group": "Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt", "group_label": "Quy chế trường ĐHQT", "file_type": "pdf", "catalog": {"title": "Quy chế tổ chức thi học kỳ trình độ đại học tại Trường Đại học Quốc tế", "doc_number": "07/QĐ-ĐHQT", "year": 2025, "issued": "2025-01-08"}}, "5.-Quyet-dinh-ban-hanh-_-Quy-dinh-cong-tac-khen-thuong-sinh-vien-truong-DHQT-Signed-4.pdf": {"title": "", "doc_type": "school_decision_full", "doc_number": "", "issuing_body": "Trường Đại học Quốc tế", "group": "Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt", "group_label": "Quy chế trường ĐHQT", "file_type": "pdf", "catalog": {"title": "Quy định công tác khen thưởng sinh viên tại Trường Đại học Quốc tế", "doc_number": "808/QĐ-ĐHQT", "year": 2024, "issued": "2024-10-30"}}, "9.-QD688-MGHP-2024.pdf": {"title": "", "doc_type": "school_decision_full", "doc_number": "", "issuing_body": "Trường Đại học Quốc tế", "group": "Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt", "group_label": "Quy chế trường ĐHQT", "file_type": "pdf", "catalog": {"title": "Quy định chế độ chính sách miễn, giảm học phí", "doc_number": "668/QĐ-ĐHQT", "year": 2024, "issued": "2024-09-16"}}, "Quy-che-CTSV-theo-QD-967-12.2022-Signed-2.pdf": {"title": "", "doc_type": "school_decision_full", "doc_number": "", "issuing_body": "Trường Đại học Quốc tế", "group": "Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt", "group_label": "Quy chế trường ĐHQT", "file_type": "pdf", "catalog": {"title": "Quy chế công tác sinh viên Trường Đại học Quốc tế", "doc_number": "967/QĐ-ĐHQT", "year": 2022, "issued": "2022-12-26"}}, "7.-TB.486-MGHP-04112014-thong-bao-P.CTSV_.pdf": {"title": "", "doc_type": "announcement", "doc_number": "", "issuing_body": "Phòng Công tác sinh viên", "group": "Thong-bao", "group_label": "Thông báo", "file_type": "pdf", "catalog": {"title": "Hướng dẫn thực hiện chính sách miễn, giảm học phí mới áp dụng từ học kỳ II năm học 2014–2015", "doc_number": "486-TB/ĐHQT-CTSV", "year": 2014, "issued": "2014-11-04"}}, "19.-2016-Quy-che-CTSV-Bo-GD-DT.pdf": {"title": "", "doc_type": "circular", "doc_number": "", "issuing_body": "Bộ Giáo dục và Đào tạo", "group": "Thong-tu-quy-che-cap-bo-gddt", "group_label": "Thông tư Bộ GD&ĐT", "file_type": "pdf", "catalog": {"title": "Quy chế công tác sinh viên đối với chương trình đào tạo đại học hệ chính quy", "doc_number": "10/2016/TT-BGDĐT", "year": 2016, "issued": "2016-04-05"}}}, "summary": {"documents": 34, "collections": 7}, "collections": {"Luật quốc gia": 9, "Phụ lục": 2, "Nội quy / quyết định ngắn ĐHQT": 4, "Quyết định ĐHQG-HCM": 4, "Quy chế trường ĐHQT": 11, "Thông báo": 1, "Thông tư Bộ GD&ĐT": 3}, "groups": [{"id": "Luat-quoc-gia", "label": "Luật quốc gia", "doc_type": "law", "issuing_body": "Quốc hội", "language": "", "file_count": 9}, {"id": "Phu-luc", "label": "Phụ lục", "doc_type": "appendix", "issuing_body": "", "language": "", "file_count": 2}, {"id": "Quyet-dinh-ngan-noi-quy-cua-truong-dhqt", "label": "Nội quy / quyết định ngắn ĐHQT", "doc_type": "school_decision_brief", "issuing_body": "Trường Đại học Quốc tế", "language": "", "file_count": 4}, {"id": "Quyet-dinh-quy-che-cap-dhqg-hcm", "label": "Quyết định ĐHQG-HCM", "doc_type": "university_decision", "issuing_body": "ĐHQG-HCM", "language": "", "file_count": 4}, {"id": "Quyet-dinh-quy-che-quy-dinh-day-du-cua-truong-dhqt", "label": "Quy chế trường ĐHQT", "doc_type": "school_decision_full", "issuing_body": "Trường Đại học Quốc tế", "language": "", "file_count": 11}, {"id": "Thong-bao", "label": "Thông báo", "doc_type": "announcement", "issuing_body": "Phòng Công tác sinh viên", "language": "", "file_count": 1}, {"id": "Thong-tu-quy-che-cap-bo-gddt", "label": "Thông tư Bộ GD&ĐT", "doc_type": "circular", "issuing_body": "Bộ Giáo dục và Đào tạo", "language": "", "file_count": 3}, {"id": "qdrant_seed", "label": "qdrant_seed", "doc_type": "", "issuing_body": "", "language": "", "file_count": 0}]}</script>
+<script>
+(() => {
+const DATA = JSON.parse(document.getElementById('mock-data').textContent);
+const API_BASE = 'http://127.0.0.1:8000';          // links only: the mockup makes no requests
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const ICON = {
+  plus: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  arrow: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>',
+  copy: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="1"/><path d="M15.5 8.5v-3a1 1 0 0 0-1-1h-9a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3"/></svg>',
+  check: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  passages: '<svg class="lib-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>',
+};
+const TYPE_LABELS = { law: 'Law', decree: 'Decree', circular: 'Circular', university_decision: 'Decision',
+  school_decision: 'Decision', school_decision_full: 'Decision', school_decision_brief: 'Decision (short form)',
+  regulation: 'Regulation', guideline: 'Guideline', notice: 'Notice', announcement: 'Notice',
+  dispatch: 'Official letter', appendix: 'Appendix' };
+const RANK = { law: 1, decree: 2, circular: 3, university_decision: 4, school_decision_full: 5, school_decision: 5,
+  regulation: 5, school_decision_brief: 6, guideline: 7, dispatch: 7, appendix: 8, announcement: 9, notice: 9 };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const has = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k);
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const drawerMode = () => matchMedia('(max-width:1439px)').matches;
+
+// Same rules as the Library (libNameFromFile, libTitle, libNumber, libIssuer, libYear, libTypeLabel).
+function nameFromFile(src) {
+  const s = String(src || '');
+  return s.replace(/\.(pdf|docx)$/i, '').replace(/^\d+[.\-_ ]*/, '').replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim() || s;
+}
+function info(file, numberFromAnswer) {
+  const d = DATA.catalog[file];
+  if (!d) return { title: nameFromFile(file), type: '', number: numberFromAnswer || '', issuer: '', year: '', known: false };
+  const c = d.catalog || {};
+  const number = has(c, 'doc_number') ? c.doc_number : (d.doc_number || numberFromAnswer || '');
+  const issuer = has(c, 'issuing_body') ? c.issuing_body : (d.issuing_body || '');
+  const year = c.year ? String(c.year) : ((/\/((?:19|20)\d{2})\//.exec(number) || [])[1] || '');
+  const type = TYPE_LABELS[String(d.doc_type || '').toLowerCase()] || d.doc_type || '';
+  return { title: d.title || c.title || nameFromFile(file), type, number, issuer, year, known: true };
+}
+function docUrl(name, page) {
+  const n = String(name || '');
+  if (/\.pdf$/i.test(n)) return `${API_BASE}/pdf/${encodeURIComponent(n)}` + (page ? `#page=${page}` : '');
+  return `${API_BASE}/documents/${encodeURIComponent(n)}/file`;
+}
+function renderMarkdown(md) {
+  try {
+    if (window.marked) {
+      if (!window.__footnotes && window.markedFootnote) { marked.use(window.markedFootnote()); window.__footnotes = true; }
+      return marked.parse(md, { breaks: true, gfm: true });
+    }
+  } catch (e) {}
+  return esc(md).replace(/\n/g, '<br>');
+}
+// The application's linkifyFootnotePdfs, unchanged (R9).
+function linkify(root) {
+  const RE = /(\[\^?\d+\]:\s*)?(\S+\.(?:pdf|docx))\s*[—–\-]\s*(?:trang|tr\.?)\s*(\d+)/gi;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentNode.closest('a') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+  const targets = []; let n;
+  while ((n = w.nextNode())) { RE.lastIndex = 0; if (RE.test(n.nodeValue)) targets.push(n); }
+  targets.forEach(tn => {
+    RE.lastIndex = 0; const text = tn.nodeValue; const frag = document.createDocumentFragment(); let last = 0; let m;
+    while ((m = RE.exec(text)) !== null) {
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const a = document.createElement('a'); a.href = docUrl(m[2], m[3]); a.target = '_blank'; a.rel = 'noopener'; a.className = 'pdf-link';
+      a.textContent = `${m[1] || ''}${m[2]} — trang ${m[3]}`; frag.appendChild(a); last = m.index + m[0].length;
+    }
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    tn.parentNode.replaceChild(frag, tn);
+  });
+}
+
+// 7.2 — the sources block written by the server.
+const FOOTER = '\n---\n**Tài liệu đính kèm:**\n';
+function splitFooter(md) {
+  const i = md.lastIndexOf(FOOTER);
+  if (i < 0) return { body: md, lines: [] };
+  return { body: md.slice(0, i), lines: md.slice(i + FOOTER.length).split('\n').filter(l => l.trim()) };
+}
+function parseSources(lines) {
+  const items = [], other = [];
+  for (const line of lines) {
+    const m = /^\[(\d+)\]: (.+) — trang (\S+)$/.exec(line.trim());
+    if (!m) { other.push(line); continue; }
+    const parts = m[2].split(' – ');
+    const file = parts.pop().trim();
+    items.push({ n: +m[1], file, number: parts.join(' – ').trim(), page: /^\d+$/.test(m[3]) ? +m[3] : null });
+  }
+  return { items, other };
+}
+const kids = el => [...el.childNodes].filter(n => !(n.nodeType === 3 && !n.textContent.trim()));
+
+// 5.6 — R2 to R8 on the rendered body.
+function decorateBody(root, e) {
+  const nums = new Set(e.sources.items.map(s => s.n));
+  root.querySelectorAll('p').forEach(p => {
+    const k = kids(p);
+    if (!k.length) return;
+    if (k.length === 1 && k[0].nodeName === 'EM') {
+      const t = k[0].textContent.trim();
+      if (/^\(Trích /.test(t)) p.classList.add('ask-note');
+      else if (/:$/.test(t)) p.classList.add('ask-clause');
+      return;
+    }
+    if (k[0].nodeName !== 'STRONG' || p.closest('blockquote')) return;
+    const rest = k.slice(1).map(n => n.textContent).join('').trim();
+    if (rest && !/^(\[\d+\]\s*)+$/.test(rest)) return;
+    if (!rest && /:\s*$/.test(k[0].textContent)) { p.classList.add('ask-clause'); return; }
+    p.classList.add('ask-loc');
+    const m = /^(\d+\.\s+)?(?:(.+?) – )?(\S+\.(?:pdf|docx))$/i.exec(k[0].textContent.trim());
+    if (m) {
+      const inf = info(m[3], m[2]);
+      if (inf.known) {
+        k[0].textContent = (m[1] || '') + inf.title;
+        const f = document.createElement('span'); f.className = 'ask-file';
+        f.textContent = (m[2] ? m[2] + ' – ' : '') + m[3];
+        p.appendChild(f);
+      }
+    }
+  });
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n =>
+    n.parentNode.closest('a,code') ? NodeFilter.FILTER_REJECT : (/\[\d+\]/.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) });
+  const targets = []; let n;
+  while ((n = w.nextNode())) targets.push(n);
+  targets.forEach(tn => {
+    const text = tn.nodeValue; const frag = document.createDocumentFragment(); const re = /\[(\d+)\]/g; let last = 0; let m;
+    while ((m = re.exec(text))) {
+      const num = +m[1];
+      if (!nums.has(num)) continue;
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const s = e.sources.items.find(x => x.n === num);
+      const a = document.createElement('a'); a.className = 'ask-cite'; a.href = `#${e.id}-src-${num}`; a.dataset.n = num;
+      a.textContent = `[${num}]`; a.setAttribute('aria-label', `Source ${num}: ${info(s.file, s.number).title}`);
+      frag.appendChild(a); last = m.index + m[0].length;
+    }
+    if (!last) return;
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    tn.parentNode.replaceChild(frag, tn);
+  });
+}
+
+// 5.7 — Sources.
+function srcItem(e, s) {
+  const inf = info(s.file, s.number);
+  const pdf = /\.pdf$/i.test(s.file);
+  const meta = [inf.type, inf.number ? 'No. ' + inf.number : '', inf.issuer, inf.year, s.page ? 'p. ' + s.page : ''].filter(Boolean);
+  return `<li class="ask-src" id="${e.id}-src-${s.n}" tabindex="-1"><span class="ask-src-n">[${s.n}]</span><div>` +
+    `<a class="ask-src-title" href="${esc(docUrl(s.file, s.page))}" target="_blank" rel="noopener" title="${esc(pdf ? `Open ${s.file} at page ${s.page ?? '?'}` : `Download ${s.file}`)}">${esc(inf.title)}</a>` +
+    `<p class="ask-src-meta">${meta.map(esc).join('<span class="sep">·</span>')}</p>` +
+    `<p class="ask-src-file">${esc(s.file)}<span class="ft">${pdf ? 'PDF' : 'DOCX'}</span></p></div></li>`;
+}
+function renderSources(e) {
+  const { items, other } = e.sources;
+  if (!items.length && !other.length) return '';
+  const cited = items.filter(s => e.cited.has(s.n));
+  const more = items.filter(s => !e.cited.has(s.n));
+  let h = `<section class="ask-sources" aria-labelledby="${e.id}-src-h"><h3 class="ask-label" id="${e.id}-src-h">Sources</h3>`;
+  if (cited.length) h += `<p class="ask-sub">Cited in the answer</p><ol class="ask-srcs">${cited.map(s => srcItem(e, s)).join('')}</ol>`;
+  if (more.length) h += `<details class="ask-more"${cited.length ? '' : ' open'}><summary>Also found by the search (${more.length})</summary><ol class="ask-srcs">${more.map(s => srcItem(e, s)).join('')}</ol></details>`;
+  other.forEach(l => { h += `<p class="ask-src-raw">${esc(l)}</p>`; });
+  return h + '</section>';
+}
+
+// 5.5 — one enquiry record per question.
+let count = 0, pending = null, panelOwner = null;
+const entries = [];
+function live(msg) { const l = $('#ask-live'); l.textContent = ''; setTimeout(() => { l.textContent = msg; }, 50); }
+function addEntry(question) {
+  const i = ++count, id = 'enq-' + i;
+  const time = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  const el = document.createElement('article');
+  el.className = 'ask-entry'; el.id = id; el.setAttribute('aria-labelledby', id + '-q');
+  el.innerHTML = `<p class="ask-label">Enquiry ${i} · ${time}</p><h2 class="ask-q" id="${id}-q">${esc(question)}</h2><div class="ask-answer"></div>`;
+  $('#chat-messages').appendChild(el);
+  $('#chat-welcome').classList.add('hidden');
+  $('#clear-chat').classList.remove('hidden');
+  const e = { i, id, el, question };
+  entries.push(e);
+  return e;
+}
+function setWaiting(e) {
+  const box = e.el.querySelector('.ask-answer');
+  e.el.setAttribute('aria-busy', 'true');
+  box.innerHTML = '<p class="ask-status"><span class="mk" aria-hidden="true"></span>Searching the regulations… <span class="t">0 s</span></p>';
+  const t0 = Date.now(), t = box.querySelector('.t');
+  clearInterval(e.timer);
+  e.timer = setInterval(() => { t.textContent = Math.round((Date.now() - t0) / 1000) + ' s'; }, 1000);
+  live('Searching the regulations…');
+}
+function renderAnswer(e, data) {
+  clearInterval(e.timer); e.el.removeAttribute('aria-busy'); e.data = data;
+  const answer = data.answer || '';
+  const { body, lines } = splitFooter(answer);
+  e.sources = parseSources(lines);
+  const bodyMd = e.sources.items.length ? body : answer;          // R1: nothing to split, show as it is
+  const nums = new Set(e.sources.items.map(s => s.n));
+  e.cited = new Set([...bodyMd.matchAll(/\[(\d+)\]/g)].map(m => +m[1]).filter(k => nums.has(k)));
+  const n = e.sources.items.length, c = e.cited.size;
+  const plainNotice = !n && !/\[\d+\]/.test(bodyMd) && !/^\s*>/m.test(bodyMd);   // R10
+  const what = !n ? 'no provision matched' : c === n ? `quoted from ${n} document${n > 1 ? 's' : ''}` :
+    c ? `quoted from ${c} of ${n} documents found` : `${n} documents found`;
+  let h = `<p class="ask-label">Answer · ${what} · ${Number(data.elapsed || 0).toFixed(1)} s</p>`;
+  if (plainNotice) {
+    h += `<p class="ask-nf">${esc(bodyMd.trim())}</p><p class="ask-nf-help">Try other words — the name of the regulation or an article number — or <button type="button" class="lib-link" data-library>browse the Library</button>.</p>`;
+  } else {
+    h += `<div class="ask-body">${renderMarkdown(bodyMd)}</div>`;
+  }
+  h += renderSources(e);
+  h += `<div class="ask-actions"><button type="button" class="lib-btn lib-btn-quiet" data-copy>${ICON.copy}<span>Copy answer</span></button>`;
+  if ((data.sources || []).length) h += `<button type="button" class="lib-btn lib-btn-quiet" data-passages aria-controls="source-panel" aria-expanded="false">${ICON.passages}<span>Passages consulted (${data.sources.length})</span></button>`;
+  h += '</div>';
+  const box = e.el.querySelector('.ask-answer');
+  box.innerHTML = h;
+  const bodyEl = box.querySelector('.ask-body');
+  if (bodyEl) { decorateBody(bodyEl, e); linkify(bodyEl); }
+  live(plainNotice || !n ? 'No provision matched.' : `Answer ready: quoted from ${c || n} document${(c || n) > 1 ? 's' : ''}.`);
+}
+function renderError(e, err) {
+  clearInterval(e.timer); e.el.removeAttribute('aria-busy');
+  e.el.querySelector('.ask-answer').innerHTML = `<p class="ask-label bad">No answer</p><p class="ask-err">${esc(err.message)}</p>` +
+    (err.detail ? `<pre class="ask-err-detail">${esc(String(err.detail).slice(0, 600))}</pre>` : '') +
+    '<div class="ask-actions" style="margin-left:0"><button type="button" class="lib-btn" data-retry>Try again</button></div>';
+  live('No answer.');
+}
+
+// 5.8 — Passages consulted.
+function locator(s) { return [s.article ? 'Điều ' + s.article : '', s.khoan ? 'Khoản ' + s.khoan : ''].filter(Boolean).join(', '); }
+function openPassages(e, btn) {
+  const panel = $('#source-panel');
+  panelOwner = { e, btn };
+  const byFile = new Map(e.sources.items.map(s => [s.file, s.n]));
+  $('#sp-sub').textContent = `Enquiry ${e.i} · ${e.data.sources.length} passages, as ranked by the search`;
+  $('#sp-body').innerHTML = '<ol style="list-style:none">' + e.data.sources.map((s, k) => {
+    const inf = info(s.source);
+    const meta = [inf.type, inf.number ? 'No. ' + inf.number : '', locator(s), s.page ? 'p. ' + s.page : '', byFile.has(s.source) ? `[${byFile.get(s.source)}]` : ''].filter(Boolean);
+    const score = typeof s.score_rerank === 'number' ? `<span class="ask-score" title="Cross-encoder relevance score">rerank ${s.score_rerank.toFixed(2)}</span>` : '';
+    return `<li class="ask-pass"><span class="ask-pass-n">${k + 1}</span><div>` +
+      `<a class="ask-pass-title" href="${esc(docUrl(s.source, s.page))}" target="_blank" rel="noopener">${esc(inf.title)}</a>` +
+      `<p class="ask-pass-meta"><span>${meta.map(esc).join('<span class="sep">·</span>')}</span>${score}</p>` +
+      `<p class="ask-pass-text">${esc(s.text)}</p><button type="button" class="lib-link ask-pass-more hidden">Show full passage</button></div></li>`;
+  }).join('') + '</ol>';
+  panel.classList.remove('hidden');
+  if (drawerMode()) { panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'false'); }
+  else { panel.removeAttribute('role'); panel.removeAttribute('aria-modal'); }
+  $$('#sp-body .ask-pass-text').forEach(p => { if (p.scrollHeight > p.clientHeight + 2) p.nextElementSibling.classList.remove('hidden'); });
+  $$('[data-passages]').forEach(b => b.setAttribute('aria-expanded', b === btn ? 'true' : 'false'));
+  $('#sp-body').scrollTop = 0;
+  $('#sp-title').focus({ preventScroll: true });
+}
+function closePassages(returnFocus = true) {
+  const panel = $('#source-panel');
+  if (panel.classList.contains('hidden')) return;
+  panel.classList.add('hidden');
+  $$('[data-passages]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+  if (returnFocus && panelOwner && panelOwner.btn.isConnected) panelOwner.btn.focus();
+}
+
+// M10 — Copy answer: the answer and its sources as plain text.
+function copyText(e) {
+  const body = (e.el.querySelector('.ask-body') || e.el.querySelector('.ask-nf')).innerText.trim();
+  const src = e.sources.items.map(s => {
+    const inf = info(s.file, s.number);
+    return `[${s.n}] ${inf.title}` + [inf.type, inf.number ? 'No. ' + inf.number : '', inf.issuer, inf.year].filter(Boolean).map(x => ', ' + x).join('') +
+      ` — ${s.file}` + (s.page ? `, p. ${s.page}` : '');
+  });
+  return body + (src.length ? '\n\nSources\n' + src.join('\n') : '');
+}
+function jump(e, n) {
+  const li = document.getElementById(`${e.id}-src-${n}`);
+  if (!li) return;
+  li.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
+  li.classList.add('is-target'); li.focus({ preventScroll: true });
+  setTimeout(() => li.classList.remove('is-target'), 2000);
+}
+
+// Asking. The mockup answers from the recorded responses after a short wait.
+const input = $('#chat-input'), sendBtn = $('#chat-send');
+function autosize() { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 160) + 'px'; }
+function recorded(q) { return DATA.entries.find(x => x.question.trim() === q.trim()); }
+function ask(e) {
+  setWaiting(e);
+  const timer = setTimeout(() => {
+    pending = null; sendBtn.disabled = false;
+    if (!e.el.isConnected) return;
+    const rec = recorded(e.question);
+    renderAnswer(e, rec || { answer: DATA.entries[3].answer, elapsed: 2.4, sources: DATA.entries[3].sources });
+  }, 2400);
+  pending = { e, cancel: () => clearTimeout(timer) };
+  sendBtn.disabled = true;
+}
+function send() {
+  const q = input.value.trim();
+  if (!q || pending) return;                          // M16: one question at a time
+  input.value = ''; autosize();
+  const e = addEntry(q);
+  ask(e);
+  e.el.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });    // M11
+  input.focus();
+}
+window.sendSuggest = btn => { input.value = btn.querySelector('.sq-text').textContent.trim(); send(); };
+function clearAll() {
+  if (pending) { pending.cancel(); pending = null; sendBtn.disabled = false; }
+  entries.forEach(e => clearInterval(e.timer)); entries.length = 0; count = 0;
+  $('#chat-messages').innerHTML = '';
+  $('#chat-welcome').classList.remove('hidden');
+  $('#clear-chat').classList.add('hidden');
+  closePassages(false);
+  $('#sp-body').innerHTML = '<p class="ask-panel-empty">Ask a question to see the passages consulted.</p>';
+  $('#sp-sub').textContent = '';
+}
+
+sendBtn.innerHTML = '<span>Ask</span>' + ICON.arrow;
+$('#clear-chat').innerHTML = ICON.plus + '<span>New enquiry</span>';
+input.addEventListener('input', autosize);
+input.addEventListener('keydown', ev => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); send(); } });
+sendBtn.addEventListener('click', send);
+$('#clear-chat').addEventListener('click', () => { clearAll(); input.focus(); });
+$('#sp-close').addEventListener('click', () => closePassages());
+$('#chat-messages').addEventListener('click', ev => {
+  const art = ev.target.closest('.ask-entry');
+  const e = art && entries.find(x => x.el === art);
+  if (!e) return;
+  const cite = ev.target.closest('.ask-cite');
+  if (cite) { ev.preventDefault(); jump(e, +cite.dataset.n); return; }
+  const b = ev.target.closest('button');
+  if (!b) return;
+  if (b.hasAttribute('data-passages')) openPassages(e, b);
+  else if (b.hasAttribute('data-retry')) ask(e);
+  else if (b.hasAttribute('data-copy')) {
+    navigator.clipboard.writeText(copyText(e)).catch(() => {});
+    b.innerHTML = ICON.check + '<span>Copied</span>';
+    setTimeout(() => { b.innerHTML = ICON.copy + '<span>Copy answer</span>'; }, 1800);
+  }
+});
+$('#sp-body').addEventListener('click', ev => {
+  const b = ev.target.closest('.ask-pass-more');
+  if (!b) return;
+  const p = b.previousElementSibling;
+  const open = p.classList.toggle('open');
+  b.textContent = open ? 'Show less' : 'Show full passage';
+});
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && !$('#source-panel').classList.contains('hidden')) { closePassages(); return; }
+  if (ev.key === '/' && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+    const t = ev.target;
+    if (t.closest && t.closest('input,textarea,select,[contenteditable="true"]')) return;
+    ev.preventDefault(); input.focus();
+  }
+});
+document.addEventListener('mousedown', ev => {
+  const panel = $('#source-panel');
+  if (!drawerMode() || panel.classList.contains('hidden')) return;
+  if (panel.contains(ev.target) || ev.target.closest('[data-passages]')) return;
+  closePassages(false);
+});
+
+// Masthead scope line and "The search covers" (5.2, 5.4).
+$('#ask-scope').innerHTML = `Searches <b>${DATA.summary.documents}</b> documents in <b>${DATA.summary.collections}</b> collections · <button type="button" class="lib-link" title="Opens the Regulation Library">Browse the Library</button>`;
+const typeOf = Object.fromEntries((DATA.groups || []).map(g => [g.label, g.doc_type]));
+const cols = Object.entries(DATA.collections).sort((a, b) => ((RANK[typeOf[a[0]]] || 50) - (RANK[typeOf[b[0]]] || 50)) || a[0].localeCompare(b[0], 'vi'));
+$('#ask-covers-list').innerHTML = cols.map(([label, k]) => `${esc(label)} ${k}`).join('<span class="sep">·</span>');
+
+// Mockup states.
+function stateConversation(upTo) {
+  clearAll();
+  DATA.entries.slice(0, upTo).forEach(r => { const e = addEntry(r.question); renderAnswer(e, r); });
+}
+const states = {
+  empty() { clearAll(); },
+  conversation() {
+    stateConversation(4);
+    if (!drawerMode()) { const e = entries[2]; openPassages(e, e.el.querySelector('[data-passages]')); }
+    $('#chat-history').scrollTop = 0;
+  },
+  waiting() { stateConversation(1); const e = addEntry('Điều kiện để được xét tốt nghiệp sớm?'); setWaiting(e); pending = { e, cancel() {} }; sendBtn.disabled = true; e.el.scrollIntoView({ block: 'start' }); },
+  error() {
+    stateConversation(1);
+    const e = addEntry('Điều kiện để được xét tốt nghiệp sớm?');
+    renderError(e, { message: 'The server returned an error (HTTP 500).', detail: '{"detail":"Could not connect to Qdrant at http://localhost:6333 (sample error)"}' });
+    e.el.scrollIntoView({ block: 'start' });
+  },
+};
+$$('.mock-bar [data-state]').forEach(b => b.addEventListener('click', () => {
+  $$('.mock-bar [data-state]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+  states[b.dataset.state]();
+}));
+states.conversation();
+})();
+</script>
+</body>
+</html>
