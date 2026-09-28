@@ -1,10 +1,10 @@
 """
-FastAPI backend for the RAG chatbot.
+FastAPI backend for ARRS, the Academic Regulation Retrieval System.
 
 Endpoints:
   GET  /health        – health check
-  POST /chat          – full RAG query (retrieve + rerank + LLM)
-  POST /retrieve      – retrieve + rerank only (no LLM)
+  POST /chat          – full query (retrieve + rerank + verbatim answer, no LLM)
+  POST /retrieve      – retrieve + rerank only (no answer)
   GET  /search        – search with selectable mode (hybrid_rerank|hybrid|dense|sparse)
   GET  /stats         – corpus statistics from processed JSONL files
   GET  /sources       – list source documents with metadata
@@ -48,8 +48,8 @@ from src.ingest.jobs import JobRunner, JobStore, now_iso
 CONFIG_PATH = os.environ.get("CONFIG_PATH", "config.yaml")
 
 app = FastAPI(
-    title="ARRS – RAG Chatbot API",
-    description="Hybrid search + reranking RAG over Vietnamese university regulations",
+    title="ARRS – Academic Regulation Retrieval API",
+    description="Hybrid vector + BM25 search, cross-encoder reranking and verbatim answers over Vietnamese university regulations",
     version="2.2.0",
 )
 
@@ -478,7 +478,7 @@ def update_config(req: ConfigUpdateRequest):
         # Reset chain so it reloads config on next request
         global _chain
         _chain = None
-        return {"status": "ok", "message": "Config updated. RAG chain will reload on next request."}
+        return {"status": "ok", "message": "Config updated. The retrieval pipeline will reload on next request."}
     except yaml.YAMLError as e:
         raise HTTPException(status_code=400, detail=f"Invalid YAML: {e}")
     except Exception as e:

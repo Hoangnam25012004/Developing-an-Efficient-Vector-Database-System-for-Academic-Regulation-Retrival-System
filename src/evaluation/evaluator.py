@@ -89,7 +89,7 @@ def run_rag_phase(
     results = [None] * len(tasks)
     done, lock = 0, threading.Lock()
 
-    print(f"Phase 1 - RAG pipeline  ({len(tasks)} queries, {max_workers} workers)")
+    print(f"Phase 1 - retrieval pipeline  ({len(tasks)} queries, {max_workers} workers)")
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {executor.submit(_run_rag, t): t[0] for t in tasks}
         for fut in as_completed(futures):
@@ -98,7 +98,7 @@ def run_rag_phase(
             with lock:
                 done += 1
                 if done % 10 == 0 or done == len(tasks):
-                    print(f"  [{done}/{len(tasks)}] RAG done")
+                    print(f"  [{done}/{len(tasks)}] queries done")
 
     return results
 
@@ -199,7 +199,7 @@ def run_evaluation(
     print("\n-- Generation Metrics --")
     primary = ["answer_recall", "bertscore_xlmr"]
     legacy  = ["rouge1", "rougeL", "bertscore_multi"]
-    print("  [Primary - suited for extractive RAG over Vietnamese]")
+    print("  [Primary - suited for verbatim (extractive) answers in Vietnamese]")
     for m in primary:
         if m in gen_agg:
             print(f"    {m:<25}: {gen_agg[m]:.4f}")
@@ -213,10 +213,10 @@ def run_evaluation(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Evaluate RAG pipeline")
+    parser = argparse.ArgumentParser(description="Evaluate the retrieval pipeline")
     parser.add_argument("--config",  default="config.yaml")
     parser.add_argument("--workers", type=int, default=8,
-                        help="Parallel workers for RAG pipeline (default: 8)")
+                        help="Parallel workers for the retrieval pipeline (default: 8)")
     parser.add_argument("--gt", default=None,
                         help="Override ground-truth JSONL path (default: from config.yaml)")
     args = parser.parse_args()

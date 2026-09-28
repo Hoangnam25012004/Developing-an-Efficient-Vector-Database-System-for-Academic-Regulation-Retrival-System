@@ -457,13 +457,18 @@ python -m src.pipeline.03_bm25_index --only-files Tai-lieu-moi.jsonl
 ### Chạy Local
 
 ```bash
-# Windows
+# Windows, PowerShell (terminal mặc định của Windows 11 và VS Code)
+.\start.bat
+
+# Windows, cmd hoặc bấm đúp vào start.bat trong File Explorer
 start.bat
 
 # Linux / Mac
 chmod +x start.sh
 ./start.sh
 ```
+
+Trong PowerShell phải gõ `.\start.bat`: PowerShell không chạy file nằm ở thư mục hiện tại nếu thiếu `.\`, nên `start.bat` sẽ báo *The term 'start.bat' is not recognized*. Server chạy trong cửa sổ `ARRS-Server`; đóng cửa sổ đó để dừng server.
 
 UI tĩnh (`ui/index.html`) được FastAPI serve trực tiếp tại `/`, **không có** service riêng:
 
@@ -484,7 +489,7 @@ uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 
 ### `POST /chat`
 
-Gửi câu hỏi và nhận câu trả lời từ RAG pipeline đầy đủ.
+Gửi câu hỏi và nhận câu trả lời từ toàn bộ pipeline truy xuất (tìm kiếm lai, rerank, trích nguyên văn).
 
 ```bash
 curl -X POST http://localhost:8000/chat \
@@ -619,7 +624,7 @@ Truy cập `http://localhost:8000` để mở UI. UI là HTML/CSS/JS tĩnh, đư
 
 ## Đánh Giá Hệ Thống
 
-Hệ thống dùng **reference-based evaluation** — so sánh output của RAG pipeline với bộ ground truth do người gán nhãn, bằng các phép đo lexical (bigram, ROUGE) và embedding (BERTScore). Toàn bộ pipeline (cả retrieval, generation lẫn evaluation) đều không gọi LLM, nên kết quả tái lập 100% giữa các lần chạy và không phát sinh chi phí API.
+Hệ thống dùng **reference-based evaluation** — so sánh output của pipeline truy xuất với bộ ground truth do người gán nhãn, bằng các phép đo lexical (bigram, ROUGE) và embedding (BERTScore). Toàn bộ pipeline (cả retrieval, generation lẫn evaluation) đều không gọi LLM, nên kết quả tái lập 100% giữa các lần chạy và không phát sinh chi phí API.
 
 ### Bộ ground truth
 
@@ -657,7 +662,7 @@ python eval/reannotate_for_new_chunks.py
 ### Chạy đánh giá
 
 ```bash
-# Mặc định: dùng test_queries_path từ config + 8 RAG workers song song
+# Mặc định: dùng test_queries_path từ config + 8 worker chạy pipeline song song
 python -m src.evaluation.evaluator
 
 # Tuỳ chọn override
@@ -674,7 +679,7 @@ Output (mỗi lần chạy):
 Ground Truth JSONL
        │
        ▼
-[Phase 1] RAG pipeline song song (ThreadPoolExecutor, 8 workers)
+[Phase 1] Pipeline truy xuất song song (ThreadPoolExecutor, 8 workers)
        │   chain.query(question) → answer + 10 chunks
        ▼
 [Phase 2] Retrieval metrics      ← chỉ query có relevant_ids
@@ -702,7 +707,7 @@ Ground Truth JSONL
 
 | Metric | Mô hình / công thức | Vai trò |
 |---|---|---|
-| **`answer_recall`** | Bigram recall: `|ref∩hyp| / |ref|` | **Primary** — không phạt verbose answer (phù hợp extractive RAG) |
+| **`answer_recall`** | Bigram recall: `|ref∩hyp| / |ref|` | **Primary** — không phạt verbose answer (phù hợp câu trả lời trích nguyên văn) |
 | **`bertscore_xlmr`** | `xlm-roberta-base` F1 | **Primary** — semantic similarity tốt cho tiếng Việt |
 | `rouge1`, `rougeL` | `rouge_score` package | Legacy, để so sánh |
 | `bertscore_multi` | `bert-base-multilingual-cased` F1 | Legacy, kém hơn xlm-roberta cho tiếng Việt (0.61 vs 0.79) |

@@ -45,7 +45,7 @@ def main():
     ap.add_argument("--config", required=True)
     ap.add_argument("--gt", required=True)
     ap.add_argument("--workers", type=int, default=1,
-                    help="RAG workers. Keep 1: embedded local Qdrant is not "
+                    help="Pipeline workers. Keep 1: embedded local Qdrant is not "
                          "guaranteed thread-safe and we want determinism.")
     args = ap.parse_args()
 
