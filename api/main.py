@@ -50,7 +50,7 @@ CONFIG_PATH = os.environ.get("CONFIG_PATH", "config.yaml")
 app = FastAPI(
     title="ARRS – Academic Regulation Retrieval API",
     description="Hybrid vector + BM25 search, cross-encoder reranking and verbatim answers over Vietnamese university regulations",
-    version="2.2.0",
+    version="2.2.1",
 )
 
 app.add_middleware(
